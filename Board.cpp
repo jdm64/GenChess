@@ -76,6 +76,9 @@ bool Board::inCheck(char color)
 	MoveLookup movelookup;
 	int king = (color == WHITE)? 31:15;
 
+	if (pieces[king].loc < 0)
+		return false;
+
 	movelookup.setLoc(pieces[king].loc);
 	return movelookup.isAttacked();
 }
