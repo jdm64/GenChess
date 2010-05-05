@@ -183,13 +183,12 @@ int Board::CalcScore()
 	int white = 0, black = 0;
 	for (int b = 0, w = 16; b < 15; b++, w++) {
 		switch (pieces[b].loc) {
+		case PLACEABLE:
 		default:
 			black += pieceValues[b];
 			break;
 		case DEAD:
 			black -= pieceValues[b];
-			break;
-		case PLACEABLE:
 			break;
 		}
 		switch (pieces[w].loc) {
