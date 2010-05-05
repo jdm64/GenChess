@@ -246,8 +246,8 @@ void MoveLookup::setLoc(int Index)
 	loc = Index;
 	lookup = &rook_lookup[loc][0];
 	offset = 0;
-	type = ROOK;
 	k = 1;
+	type = ROOK;
 }
 
 int MoveLookup::nextAttack()
@@ -296,8 +296,8 @@ loop2:		// starts out rook
 			goto loop2;
 		case NONE:
 			lookup = &bishop_lookup[loc][0];
-			offset = 0;
 			type = BISHOP;
+			offset = 0;
 			goto loop1;
 		}
 		return n;
@@ -343,8 +343,8 @@ loop1:
 		switch (n) {
 		default:
 			if (!board[n]) {
-				k++;
 				offset++;
+				k++;
 				goto loop1;
 			} else if (board[n] * board[loc] > 0){
 				offset = ((offset / 7) + 1) * 7;
@@ -354,14 +354,14 @@ loop1:
 			}
 			break;
 		case -2:
-			k = 1;
 			offset = ((offset / 7) + 1) * 7;
+			k = 1;
 			goto loop1;
 		case NONE:
 			lookup = &bishop_lookup[loc][0];
+			type = BISHOP;
 			offset = 0;
 			k = 1;
-			type = BISHOP;
 			goto loop2;
 		}
 		switch (abs(board[n])) {
@@ -384,8 +384,8 @@ loop2:
 		switch (n) {
 		default:
 			if (!board[n]) {
-				k++;
 				offset++;
+				k++;
 				goto loop2;
 			} else if (board[n] * board[loc] > 0){
 				offset = ((offset / 7) + 1) * 7;
@@ -395,14 +395,14 @@ loop2:
 			}
 			break;
 		case -2:
-			k = 1;
 			offset = ((offset / 7) + 1) * 7;
+			k = 1;
 			goto loop2;
 		case NONE:
 			lookup = &knight_lookup[loc][0];
+			type = KNIGHT;
 			offset = 0;
 			// k = 1; not needed
-			type = KNIGHT;
 			goto loop3;
 		}
 		switch (abs(board[n])) {
