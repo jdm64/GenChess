@@ -317,7 +317,7 @@ MovesPly* Board::getMovesList(char color, bool getScore)
 				item.check = inCheck(color ^ -2);
 				if (getScore) {
 					item.score = CalcScore();
-					item.score -= -(item.check) & pieceValues[BLACK_KING];
+					item.score -= -(item.check) & pieceValues[15];
 				}
 				data->list[data->size++] = item;
 			}
