@@ -2,7 +2,7 @@
 
 using namespace std;
 
-const int Board::pieceValues[16] = {11, 11, 11, 11, 11, 11, 11, 11, 34, 34, 56, 56, 90, 90, 146, 2376};
+const int Board::pieceValues[16] = {11, 11, 11, 11, 11, 11, 11, 11, 34, 34, 56, 56, 90, 90, 146, 4752};
 
 const char Board::pieceSymbol[7] = {' ', 'P', 'N', 'B', 'R', 'Q', 'K'};
 
@@ -202,7 +202,8 @@ int Board::CalcScore()
 		}
 	}
 	// Score for check is added in getMovesList
-	return (curr == WHITE)? white - black : black - white;
+	white -= black;
+	return (curr == WHITE)? -white : white;
 }
 
 int Board::getNumMoves(char color)
@@ -319,7 +320,7 @@ MovesPly* Board::getMovesList(char color, bool getScore)
 				item.check = inCheck(color ^ -2);
 				if (getScore) {
 					item.score = CalcScore();
-					item.score -= -(item.check) & pieceValues[15];
+					item.score += -(item.check) & pieceValues[15];
 				}
 				data->list[data->size++] = item;
 			}
