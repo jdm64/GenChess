@@ -246,7 +246,6 @@ void MoveLookup::setLoc(int Index)
 	loc = Index;
 	lookup = &rook_lookup[loc][0];
 	offset = 0;
-	k = 1;
 	type = ROOK;
 }
 
@@ -344,39 +343,36 @@ loop1:
 		default:
 			if (!board[n]) {
 				offset++;
-				k++;
 				goto loop1;
 			} else if (board[n] * board[loc] > 0){
 				offset = ((offset / 7) + 1) * 7;
 				goto loop1;
-			} else {
-				offset = ((offset / 7) + 1) * 7;
 			}
 			break;
 		case -2:
 			offset = ((offset / 7) + 1) * 7;
-			k = 1;
 			goto loop1;
 		case NONE:
 			lookup = &bishop_lookup[loc][0];
 			type = BISHOP;
 			offset = 0;
-			k = 1;
 			goto loop2;
 		}
 		switch (abs(board[n])) {
 		case KING:
-			if (k == 1)
+			if (!(offset % 7))
 				return true;
 			// fall through
 		case PAWN:
 		case KNIGHT:
 		case BISHOP:
-		default:
+			offset = ((offset / 7) + 1) * 7;
 			goto loop1;
 		case ROOK:
 		case QUEEN:
 			return true;
+		default:
+			assert(0);
 		}
 	case BISHOP:
 loop2:
@@ -385,18 +381,14 @@ loop2:
 		default:
 			if (!board[n]) {
 				offset++;
-				k++;
 				goto loop2;
 			} else if (board[n] * board[loc] > 0){
 				offset = ((offset / 7) + 1) * 7;
 				goto loop2;
-			} else {
-				offset = ((offset / 7) + 1) * 7;
 			}
 			break;
 		case -2:
 			offset = ((offset / 7) + 1) * 7;
-			k = 1;
 			goto loop2;
 		case NONE:
 			lookup = &knight_lookup[loc][0];
@@ -408,16 +400,18 @@ loop2:
 		switch (abs(board[n])) {
 		case PAWN:
 		case KING:
-			if (k == 1)
+			if (!(offset % 7))
 				return true;
 			// fall through
 		case KNIGHT:
 		case ROOK:
-		default:
+			offset = ((offset / 7) + 1) * 7;
 			goto loop2;
 		case BISHOP:
 		case QUEEN:
 			return true;
+		default:
+			assert(0);
 		}
 	case KNIGHT:
 loop3:

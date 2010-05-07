@@ -9,7 +9,7 @@ private:
 
 	char *lookup;
 
-	int type, loc, offset, k;
+	int type, loc, offset;
 public:
 	static void setBoard(char *b);
 
