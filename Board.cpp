@@ -8,6 +8,21 @@ const char Board::pieceSymbol[7] = {' ', 'P', 'N', 'B', 'R', 'Q', 'K'};
 
 Board::Board()
 {
+	newGame();
+}
+
+char Board::currentPlayer()
+{
+	return curr;
+}
+
+void Board::quitGame()
+{
+	curr = QUIT_GAME;
+}
+
+void Board::newGame()
+{
 	pieces = {
 		{BLACK_PAWN, PLACEABLE},	{BLACK_PAWN, PLACEABLE},
 		{BLACK_PAWN, PLACEABLE},	{BLACK_PAWN, PLACEABLE},
@@ -27,8 +42,6 @@ Board::Board()
 		{WHITE_ROOK, PLACEABLE},	{WHITE_ROOK, PLACEABLE},
 		{WHITE_QUEEN, PLACEABLE},	{WHITE_KING, PLACEABLE},
 	};
-	curr = WHITE;
-	hcounter = 0;
 	board = {0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
@@ -37,18 +50,10 @@ Board::Board()
 		0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0};
-
+	curr = WHITE;
+	hcounter = 0;
 	MoveLookup::setBoard(board);
-}
-
-char Board::currentPlayer()
-{
-	return curr;
-}
-
-void Board::quitGame()
-{
-	curr = QUIT_GAME;
+	history.clear();
 }
 
 int Board::pieceIndex(int loc)
