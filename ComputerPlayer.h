@@ -6,7 +6,6 @@
 
 class ComputerPlayer : public Player {
 private:
-	MovesPly *root;
 	MovesPly *curr;
 
 	Move *killer1;
@@ -20,10 +19,16 @@ private:
 public:
 	ComputerPlayer(Board* b, char c): Player(b, c)
 	{
+		maxDepth = 2;
 		killer1 = new Move[maxDepth];
 		killer2 = new Move[maxDepth];
-		maxDepth = 3;
 		curr = NULL;
+	};
+
+	~ComputerPlayer()
+	{
+		delete[] killer1;
+		delete[] killer2;
 	};
 
 	void pickMove(MovesPly* ptr, int score);

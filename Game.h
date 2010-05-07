@@ -13,6 +13,12 @@ private:
 public:
 	Game(bool, bool, bool);
 
+	~Game()
+	{
+		delete white;
+		delete black;
+	}
+
 	void run();
 };
 

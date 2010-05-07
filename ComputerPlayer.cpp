@@ -46,7 +46,6 @@ int ComputerPlayer::getMaxScore(MovesPly *ptr)
 
 int ComputerPlayer::NegaScout(int alpha, int beta, int depth, MovesPly *&ptr)
 {
-	bool never = false;
 	int b = beta;
 
 	if (!ptr) {
@@ -54,7 +53,6 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, MovesPly *&ptr)
 			ptr = board->getMovesList(board->currentPlayer(), true);
 		else
 			ptr = board->getMovesList(board->currentPlayer());
-		never = true;
 	}
 	if (!ptr->size)
 		return -INT_MAX;
@@ -78,6 +76,8 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, MovesPly *&ptr)
 
 		if (alpha >= beta) {
 			setKillerMoves(ptr->list[n].move, maxDepth - depth);
+			delete ptr->list[n].next;
+			ptr->list[n].next = NULL;
 			return alpha;
 		}
 		delete ptr->list[n].next;

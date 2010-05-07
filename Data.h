@@ -37,8 +37,10 @@ struct Move {
 
 	Move()
 	{
+		index = NONE;
 		xindex = NONE;
 		from = PLACEABLE;
+		to = PLACEABLE;
 	}
 	bool operator==(const Move &rhs)
 	{
