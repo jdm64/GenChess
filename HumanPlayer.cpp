@@ -19,6 +19,15 @@ int HumanPlayer::parseCommand(string cmd)
 	} else if (cmd == "list") {
 		board->printPieceList();
 		return IS_COMMAND;
+	} else if (cmd == "new") {
+		board->newGame();
+		return IS_COMMAND;
+	} else if (cmd == "help") {
+		cout << "list\tshows where each piece is located\n"
+			<< "new\tstarts a new game\n"
+			<< "quit\texits the game\n"
+			<< "help\tdisplays this help message\n";
+		return IS_COMMAND;
 	}
 	return NOT_COMMAND;
 }
@@ -103,7 +112,6 @@ void HumanPlayer::think()
 		case VALID_MOVE:
 			cout << ".\n";
 			return;
-		case INVALID_FORMAT:
 		case NOPIECE_ERROR:
 		case DONT_OWN:
 		case KING_FIRST:
@@ -114,8 +122,11 @@ void HumanPlayer::think()
 		case IN_CHECK_PLACE:
 			cout << "? " << errorMessage[tmp] << endl;
 			continue;
+		case INVALID_FORMAT:
+			break;
 		}
-		parseCommand(comd);
+		if ((tmp = parseCommand(comd)) == NOT_COMMAND)
+			cout << "? That's a valid comman\n";
 		return;
 	}
 }
