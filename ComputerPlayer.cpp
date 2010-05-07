@@ -55,10 +55,10 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, MovesPly *&ptr)
 			ptr = board->getMovesList(board->currentPlayer());
 	}
 	if (!ptr->size)
-		return -INT_MAX;
+		return -(INT_MAX - 2);
 	if (depth <= 0)
 		return getMaxScore(ptr);
-	partial_sort(ptr->list.begin(), ptr->list.begin() + ptr->size / 2, ptr->list.begin() + ptr->size, cmpCapture);
+	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpCapture);
 
 	getKillerMoves(ptr, maxDepth - depth);
 
