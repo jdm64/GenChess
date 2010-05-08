@@ -1,5 +1,8 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -pedantic -O3 -std=gnu++0x -g3
+#CXXFLAGS = -Wall -Wextra -pedantic -O3 -std=gnu++0x
+
+# use this for debuging
+CXXFLAGS = -Wall -Wextra -pedantic -O0 -std=gnu++0x -g3
 
 VERSION = 1.0.0
 BIN = genchess
