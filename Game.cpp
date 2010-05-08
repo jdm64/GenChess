@@ -1,3 +1,10 @@
+/*      Justin Madru (jdm64@gawab.com)
+ *      CPSC 386 - Game Design
+ *      Assignment #6 - (2010-5-7)
+ *
+ *      Game class functions
+ */
+
 #include "Game.h"
 
 Game::Game(bool whiteAI, bool blackAI, bool XMode)

@@ -1,3 +1,10 @@
+/*      Justin Madru (jdm64@gawab.com)
+ *      CPSC 386 - Game Design
+ *      Assignment #6 - (2010-5-7)
+ *
+ *      Player class declarations
+ */
+
 #ifndef __PLAYER_H__
 #define __PLAYER_H__
 

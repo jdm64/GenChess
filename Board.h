@@ -1,3 +1,10 @@
+/*      Justin Madru (jdm64@gawab.com)
+ *      CPSC 386 - Game Design
+ *      Assignment #6 - (2010-5-7)
+ *
+ *      Board class declarations
+ */
+
 #ifndef __BOARD_H__
 #define __BOARD_H__
 

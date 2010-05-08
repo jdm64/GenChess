@@ -1,3 +1,10 @@
+/*      Justin Madru (jdm64@gawab.com)
+ *      CPSC 386 - Game Design
+ *      Assignment #6 - (2010-5-7)
+ *
+ *      ComputerPlayer class functions
+ */
+
 #include "ComputerPlayer.h"
 
 void ComputerPlayer::getKillerMoves(MovesPly *ptr, int depth)

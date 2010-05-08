@@ -1,3 +1,10 @@
+/*      Justin Madru (jdm64@gawab.com)
+ *      CPSC 386 - Game Design
+ *      Assignment #6 - (2010-5-7)
+ *
+ *      HumanPlayer class declarations
+ */
+
 #ifndef __HUMAN_PLAYER_H__
 #define __HUMAN_PLAYER_H__
 
