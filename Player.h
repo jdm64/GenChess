@@ -29,8 +29,6 @@ public:
 			color_str = string("black");
 	};
 
-	~Player() {};
-
 	void setPrintMode(char type)
 	{
 		xMode = type;

@@ -80,6 +80,7 @@ int HumanPlayer::parseMove(string s)
 			return INVALID_FORMAT;
 		move.to = s[1] - 'a';
 		move.to += 8 * (8 - (s[2] - '0'));
+		move.from = PLACEABLE;
 		move.index = board->pieceIndex(PLACEABLE, color * piece);
 	} else {
 	// parse movement move

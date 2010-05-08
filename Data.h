@@ -14,8 +14,8 @@
 #define PLACEABLE	-2
 #define DEAD		-4
 
-#define NEW_GAME	-4
-#define QUIT_GAME	-2
+#define QUIT_GAME	-4
+#define NEW_GAME	-2
 #define BLACK		-1
 #define WHITE		1
 
@@ -37,18 +37,11 @@ struct MoveScores;
 struct MovesPly;
 
 struct Move {
+	char index;
 	char to;
 	char from;
-	char index;
 	char xindex;
 
-	Move()
-	{
-		index = NONE;
-		xindex = NONE;
-		from = PLACEABLE;
-		to = PLACEABLE;
-	}
 	bool operator==(const Move &rhs)
 	{
 		if (to == rhs.to && from == rhs.from && index == rhs.index &&
@@ -59,13 +52,8 @@ struct Move {
 };
 
 struct Piece {
-	const char type;
 	char loc;
-};
-
-struct Action {
-	int type;
-	Move move;
+	const char type;
 };
 
 struct MoveScores {
@@ -77,13 +65,12 @@ struct MoveScores {
 	MoveScores()
 	{
 		next = NULL;
-		check = false;
 	}
 };
 
 struct MovesPly {
-	int size;
 	boost::array<MoveScores, 320> list;
+	int size;
 
 	MovesPly()
 	{
