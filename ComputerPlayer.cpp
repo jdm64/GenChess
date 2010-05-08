@@ -32,13 +32,13 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 void ComputerPlayer::pickMove(MovesPly *ptr, int score)
 {
 	int x;
-	vector<int> list;
+	vector<int> match;
 
 	for (int i = 0; i < ptr->size; i++)
 		if (ptr->list[i].score == score)
-			list.push_back(i);
-	x = rand() % list.size();
-	swap(ptr->list[0], ptr->list[x]);
+			match.push_back(i);
+	x = rand() % match.size();
+	swap(ptr->list[0], ptr->list[match[x]]);
 }
 
 int ComputerPlayer::getMaxScore(MovesPly *ptr)

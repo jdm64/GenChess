@@ -308,6 +308,7 @@ MovesPly* Board::getMovesList(char color, bool getScore)
 			doMove(item.move);
 			// place moves are only valid if neither side is inCheck
 			if (!inCheck(color) && !inCheck(color ^ -2)) {
+				item.check = false;
 				if (getScore)
 					item.score = CalcScore();
 				data->list[data->size++] = item;
@@ -355,6 +356,7 @@ MovesPly* Board::getMovesList(char color, bool getScore)
 			doMove(item.move);
 			// place moves are only valid if neither side is inCheck
 			if (!inCheck(color) && !inCheck(color ^ -2)) {
+				item.check = false;
 				if (getScore)
 					item.score = CalcScore();
 				data->list[data->size++] = item;
