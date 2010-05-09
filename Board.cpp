@@ -73,8 +73,8 @@ int Board::pieceIndex(int loc)
 
 int Board::pieceIndex(int loc, int type)
 {
-	int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16},
-		start = ((type < 0)? 0 : 16) + offset[abs(type)],
+	static int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
+	int start = ((type < 0)? 0 : 16) + offset[abs(type)],
 		end = ((type < 0)? 0 : 16) + offset[abs(type) + 1];
 
 	for (int i = start; i < end; i++)
@@ -85,14 +85,10 @@ int Board::pieceIndex(int loc, int type)
 
 bool Board::inCheck(char color)
 {
-	MoveLookup movelookup;
+	MoveLookup ml;
 	int king = (color == WHITE)? 31:15;
 
-	if (pieces[king].loc < 0)
-		return false;
-
-	movelookup.setLoc(pieces[king].loc);
-	return movelookup.isAttacked();
+	return ml.setLoc(pieces[king].loc)? ml.isAttacked() : false;
 }
 
 void Board::doMove(Move move)
