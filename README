@@ -1,0 +1,74 @@
+Justin Madru (jdm64@gawab.com)
+CPSC 386 - Game Design
+Assignment #6 - (2010-5-7)
+
+  ________                 _________  .__                              
+ /  _____/   ____    ____  \_   ___ \ |  |__    ____    ______  ______ 
+/   \  ___ _/ __ \  /    \ /    \  \/ |  |  \ _/ __ \  /  ___/ /  ___/ 
+\    \_\  \\  ___/ |   |  \\     \____|   Y  \\  ___/  \___ \  \___ \  
+ \______  / \___  >|___|  / \______  /|___|  / \___  >/____  >/____  > 
+        \/      \/      \/         \/      \/      \/      \/      \/  
+                                                                       
+== Requirements ==
+
+* C++ compiler (with C++0x extended initializers)
+* make
+* Boost headers and libraries (for boost::array)
+
+Optional for PyQt GUI
+* Qt 4.0+ libraries
+* PyQt 4.0+ python modules
+* Python 2.5+
+
+Debian/ubuntu systems can install the required dependencies with:
+
+	apt-get install python-qt4 libboost-dev
+
+#Note1:
+It's known to compile successfully with GCC 4.4.3 with no alterations. Older
+compilers might need changes to the functions that use the extended initializers
+of C++0x. My development environment is Kubuntu 10.4.
+
+#Note2:
+The Qt libraries have to be for the newer 4.0+ version. The older 3.0
+libraries will not work. The exact lowest required version is unknown,
+but it is known to work on recent Linux systems with Qt 4.6.
+
+
+== Build Instructions ==
+
+A make file is included to build the program. By default the make file will
+build with full debug support. To build, just run the following command in
+the same directory as the source.
+
+	make
+
+To clean the build environment just run
+
+	make clean
+
+== Running The Game ==
+
+The above build instructions will create a binary called "genchess"
+in the build directory. Running the program consists entering the following
+command in the build directory.
+
+	./genchess
+
+There are several command line arguments. The default options are for
+human vs human and terminal mode.
+
+-X		puts the engine in GUI mode, the board and prompt are not printed
+-w[c|h]		selects type of white player: c=computer, h=human
+-b[c|h]		selects type of black player
+-h		prints the help screen for program and argument info
+
+
+Also available is the PyQt version. This is started with:
+
+	python qtGenchess.py
+
+
+== Game Rules ==
+
+The game rules are explaned in "Rules.txt" and in the Design Doc.
