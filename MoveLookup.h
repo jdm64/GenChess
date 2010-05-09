@@ -15,7 +15,7 @@ public:
 
 	void setPiece(int Index);
 
-	void setLoc(int Index);
+	bool setLoc(int Index);
 
 	int nextAttack();
 

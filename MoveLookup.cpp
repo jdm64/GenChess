@@ -241,12 +241,15 @@ void MoveLookup::setPiece(int Index)
 	offset = 0;
 }
 
-void MoveLookup::setLoc(int Index)
+bool MoveLookup::setLoc(int Index)
 {
+	if (Index < 0)
+		return false;
 	loc = Index;
 	lookup = &rook_lookup[loc][0];
 	offset = 0;
 	type = ROOK;
+	return true;
 }
 
 int MoveLookup::nextAttack()
