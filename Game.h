@@ -17,6 +17,8 @@ private:
 
 	Player *white, *black;
 
+	bool xMode;
+
 public:
 	Game(bool, bool, bool);
 
@@ -25,6 +27,8 @@ public:
 		delete white;
 		delete black;
 	}
+
+	void mainMenu();
 
 	void run();
 };

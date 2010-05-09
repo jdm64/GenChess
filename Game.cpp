@@ -18,8 +18,37 @@ Game::Game(bool whiteAI, bool blackAI, bool XMode)
 		black = new ComputerPlayer(&board, BLACK);
 	else
 		black = new HumanPlayer(&board, BLACK);
-	white->setPrintMode(XMode);
-	black->setPrintMode(XMode);
+	xMode = XMode;
+	white->setPrintMode(xMode);
+	black->setPrintMode(xMode);
+}
+
+void Game::mainMenu()
+{
+	string cmd;
+
+	while (true) {
+		if (!xMode)
+			cout << "main> ";
+		cin >> cmd;
+
+		if (cmd == "quit") {
+			board.quitGame();
+			return;
+		} else if (cmd == "list") {
+			board.printPieceList();
+		} else if (cmd == "new") {
+			board.newGame();
+			return;
+		} else if (cmd == "help") {
+			cout << "list\tshows where each piece is located\n"
+				<< "new\tstarts a new game\n"
+				<< "quit\texits the game\n"
+				<< "help\tdisplays this help message\n";
+		} else {
+			cout << "? game is over, select new game\n";
+		}
+	}
 }
 
 void Game::run()
@@ -37,12 +66,17 @@ void Game::run()
 			nMoves = board.getNumMoves(state);
 			player = (state == WHITE)? "white":"black";
 
-			if (check && nMoves)
+			if (check && nMoves) {
 				cout << "! " << player << " in check\n";
-			else if (check && !nMoves)
+			} else if (check && !nMoves) {
 				cout << "$ " << player << " in checkmate\n";
-			else if (!check && !nMoves)
+				mainMenu();
+				continue;
+			} else if (!check && !nMoves) {
 				cout << "$ stalemate\n";
+				mainMenu();
+				continue;
+			}
 		}
 		switch (state) {
 		case WHITE:
@@ -52,9 +86,6 @@ void Game::run()
 			black->think();
 			break;
 		case QUIT_GAME:
-			return;
-		case NEW_GAME:
-			// TODO how to pass parameters from within player?
 			return;
 		}
 	}
