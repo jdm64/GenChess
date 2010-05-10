@@ -30,7 +30,7 @@ compilers might need changes to the functions that use the extended initializers
 of C++0x. My development environment is Kubuntu 10.4.
 
 #Note2:
-The Qt libraries have to be for the newer 4.0+ version. The older 3.0
+The Qt libraries have to be the newer 4.0+ version. The older 3.0
 libraries will not work. The exact lowest required version is unknown,
 but it is known to work on recent Linux systems with Qt 4.6.
 
@@ -46,6 +46,12 @@ the same directory as the source.
 To clean the build environment just run
 
 	make clean
+
+To modify how deep the AI searches for moves modify the line:
+
+	 maxDepth = 3;
+
+In the ComputerPlayer.h file. On my 1.8Ghz computer, 3 will take 30-60secs a move
 
 == Running The Game ==
 
@@ -68,7 +74,12 @@ Also available is the PyQt version. This is started with:
 
 	python qtGenchess.py
 
+To set what players are human or computer edit the line
+in the qtGenchess.py file as described
+
+	player = ["human", "computer"]
+
 
 == Game Rules ==
 
-The game rules are explaned in "Rules.txt" and in the Design Doc.
+The game rules are explaned in "Rules.txt" and in the Project Summary.

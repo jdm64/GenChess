@@ -1,0 +1,30 @@
+Genesis Chess
+By Justin Madru
+
+
+Game Summary:
+Genesis Chess is a fast-paced highly strategic chess variant. The game is played on a normal 8x8 chess board with the standard set of pieces. However, instead of the initial piece configuration, the game begins with a blank board. On each player's first turn they must place their king down anywhere on the board that does not place the other king in check. The game then continues with each player either placing down a new piece or moving an already placed piece. Like regular chess, the goal is to checkmate the opponent's king, and henceforth the game ends under the same circumstances.
+
+Piece Placement:
+Pieces that have not been placed on the board are called reserve pieces; pieces that have already been placed are called active pieces. The rules of placing a piece down are the following:
+   1.  A piece may not be placed down on an already occupied space.
+   2.  If a piece placement results in checking the opponent's king then the move is illegal.
+   3.  A piece can be placed to block check.
+
+Piece Movement:
+All pieces move the same as in regular chess except for pawns. Because the game starts out with a blank board there is no meaning in board orientation. Therefore, the pawns have been altered to move omni-directional. They can move horizontally and vertically back and forth one space, but can only capture diagonally one space in any direction. The pawn's special moves, for example, promotion and en passant, have been removed from the game, along with castling, because those moves only make sense with a fixed starting configuration and orientation. Also like regular chess, making a move that would put ones own king in check or making a move that does not get oneself out of check are illegal.
+
+
+Strategies
+
+Placing Pieces:
+Having more pieces on the board can be advantageous because of the increase in spaces that can be attacked or protected, but there is a downfall. One way of getting out of check is to place a piece between the king and the opponent's piece that is checking the king. But if there are no reserve pieces left or there is no space in between then getting out of check could be more difficult. 
+
+Pawns:
+In normal chess, pawns are often considered the weakest piece, used for blocking and the rarely achieved promotion. But in genesis chess, pawns are very power if used correctly. Because there are so many they are commonly used as walls to block attacks from the opponent. Also two pawns diagonally from each other become a self-protecting wall.
+
+Knights:
+Very useful for checkmating because the opponent can not drop in a piece to block a check from a knight. It also is useful for placing the opponent in a fork (one piece able to attack two valuable pieces) where a decision must be made to which piece will be captured; this is especially helpful if you can place a fork between his king and queen.
+
+Checkmating:
+One strategy is to start placing pieces where they only attack the squares immediately around the opponent's king, then move one piece in so that it's protected and attacking the king. To counter this strategy one must capture or threaten the most valuable pieces that are boxing in the king.
