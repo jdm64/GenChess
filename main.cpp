@@ -8,16 +8,20 @@
 #include <unistd.h>
 #include "Game.h"
 
-#define VERSION		"2.0.10"
+#define VERSION		"2.0.25"
 
 using namespace std;
 
 void show_help()
 {
-	cout << "GenChess v" << VERSION << " Copyright (C) 2010 Justin Madru under the GPLv3\n"
-		<< "Welcome to GenChess a game engine that plays Genesis chess\n"
-		<< "For official game rules see: jdserver.homelinux.org/genesischess.php\n"
-		<< "Happy playing - enjoy :)\n\n";
+	cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
+		<< "Copyright (C) 2010 Justin Madru under the GPLv3\n\n"
+		<< "Usage: genchess [options]\n\n"
+		<< "The following options are recognized:\n"
+		<< "-X\t\tputs the engine in GUI mode, the board and prompt are not printed\n"
+		<< "-w[c|h]\t\tselects type of white player: c=computer, h=human\n"
+		<< "-b[c|h]\t\tselects type of black player\n"
+		<< "-h\t\tprints the help screen for program and argument info\n\n";
 }
 
 int main(int argc, char **argv)
@@ -50,7 +54,8 @@ int main(int argc, char **argv)
 			show_help();
 			return EXIT_SUCCESS;
 		case 'v':
-			cout << "Version 1.0";
+			cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
+			<< "Copyright (C) 2010 Justin Madru under the GPLv3\n\n"
 			return EXIT_SUCCESS;
 		}
 	}
