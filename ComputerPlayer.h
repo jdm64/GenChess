@@ -26,7 +26,9 @@ private:
 public:
 	ComputerPlayer(Board* b, char c): Player(b, c)
 	{
-		maxDepth = 2;
+		// set this for how deep the search is. higher values
+		// will take longer, 4 takes about 3mins per move
+		maxDepth = 3;
 		killer1 = new Move[maxDepth];
 		killer2 = new Move[maxDepth];
 		curr = NULL;
@@ -38,15 +40,21 @@ public:
 		delete[] killer2;
 	};
 
-	void pickMove(MovesPly* ptr, int score);
+	void pickMove(MovesPly *ptr, int score);
 
+	// swaps any ptr->list[].move that matches
+	// killer1/killer2 to the front of ptr->list[]
 	void getKillerMoves(MovesPly *ptr, int depth);
 
+	// sets move to be one of the killermoves
 	void setKillerMoves(Move move, int depth);
 
+	// returns the maximum score in ptr->list[].score
 	int getMaxScore(MovesPly *ptr);
 
-	int NegaScout(int alpha, int beta, int depth, MovesPly *&ptr);
+	int Quiescence(MovesPly *&ptr, int alpha, int beta, int depth);
+
+	int NegaScout(MovesPly *&ptr, int alpha, int beta, int depth, int limit);
 
 	void think();
 };
