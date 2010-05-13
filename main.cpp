@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 			return EXIT_SUCCESS;
 		case 'v':
 			cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
-			<< "Copyright (C) 2010 Justin Madru under the GPLv3\n\n"
+				<< "Copyright (C) 2010 Justin Madru under the GPLv3\n\n";
 			return EXIT_SUCCESS;
 		}
 	}
