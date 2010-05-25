@@ -34,9 +34,10 @@ void ComputerPlayer::pickMove(MovesPly *ptr, int score)
 	int x;
 	vector<int> match;
 
-	for (int i = 0; i < ptr->size; i++)
+	for (int i = 0; i < ptr->size; i++) {
 		if (ptr->list[i].score == score)
 			match.push_back(i);
+	}
 	x = rand() % match.size();
 	swap(ptr->list[0], ptr->list[match[x]]);
 }
@@ -116,18 +117,16 @@ int ComputerPlayer::NegaScout(MovesPly *&ptr, int alpha, int beta, int depth, in
 		}
 		b = alpha + 1;
 	}
-	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
-	return ptr->list[0].score;
+	return getMaxScore(ptr);
 }
 
 void ComputerPlayer::think()
 {
-	int score = -INT_MAX;
+	int score;
 
 	srand(time(NULL));
-	for (int depth = 0; depth < maxDepth; depth++)
-		score = NegaScout(curr, score, INT_MAX, 0, depth);
-	score = NegaScout(curr, -INT_MAX, INT_MAX, 0, maxDepth);
+	for (int depth = 1; depth <= maxDepth; depth++)
+		score = NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr, score);
 
 	assert(board->doMove(curr->list[0].move, color) == VALID_MOVE);
