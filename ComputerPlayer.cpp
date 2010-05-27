@@ -34,7 +34,10 @@ void ComputerPlayer::pickMove(MovesPly *ptr, int score)
 	int x;
 	vector<int> match;
 
+	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
 	for (int i = 0; i < ptr->size; i++) {
+		cout << board->printMove(ptr->list[i].move) << "[" <<
+			ptr->list[i].score << "] ";
 		if (ptr->list[i].score == score)
 			match.push_back(i);
 	}
