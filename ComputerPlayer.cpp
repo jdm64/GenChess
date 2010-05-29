@@ -126,7 +126,7 @@ void ComputerPlayer::think()
 	int score;
 
 	srand(time(NULL));
-	for (int depth = 1; depth <= maxDepth; depth++)
+	for (int depth = 0; depth <= maxDepth; depth++)
 		score = NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr);
 
