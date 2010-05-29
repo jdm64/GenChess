@@ -40,7 +40,7 @@ public:
 		delete[] killer2;
 	};
 
-	void pickMove(MovesPly *ptr, int score);
+	void pickMove(MovesPly *ptr);
 
 	// swaps any ptr->list[].move that matches
 	// killer1/killer2 to the front of ptr->list[]

@@ -29,7 +29,7 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 	killer1[depth] = move;
 }
 
-void ComputerPlayer::pickMove(MovesPly *ptr, int score)
+void ComputerPlayer::pickMove(MovesPly *ptr)
 {
 	int x;
 	vector<int> match;
@@ -130,7 +130,7 @@ void ComputerPlayer::think()
 	srand(time(NULL));
 	for (int depth = 1; depth <= maxDepth; depth++)
 		score = NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
-	pickMove(curr, score);
+	pickMove(curr);
 
 	assert(board->doMove(curr->list[0].move, color) == VALID_MOVE);
 	cout << board->printMove(curr->list[0].move) << endl;
