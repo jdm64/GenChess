@@ -103,13 +103,11 @@ int ComputerPlayer::NegaScout(MovesPly *&ptr, int alpha, int beta, int depth, in
 	for (int n = 0; n < ptr->size; n++) {
 		board->doMove(ptr->list[n].move);
 		ptr->list[n].score = -NegaScout(ptr->list[n].next, -b, -alpha, depth + 1, limit);
+
+		if (ptr->list[n].score > alpha && ptr->list[n].score < beta && n > 0)
+			ptr->list[n].score = -NegaScout(ptr->list[n].next, -beta, -alpha, depth + 1, limit);
 		board->undo(ptr->list[n].move);
 
-		if (ptr->list[n].score > alpha && ptr->list[n].score < beta && n > 0) {
-			board->doMove(ptr->list[n].move);
-			ptr->list[n].score = -NegaScout(ptr->list[n].next, -beta, -alpha, depth + 1, limit);
-			board->undo(ptr->list[n].move);
-		}
 		delete ptr->list[n].next;
 		ptr->list[n].next = NULL;
 
