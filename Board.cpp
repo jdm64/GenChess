@@ -211,7 +211,7 @@ int Board::CalcScore()
 	}
 	// Score for check is added in getMovesList
 	white -= black;
-	return (curr == WHITE)? white : -white;
+	return (curr == WHITE)? -white : white;
 }
 
 int Board::getNumMoves(char color)
