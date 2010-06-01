@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include "Game.h"
 
-#define VERSION		"2.0.25"
+#define VERSION		"2.0.75"
 
 using namespace std;
 

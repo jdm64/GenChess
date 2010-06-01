@@ -4,7 +4,7 @@ CXX = g++
 # use this for debuging
 CXXFLAGS = -Wall -Wextra -pedantic -O0 -std=gnu++0x -g3
 
-VERSION = 1.0.0
+VERSION = $(shell grep "define VERSION" main.cpp | cut -d'"' -f2)
 BIN = genchess
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
