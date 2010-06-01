@@ -18,10 +18,6 @@ using namespace std;
 
 class Board {
 private:
-	static const char pieceSymbol[7];
-
-	static const int pieceValues[16];
-
 	vector<Move> history;
 
 	char board[64];
@@ -34,14 +30,16 @@ private:
 
 	int validateMove(Move move, char color);
 
-	int CalcScore();
-
 	string printSquare(int index);
 
 	string printLoc(const char loc);
 
 public:
 	Board();
+
+	static const char pieceSymbol[7];
+
+	static const int pieceValues[16];
 
 	char currentPlayer();
 
@@ -63,9 +61,11 @@ public:
 
 	bool undo();
 
+	int CalcScore();
+
 	int getNumMoves(char color);
 
-	MovesPly* getMovesList(char color, bool getScore = false);
+	MovesPly* getMovesList(char color);
 
 	string printMove(Move move);
 

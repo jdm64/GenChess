@@ -211,7 +211,7 @@ int Board::CalcScore()
 	}
 	// Score for check is added in getMovesList
 	white -= black;
-	return (curr == WHITE)? -white : white;
+	return (curr == WHITE)? white : -white;
 }
 
 int Board::getNumMoves(char color)
@@ -280,7 +280,7 @@ int Board::getNumMoves(char color)
 	return num;
 }
 
-MovesPly* Board::getMovesList(char color, bool getScore)
+MovesPly* Board::getMovesList(char color)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
@@ -305,8 +305,7 @@ MovesPly* Board::getMovesList(char color, bool getScore)
 			// place moves are only valid if neither side is inCheck
 			if (!inCheck(color) && !inCheck(color ^ -2)) {
 				item.check = false;
-				if (getScore)
-					item.score = CalcScore();
+				item.score = -CalcScore();
 				data->list[data->size++] = item;
 			}
 			undo(item.move);
@@ -327,10 +326,8 @@ MovesPly* Board::getMovesList(char color, bool getScore)
 			doMove(item.move);
 			if (!inCheck(color)) {
 				item.check = inCheck(color ^ -2);
-				if (getScore) {
-					item.score = CalcScore();
-					item.score += -(item.check) & pieceValues[15];
-				}
+				item.score = -CalcScore();
+				item.score += -(item.check) & pieceValues[15];
 				data->list[data->size++] = item;
 			}
 			undo(item.move);
@@ -353,8 +350,7 @@ MovesPly* Board::getMovesList(char color, bool getScore)
 			// place moves are only valid if neither side is inCheck
 			if (!inCheck(color) && !inCheck(color ^ -2)) {
 				item.check = false;
-				if (getScore)
-					item.score = CalcScore();
+				item.score = -CalcScore();
 				data->list[data->size++] = item;
 			}
 			undo(item.move);

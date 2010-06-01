@@ -60,7 +60,7 @@ int ComputerPlayer::Quiescence(MovesPly *&ptr, int alpha, int beta, int depth)
 	int score;
 
 	if (!ptr)
-		ptr = board->getMovesList(board->currentPlayer(), true);
+		ptr = board->getMovesList(board->currentPlayer());
 
 	score = getMaxScore(ptr);
 	if (score >= beta)
@@ -91,7 +91,7 @@ int ComputerPlayer::NegaScout(MovesPly *&ptr, int alpha, int beta, int depth, in
 	int b = beta;
 
 	if (!ptr)
-		ptr = board->getMovesList(board->currentPlayer(), true);
+		ptr = board->getMovesList(board->currentPlayer());
 	if (!ptr->size)
 		return -(INT_MAX - 2);
 	if (depth >= limit)
