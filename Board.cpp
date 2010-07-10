@@ -279,13 +279,13 @@ int Board::getNumMoves(char color)
 	return num;
 }
 
-MovesPly* Board::getMovesList(char color)
+MoveList* Board::getMovesList(char color)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
-	MovesPly *data = new MovesPly;
+	MoveList *data = new MoveList;
 	MoveLookup moveLookup;
-	MoveScores item;
+	MoveNode item;
 
 	data->size = 0;
 	// we must place king first

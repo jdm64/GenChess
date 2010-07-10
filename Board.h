@@ -65,7 +65,7 @@ public:
 
 	int getNumMoves(char color);
 
-	MovesPly* getMovesList(char color);
+	MoveList* getMovesList(char color);
 
 	string printMove(Move move);
 

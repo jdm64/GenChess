@@ -33,8 +33,8 @@ enum {MOVE, UNDO};
 
 using namespace std;
 
-struct MoveScores;
-struct MovesPly;
+struct MoveNode;
+struct MoveList;
 
 struct Move {
 	char index;
@@ -56,37 +56,37 @@ struct Piece {
 	const char type;
 };
 
-struct MoveScores {
+struct MoveNode {
 	Move move;
 	int score;
-	MovesPly *next;
+	MoveList *next;
 	bool check;
 
-	MoveScores()
+	MoveNode()
 	{
 		next = NULL;
 	}
 };
 
-struct MovesPly {
-	boost::array<MoveScores, 320> list;
+struct MoveList {
+	boost::array<MoveNode, 320> list;
 	int size;
 
-	MovesPly()
+	MoveList()
 	{
 		size = 0;
 	}
 };
 
 struct ScoresCapture {
-	bool operator()(const MoveScores &a, const MoveScores &b)
+	bool operator()(const MoveNode &a, const MoveNode &b)
 	{
 		return a.move.xindex > b.move.xindex;
 	}
 };
 
 struct ScoresHiLow {
-	bool operator()(const MoveScores &a, const MoveScores &b)
+	bool operator()(const MoveNode &a, const MoveNode &b)
 	{
 		return a.score > b.score;
 	}

@@ -13,7 +13,7 @@
 
 class ComputerPlayer : public Player {
 private:
-	MovesPly *curr;
+	MoveList *curr;
 
 	Move *killer1;
 	Move *killer2;
@@ -40,21 +40,21 @@ public:
 		delete[] killer2;
 	};
 
-	void pickMove(MovesPly *ptr);
+	void pickMove(MoveList *ptr);
 
 	// swaps any ptr->list[].move that matches
 	// killer1/killer2 to the front of ptr->list[]
-	void getKillerMoves(MovesPly *ptr, int depth);
+	void getKillerMoves(MoveList *ptr, int depth);
 
 	// sets move to be one of the killermoves
 	void setKillerMoves(Move move, int depth);
 
 	// returns the maximum score in ptr->list[].score
-	int getMaxScore(MovesPly *ptr);
+	int getMaxScore(MoveList *ptr);
 
-	int Quiescence(MovesPly *&ptr, int alpha, int beta, int depth);
+	int Quiescence(MoveList *&ptr, int alpha, int beta, int depth);
 
-	int NegaScout(MovesPly *&ptr, int alpha, int beta, int depth, int limit);
+	int NegaScout(MoveList *&ptr, int alpha, int beta, int depth, int limit);
 
 	void think();
 };

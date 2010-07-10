@@ -29,7 +29,7 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 	killer1[depth] = move;
 }
 
-void ComputerPlayer::pickMove(MovesPly *ptr)
+void ComputerPlayer::pickMove(MoveList *ptr)
 {
 	int x, score;
 	vector<int> match;
@@ -46,7 +46,7 @@ void ComputerPlayer::pickMove(MovesPly *ptr)
 	swap(ptr->list[0], ptr->list[match[x]]);
 }
 
-int ComputerPlayer::getMaxScore(MovesPly *ptr)
+int ComputerPlayer::getMaxScore(MoveList *ptr)
 {
 	int max = ptr->list[0].score;
 
@@ -57,7 +57,7 @@ int ComputerPlayer::getMaxScore(MovesPly *ptr)
 	return max;
 }
 
-int ComputerPlayer::Quiescence(MovesPly *&ptr, int alpha, int beta, int depth)
+int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
 {
 	int score;
 
@@ -88,7 +88,7 @@ int ComputerPlayer::Quiescence(MovesPly *&ptr, int alpha, int beta, int depth)
 	return alpha;
 }
 
-int ComputerPlayer::NegaScout(MovesPly *&ptr, int alpha, int beta, int depth, int limit)
+int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, int limit)
 {
 	int b;
 
