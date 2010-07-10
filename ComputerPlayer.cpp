@@ -31,15 +31,16 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 
 void ComputerPlayer::pickMove(MovesPly *ptr)
 {
-	int x;
+	int x, score;
 	vector<int> match;
 
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
-	for (int i = 0; i < ptr->size; i++) {
-		cout << board->printMove(ptr->list[i].move) << "[" <<
-			ptr->list[i].score << "] ";
-		if (ptr->list[i].score == score)
-			match.push_back(i);
+	score = ptr->list[0].score;
+	match.push_back(0);
+	for (int i = 1; i < ptr->size; i++) {
+		if (ptr->list[i].score != score)
+			break;
+		match.push_back(i);
 	}
 	x = rand() % match.size();
 	swap(ptr->list[0], ptr->list[match[x]]);
@@ -49,9 +50,10 @@ int ComputerPlayer::getMaxScore(MovesPly *ptr)
 {
 	int max = ptr->list[0].score;
 
-	for (int i = 1; i < ptr->size; i++)
+	for (int i = 1; i < ptr->size; i++) {
 		if (ptr->list[i].score > max)
 			max = ptr->list[i].score;
+	}
 	return max;
 }
 

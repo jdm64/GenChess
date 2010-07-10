@@ -385,7 +385,7 @@ loop2:
 			if (!board[n]) {
 				offset++;
 				goto loop2;
-			} else if (board[n] * board[loc] > 0){
+			} else if (board[n] * board[loc] > 0) {
 				offset = ((offset / 7) + 1) * 7;
 				goto loop2;
 			}
