@@ -81,17 +81,7 @@ struct MovesPly {
 struct ScoresCapture {
 	bool operator()(const MoveScores &a, const MoveScores &b)
 	{
-		if (a.check && !b.check)
-			return true;
-		if (!a.check && b.check)
-			return false;
-		if (a.move.xindex > b.move.xindex)
-			return true;
-		if (a.move.xindex < b.move.xindex)
-			return false;
-		if (a.move.index > b.move.index)
-			return true;
-		return false;
+		return a.move.xindex > b.move.xindex;
 	}
 };
 
