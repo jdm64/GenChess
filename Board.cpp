@@ -209,9 +209,8 @@ int Board::CalcScore()
 			break;
 		}
 	}
-	// Score for check is added in getMovesList
 	white -= black;
-	return (curr == WHITE)? white : -white;
+	return (curr == WHITE)? -white : white;
 }
 
 int Board::getNumMoves(char color)
@@ -305,7 +304,7 @@ MovesPly* Board::getMovesList(char color)
 			// place moves are only valid if neither side is inCheck
 			if (!inCheck(color) && !inCheck(color ^ -2)) {
 				item.check = false;
-				item.score = -CalcScore();
+				item.score = CalcScore();
 				data->list[data->size++] = item;
 			}
 			undo(item.move);
@@ -326,8 +325,7 @@ MovesPly* Board::getMovesList(char color)
 			doMove(item.move);
 			if (!inCheck(color)) {
 				item.check = inCheck(color ^ -2);
-				item.score = -CalcScore();
-				item.score += -(item.check) & pieceValues[15];
+				item.score = CalcScore();
 				data->list[data->size++] = item;
 			}
 			undo(item.move);
@@ -350,7 +348,7 @@ MovesPly* Board::getMovesList(char color)
 			// place moves are only valid if neither side is inCheck
 			if (!inCheck(color) && !inCheck(color ^ -2)) {
 				item.check = false;
-				item.score = -CalcScore();
+				item.score = CalcScore();
 				data->list[data->size++] = item;
 			}
 			undo(item.move);
