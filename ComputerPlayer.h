@@ -18,7 +18,9 @@ private:
 	Move *killer1;
 	Move *killer2;
 
-	int maxDepth;
+	int maxNg;
+
+	vector<bool> tactical;
 
 	ScoresCapture cmpCapture;
 	ScoresHiLow cmpHiLow;
@@ -28,9 +30,7 @@ public:
 	{
 		// set this for how deep the search is. higher values
 		// will take longer, 4 takes about 3mins per move
-		maxDepth = 3;
-		killer1 = new Move[maxDepth];
-		killer2 = new Move[maxDepth];
+		maxNg = 3;
 		curr = NULL;
 	};
 

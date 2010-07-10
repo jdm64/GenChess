@@ -90,46 +90,48 @@ int ComputerPlayer::Quiescence(MovesPly *&ptr, int alpha, int beta, int depth)
 
 int ComputerPlayer::NegaScout(MovesPly *&ptr, int alpha, int beta, int depth, int limit)
 {
-	int b = beta;
+	int b;
 
 	if (!ptr)
 		ptr = board->getMovesList(board->currentPlayer());
 	if (!ptr->size)
 		return -(INT_MAX - 2);
-	if (depth >= limit)
-		return Quiescence(ptr, alpha, beta, 0);
+	if (depth >= limit) {
+		if (!tactical.back())
+			return getMaxScore(ptr);
+		else
+			limit++;
+	}
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
-	if (depth)
-		getKillerMoves(ptr, depth);
 
+	b = beta;
 	for (int n = 0; n < ptr->size; n++) {
+		tactical.push_back(ptr->list[n].check);
 		board->doMove(ptr->list[n].move);
 		ptr->list[n].score = -NegaScout(ptr->list[n].next, -b, -alpha, depth + 1, limit);
 
 		if (ptr->list[n].score > alpha && ptr->list[n].score < beta && n > 0)
 			ptr->list[n].score = -NegaScout(ptr->list[n].next, -beta, -alpha, depth + 1, limit);
 		board->undo(ptr->list[n].move);
-
+		tactical.pop_back();
 		delete ptr->list[n].next;
 		ptr->list[n].next = NULL;
 
 		alpha = max(ptr->list[n].score, alpha);
-		if (alpha >= beta) {
- 			setKillerMoves(ptr->list[n].move, depth);
+		if (alpha >= beta)
 			return alpha;
-		}
 		b = alpha + 1;
 	}
-	return getMaxScore(ptr);
+	return alpha;
 }
 
 void ComputerPlayer::think()
 {
-	int score;
-
 	srand(time(NULL));
-	for (int depth = 0; depth <= maxDepth; depth++)
-		score = NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
+	tactical.clear();
+	tactical.push_back(board->inCheck(board->currentPlayer()));
+	for (int depth = 0; depth <= maxNg; depth++)
+		NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr);
 
 	assert(board->doMove(curr->list[0].move, color) == VALID_MOVE);
