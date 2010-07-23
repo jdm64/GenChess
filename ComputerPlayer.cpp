@@ -7,7 +7,7 @@
 
 #include "ComputerPlayer.h"
 
-void ComputerPlayer::getKillerMoves(MovesPly *ptr, int depth)
+void ComputerPlayer::getKillerMoves(MoveList *ptr, int depth)
 {
 	for (int i = 1, n = 0; i < ptr->size; i++) {
 		if (ptr->list[i].move == killer1[depth])
@@ -68,7 +68,7 @@ int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
 	if (score >= beta)
 		return score;
 	alpha = max(alpha, score);
-	if (depth >= maxDepth)
+	if (depth >= maxNg)
 		return alpha;
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpCapture);
 
