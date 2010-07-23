@@ -8,6 +8,7 @@
 #ifndef __DATA_H__
 #define __DATA_H__
 
+#include <cstdint>
 #include <boost/array.hpp>
 
 #define NONE		-1
@@ -33,6 +34,8 @@ enum {MOVE, UNDO};
 
 using namespace std;
 
+typedef uint64_t uint64;
+
 struct MoveNode;
 struct MoveList;
 
@@ -44,8 +47,7 @@ struct Move {
 
 	bool operator==(const Move &rhs)
 	{
-		if (to == rhs.to && from == rhs.from && index == rhs.index &&
-				xindex == rhs.xindex)
+		if (to == rhs.to && from == rhs.from && index == rhs.index && xindex == rhs.xindex)
 			return true;
 		return false;
 	}
