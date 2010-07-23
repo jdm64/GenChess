@@ -40,6 +40,8 @@ public:
 		delete[] killer2;
 	};
 
+	void printList(MoveList *ptr);
+
 	void pickMove(MoveList *ptr);
 
 	// swaps any ptr->list[].move that matches

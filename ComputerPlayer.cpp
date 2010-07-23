@@ -7,6 +7,15 @@
 
 #include "ComputerPlayer.h"
 
+#define PRINT_ROOT_SCORES
+
+void ComputerPlayer::printList(MoveList *ptr)
+{
+	for (int i = 0; i < ptr->size; i++)
+		cout << board->printMove(ptr->list[i].move) << "[" <<
+			ptr->list[i].score << "] ";
+}
+
 void ComputerPlayer::getKillerMoves(MoveList *ptr, int depth)
 {
 	for (int i = 1, n = 0; i < ptr->size; i++) {
@@ -134,6 +143,9 @@ void ComputerPlayer::think()
 		NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr);
 
+#ifdef PRINT_ROOT_SCORES
+	printList(curr);
+#endif
 	assert(board->doMove(curr->list[0].move, color) == VALID_MOVE);
 	cout << board->printMove(curr->list[0].move) << endl;
 	delete curr;
