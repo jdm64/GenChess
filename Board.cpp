@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const int Board::pieceValues[16] = {11, 11, 11, 11, 11, 11, 11, 11, 34, 34, 56, 56, 90, 90, 146, 4752};
+const int Board::pieceValues[16] = {224, 224, 224, 224, 224, 224, 224, 224, 337, 337, 560, 560, 896, 896, 1456, 6834};
 
 const char Board::pieceSymbol[7] = {' ', 'P', 'N', 'B', 'R', 'Q', 'K'};
 
