@@ -3,23 +3,36 @@
 
 #include "Data.h"
 
+#define ATCK_CMP(A, B)		((A^B) >> 3) - ((A^(-B)) >> 3)
+#define CAPTURE_MOVE(A, B)	(A * B <  0)
+#define ANY_MOVE(A, B)		(A * B <= 0)
+#define NOT_EMPTY(A, B)		(A * B != 0)
+#define EMPTY_MOVE(A, B)	(A * B == 0)
+#define NOT_CAPTURE(A, B)	(A * B >= 0)
+#define OWN_PIECE(A, B)		(A * B >  0)
+
 class MoveLookup {
 private:
-	static char *board;
+	static char mailbox[120];
 
-	char *lookup;
+	static char mailbox64[64];
 
-	int type, loc, offset;
+	static char offsets[7][8];
+
+	char *board;
+
 public:
-	static void setBoard(char *b);
+	MoveLookup(char *Board) : board(Board) {};
 
-	void setPiece(int Index);
+	char* genAll(const char &from) const;
 
-	bool setLoc(int Index);
+	char* genCapture(const char &from) const;
 
-	int nextAttack();
+	char* genMove(const char &from) const;
 
-	bool isAttacked();
+	bool fromto(const char &From, const char &To) const;
+
+	bool isAttacked(const char &from) const;
 };
 
 #endif

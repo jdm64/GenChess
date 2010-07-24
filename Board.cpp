@@ -9,7 +9,7 @@
 
 using namespace std;
 
-const int Board::pieceValues[16] = {11, 11, 11, 11, 11, 11, 11, 11, 34, 34, 56, 56, 90, 90, 146, 4752};
+const int Board::pieceValues[16] = {224, 224, 224, 224, 224, 224, 224, 224, 337, 337, 560, 560, 896, 896, 1456, 6834};
 
 const char Board::pieceSymbol[7] = {' ', 'P', 'N', 'B', 'R', 'Q', 'K'};
 
@@ -59,7 +59,6 @@ void Board::newGame()
 		0, 0, 0, 0, 0, 0, 0, 0};
 	curr = WHITE;
 	hcounter = 0;
-	MoveLookup::setBoard(board);
 	history.clear();
 }
 
@@ -90,10 +89,10 @@ int Board::pieceIndex(int loc, int type)
 
 bool Board::inCheck(char color)
 {
-	MoveLookup ml;
+	MoveLookup ml(board);
 	int king = (color == WHITE)? 31:15;
 
-	return ml.setLoc(pieces[king].loc)? ml.isAttacked() : false;
+	return ml.isAttacked(pieces[king].loc);
 }
 
 void Board::doMove(Move move)
@@ -130,8 +129,7 @@ void Board::undo(Move move)
 
 int Board::validateMove(Move move, char color)
 {
-	MoveLookup moveLookup;
-	int loc;
+	MoveLookup moveLookup(board);
 
 	// are we moving our own piece?
 	if (pieces[move.index].type * color < 0)
@@ -150,12 +148,7 @@ int Board::validateMove(Move move, char color)
 		return CAPTURE_OWN;
 	}
 	// check for correct piece movement
-	moveLookup.setPiece(move.from);
-	while ((loc = moveLookup.nextAttack()) != NONE) {
-		if (move.to == loc)
-			return VALID_MOVE;
-	}
-	return INVALID_MOVEMENT;
+	return moveLookup.fromto(move.from, move.to)? VALID_MOVE : INVALID_MOVEMENT;
 }
 
 int Board::doMove(Move move, char color)
@@ -220,9 +213,10 @@ int Board::CalcScore()
 
 int Board::getNumMoves(char color)
 {
-	MoveLookup moveLookup;
-	int num = 0, start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
+	MoveLookup movelookup(board);
+	int n, num = 0, start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	Move move;
+	char *loc;
 
 	// we must place king first
 	if (hcounter < 2) {
@@ -245,13 +239,14 @@ int Board::getNumMoves(char color)
 		return num;
 	}
 	// generate piece moves
-	for (int idx = start, loc; idx < end; idx++) {
+	for (int idx = start; idx < end; idx++) {
 		if (pieces[idx].loc == PLACEABLE || pieces[idx].loc == DEAD)
 			continue;
-		moveLookup.setPiece(pieces[idx].loc);
-		while ((loc = moveLookup.nextAttack()) != NONE) {
-			move.xindex = (board[loc] == EMPTY)? NONE : pieceIndex(loc, board[loc]);
-			move.to = loc;
+		loc = movelookup.genAll(pieces[idx].loc);
+		n = 0;
+		while (loc[n] != -1) {
+			move.xindex = (board[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], board[loc[n]]);
+			move.to = loc[n];
 			move.from = pieces[idx].loc;
 			move.index = idx;
 
@@ -259,7 +254,10 @@ int Board::getNumMoves(char color)
 			if (!inCheck(color))
 				num++;
 			undo(move);
+
+			n++;
 		}
+		delete[] loc;
 	}
 	// generate piece place moves
 	for (int type = PAWN, idx; type <= KING; type++) {
@@ -287,10 +285,11 @@ int Board::getNumMoves(char color)
 MoveList* Board::getMovesList(char color)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
-	int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
+	int n, start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	MoveList *data = new MoveList;
-	MoveLookup moveLookup;
+	MoveLookup movelookup(board);
 	MoveNode item;
+	char *loc;
 
 	data->size = 0;
 	// we must place king first
@@ -317,13 +316,14 @@ MoveList* Board::getMovesList(char color)
 		return data;
 	}
 	// generate piece moves
-	for (int idx = start, loc; idx < end; idx++) {
+	for (int idx = start; idx < end; idx++) {
 		if (pieces[idx].loc == PLACEABLE || pieces[idx].loc == DEAD)
 			continue;
-		moveLookup.setPiece(pieces[idx].loc);
-		while ((loc = moveLookup.nextAttack()) != NONE) {
-			item.move.xindex = (board[loc] == EMPTY)? NONE : pieceIndex(loc, board[loc]);
-			item.move.to = loc;
+		loc = movelookup.genAll(pieces[idx].loc);
+		n = 0;
+		while (loc[n] != -1) {
+			item.move.xindex = (board[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], board[loc[n]]);
+			item.move.to = loc[n];
 			item.move.from = pieces[idx].loc;
 			item.move.index = idx;
 
@@ -334,7 +334,10 @@ MoveList* Board::getMovesList(char color)
 				data->list[data->size++] = item;
 			}
 			undo(item.move);
+
+			n++;
 		}
+		delete[] loc;
 	}
 	// generate piece place moves
 	for (int type = PAWN, idx; type <= KING; type++) {
