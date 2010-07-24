@@ -68,12 +68,10 @@ int ComputerPlayer::getMaxScore(MoveList *ptr)
 
 int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
 {
-	int score;
-
 	if (!ptr)
 		ptr = board->getMovesList(board->currentPlayer());
 
-	score = getMaxScore(ptr);
+	int score = getMaxScore(ptr);
 	if (score >= beta)
 		return score;
 	alpha = max(alpha, score);
@@ -99,8 +97,6 @@ int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
 
 int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, int limit)
 {
-	int b;
-
 	if (!ptr)
 		ptr = board->getMovesList(board->currentPlayer());
 	if (!ptr->size)
@@ -113,7 +109,7 @@ int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, in
 	}
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
 
-	b = beta;
+	int b = beta;
 	for (int n = 0; n < ptr->size; n++) {
 		tactical.push_back(ptr->list[n].check);
 		board->doMove(ptr->list[n].move);
