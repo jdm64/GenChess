@@ -7,6 +7,8 @@
 
 #include "Game.h"
 
+#define AUTO_EXIT_COUNT 8
+
 Game::Game(bool whiteAI, bool blackAI, bool XMode)
 {
 	if (whiteAI)
@@ -88,5 +90,9 @@ void Game::run()
 		case QUIT_GAME:
 			return;
 		}
+#ifdef AUTO_EXIT_COUNT
+		if (board.moveCount() >= AUTO_EXIT_COUNT)
+			return;
+#endif
 	}
 }

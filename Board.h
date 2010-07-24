@@ -47,6 +47,8 @@ public:
 
 	void quitGame();
 
+	int moveCount();
+
 	int pieceIndex(int loc, int type);
 
 	int pieceIndex(int loc);

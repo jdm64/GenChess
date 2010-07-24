@@ -63,6 +63,11 @@ void Board::newGame()
 	history.clear();
 }
 
+int Board::moveCount()
+{
+	return hcounter;
+}
+
 int Board::pieceIndex(int loc)
 {
 	for (int i = 0; i < 32; i++)
