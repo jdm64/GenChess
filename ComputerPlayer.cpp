@@ -8,6 +8,7 @@
 #include "ComputerPlayer.h"
 
 #define PRINT_ROOT_SCORES
+#define RANDOM_MOVE_ORDER
 
 void ComputerPlayer::printList(MoveList *ptr)
 {
@@ -40,19 +41,18 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 
 void ComputerPlayer::pickMove(MoveList *ptr)
 {
-	int x, score;
-	vector<int> match;
-
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
-	score = ptr->list[0].score;
-	match.push_back(0);
+#ifdef RANDOM_MOVE_ORDER
+	int score = ptr->list[0].score;
+	vector<int> match(1, 0);
 	for (int i = 1; i < ptr->size; i++) {
 		if (ptr->list[i].score != score)
 			break;
 		match.push_back(i);
 	}
-	x = rand() % match.size();
+	int x = rand() % match.size();
 	swap(ptr->list[0], ptr->list[match[x]]);
+#endif
 }
 
 int ComputerPlayer::getMaxScore(MoveList *ptr)
