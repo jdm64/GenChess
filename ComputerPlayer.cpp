@@ -41,7 +41,7 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 
 void ComputerPlayer::pickMove(MoveList *ptr)
 {
-	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
+	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
 #ifdef RANDOM_MOVE_ORDER
 	int score = ptr->list[0].score;
 	vector<int> match(1, 0);
@@ -77,7 +77,7 @@ int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
 	alpha = max(alpha, score);
 	if (depth >= maxNg)
 		return alpha;
-	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpCapture);
+	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpCapture);
 
 	for (int n = 0; n < ptr->size; n++) {
 		if (ptr->list[n].move.xindex == NONE && !ptr->list[n].check)
@@ -107,7 +107,7 @@ int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, in
 		else
 			limit++;
 	}
-	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
+	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
 
 	int b = beta;
 	for (int n = 0; n < ptr->size; n++) {
