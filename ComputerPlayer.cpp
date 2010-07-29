@@ -97,19 +97,19 @@ int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
 
 int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, int limit)
 {
+	if (depth >= limit) {
+		if (!tactical.back())
+			return -board->CalcScore();
+		else
+			limit++;
+	}
 	if (!ptr)
 		ptr = board->getMovesList(board->currentPlayer());
 	if (!ptr->size)
 		return -(INT_MAX - 2);
-	if (depth >= limit) {
-		if (!tactical.back())
-			return getMaxScore(ptr);
-		else
-			limit++;
-	}
 	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
 
-	int b = beta;
+	int b = beta, bestScore = -INT_MAX;
 	for (int n = 0; n < ptr->size; n++) {
 		tactical.push_back(ptr->list[n].check);
 		board->doMove(ptr->list[n].move);
@@ -119,15 +119,19 @@ int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, in
 			ptr->list[n].score = -NegaScout(ptr->list[n].next, -beta, -alpha, depth + 1, limit);
 		board->undo(ptr->list[n].move);
 		tactical.pop_back();
+
 		delete ptr->list[n].next;
 		ptr->list[n].next = NULL;
 
-		alpha = max(ptr->list[n].score, alpha);
-		if (alpha >= beta)
-			return alpha;
+		if (ptr->list[n].score > bestScore) {
+			bestScore = ptr->list[n].score;
+			alpha = max(bestScore, alpha);
+			if (alpha >= beta)
+				return alpha;
+		}
 		b = alpha + 1;
 	}
-	return alpha;
+	return bestScore;
 }
 
 void ComputerPlayer::think()
