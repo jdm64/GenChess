@@ -7,7 +7,7 @@
 
 #include "ComputerPlayer.h"
 
-#define PRINT_ROOT_SCORES
+#define DEBUG_SCORES
 #define RANDOM_MOVE_ORDER
 
 void ComputerPlayer::printList(MoveList *ptr)
@@ -139,11 +139,122 @@ void ComputerPlayer::think()
 		NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr);
 
-#ifdef PRINT_ROOT_SCORES
-	printList(curr);
+#ifdef DEBUG_SCORES
+	debugTree();
 #endif
 	assert(board->doMove(curr->list[0].move, color) == VALID_MOVE);
 	cout << board->printMove(curr->list[0].move) << endl;
 	delete curr;
 	curr = NULL;
+}
+
+bool ComputerPlayer::parseMove(string s, Move &move)
+{
+	int piece;
+	bool place = true;
+
+	// determin move type by first char
+	switch(s[0]) {
+	case 'a':	case 'b':
+	case 'c':	case 'd':
+	case 'e':	case 'f':
+	case 'g':	case 'h':
+		place = false;
+		break;
+	case 'P':
+		piece = PAWN;
+		break;
+	case 'N':
+		piece = KNIGHT;
+		break;
+	case 'B':
+		piece = BISHOP;
+		break;
+	case 'R':
+		piece = ROOK;
+		break;
+	case 'Q':
+		piece = QUEEN;
+		break;
+	case 'K':
+		piece = KING;
+		break;
+	default:
+		return NOT_MOVE;
+	}
+	// parse placement move
+	if (place) {
+		if (s[1] < 'a' || s[1] > 'h' || s[2] < '0' || s[2] > '9')
+			return false;
+		move.to = s[1] - 'a';
+		move.to += 8 * (8 - (s[2] - '0'));
+		move.from = PLACEABLE;
+		move.index = board->pieceIndex(PLACEABLE, color * piece);
+	} else {
+	// parse movement move
+		if (s[0] < 'a' || s[0] > 'h' ||
+				s[1] < '0' || s[1] > '9' ||
+				s[2] < 'a' || s[2] > 'h' ||
+				s[3] < '0' || s[3] > '9')
+			return false;
+		move.from = s[0] - 'a';
+		move.from += 8 * (8 - (s[1] - '0'));
+		move.to = s[2] - 'a';
+		move.to += 8 * (8 - (s[3] - '0'));
+		move.index = board->pieceIndex(move.from);
+	}
+	// are we talking about a valid piece?
+	if (move.index == NONE)
+		return false;
+	move.xindex = board->pieceIndex(move.to);
+	// return the code for what happends when trying to do the move
+	return true;
+}
+
+void ComputerPlayer::debugTree()
+{
+	MoveList *ptr = new MoveList(*curr);
+	string cmd;
+	int mDepth = maxNg, cDepth = 0;
+	Move move;
+	vector<Move> mstack;
+
+	while (true) {
+		printList(ptr);
+
+		cout << "<" << cDepth << "/" << mDepth << "> ";
+		cin >> cmd;
+
+		if (cmd == "quit") {
+			break;
+		} else if (cmd == "up") {
+			board->undo(mstack.back());
+			mstack.pop_back();
+			cDepth--;
+			mDepth++;
+			delete ptr;
+			ptr = NULL;
+			NegaScout(ptr, -INT_MAX, INT_MAX, 0, mDepth);
+		} else if (cmd == "down") {
+			cin >> cmd;
+			if (!parseMove(cmd, move)) {
+				cout << "error\n";
+			} else {
+				mstack.push_back(move);
+				board->doMove(move);
+				cDepth++;
+				mDepth--;
+				delete ptr;
+				ptr = NULL;
+				NegaScout(ptr, -INT_MAX, INT_MAX, 0, mDepth);
+			}
+		} else {
+			cout << "error\n";
+		}
+	}
+	for (int i = 0; i < mstack.size(); i++) {
+		board->undo(mstack.back());
+                mstack.pop_back();
+	}
+	delete ptr;
 }

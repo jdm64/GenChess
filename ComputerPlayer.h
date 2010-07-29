@@ -59,6 +59,10 @@ public:
 	int NegaScout(MoveList *&ptr, int alpha, int beta, int depth, int limit);
 
 	void think();
+
+	bool parseMove(string s, Move &move);
+
+	void debugTree();
 };
 
 #endif
