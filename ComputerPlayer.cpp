@@ -15,6 +15,7 @@ void ComputerPlayer::printList(MoveList *ptr)
 	for (int i = 0; i < ptr->size; i++)
 		cout << board->printMove(ptr->list[i].move) << "[" <<
 			ptr->list[i].score << "] ";
+	cout << "\n\n";
 }
 
 void ComputerPlayer::getKillerMoves(MoveList *ptr, int depth)
