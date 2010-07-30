@@ -12,6 +12,27 @@
 
 using namespace std;
 
+Board board;
+
+uint64 perft(int depth)
+{
+	MoveList *list = board.getMovesList(board.currentPlayer());
+
+	if (depth == 1) {
+		uint64 nodes = list->size;
+		delete list;
+		return nodes;
+	}
+	uint64 nodes = 0;
+	for (int i = 0; i < list->size; i++) {
+		board.doMove(list->list[i].move);
+		nodes += perft(depth - 1);
+		board.undo(list->list[i].move);
+	}
+	delete list;
+	return nodes;
+}
+
 void show_help()
 {
 	cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
@@ -29,7 +50,7 @@ int main(int argc, char **argv)
 	bool white_ai = false, black_ai = false, error = false, xMode = false;
 	char c;
 
-	while ((c = getopt(argc, argv, "Xw:b:hv")) != -1) {
+	while ((c = getopt(argc, argv, "Xw:b:hp:v")) != -1) {
 		switch (c) {
 		case 'X':
 			xMode = true;
@@ -52,6 +73,9 @@ int main(int argc, char **argv)
 			break;
 		case 'h':
 			show_help();
+			return EXIT_SUCCESS;
+		case 'p':
+			cout << perft(atoi(optarg)) << endl;
 			return EXIT_SUCCESS;
 		case 'v':
 			cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
