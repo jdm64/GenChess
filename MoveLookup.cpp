@@ -323,10 +323,11 @@ bool MoveLookup::isAttacked(const char &from) const
 				continue;
 			else if (OWN_PIECE(board[from], board[to]))
 				break;
-			if (abs(board[to]) == ROOK || abs(board[to]) == QUEEN)
+			else if (abs(board[to]) == ROOK || abs(board[to]) == QUEEN)
 				return true;
-			if (k == 1 && abs(board[to]) == KING)
+			else if (k == 1 && abs(board[to]) == KING)
 				return true;
+			break;
 		}
 	}
 
@@ -340,10 +341,11 @@ bool MoveLookup::isAttacked(const char &from) const
 				continue;
 			else if (OWN_PIECE(board[from], board[to]))
 				break;
-			if (abs(board[to]) == BISHOP || abs(board[to]) == QUEEN)
+			else if (abs(board[to]) == BISHOP || abs(board[to]) == QUEEN)
 				return true;
-			if (k == 1 && (abs(board[to]) == PAWN || abs(board[to]) == KING))
+			else if (k == 1 && (abs(board[to]) == PAWN || abs(board[to]) == KING))
 				return true;
+			break;
 		}
 	}
 
@@ -354,7 +356,7 @@ bool MoveLookup::isAttacked(const char &from) const
 			continue;
 		else if (NOT_CAPTURE(board[from], board[to]))
 			continue;
-		if (abs(board[to]) == KNIGHT)
+		else if (abs(board[to]) == KNIGHT)
 			return true;
 	}
 	return false;
