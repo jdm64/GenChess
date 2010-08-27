@@ -13,7 +13,7 @@
 void ComputerPlayer::printList(MoveList *ptr)
 {
 	for (int i = 0; i < ptr->size; i++)
-		cout << board->printMove(ptr->list[i].move) << "[" <<
+		cout << ptr->list[i].move.toString() << "[" <<
 			ptr->list[i].score << "] ";
 	cout << "\n\n";
 }
@@ -42,7 +42,7 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 
 void ComputerPlayer::pickMove(MoveList *ptr)
 {
-	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
+	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 #ifdef RANDOM_MOVE_ORDER
 	int score = ptr->list[0].score;
 	vector<int> match(1, 0);
@@ -70,7 +70,7 @@ int ComputerPlayer::getMaxScore(MoveList *ptr)
 int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
 {
 	if (!ptr)
-		ptr = board->getMovesList(board->currentPlayer());
+		ptr = board->getMovesList(board->currPlayer());
 
 	int score = getMaxScore(ptr);
 	if (score >= beta)
@@ -78,14 +78,14 @@ int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
 	alpha = max(alpha, score);
 	if (depth >= maxNg)
 		return alpha;
-	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpCapture);
+	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	for (int n = 0; n < ptr->size; n++) {
 		if (ptr->list[n].move.xindex == NONE && !ptr->list[n].check)
 			break;
-		board->doMove(ptr->list[n].move);
+		board->make(ptr->list[n].move);
 		score = -Quiescence(ptr->list[n].next, -beta, -alpha, depth + 1);
-		board->undo(ptr->list[n].move);
+		board->unmake(ptr->list[n].move);
 
 		delete ptr->list[n].next;
 		ptr->list[n].next = NULL;
@@ -100,25 +100,25 @@ int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, in
 {
 	if (depth >= limit) {
 		if (!tactical.back())
-			return -board->CalcScore();
+			return -board->eval();
 		else
 			limit++;
 	}
 	if (!ptr)
-		ptr = board->getMovesList(board->currentPlayer());
+		ptr = board->getMovesList(board->currPlayer());
 	if (!ptr->size)
 		return -(INT_MAX - 2);
-	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpHiLow);
+	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	int b = beta, bestScore = -INT_MAX;
 	for (int n = 0; n < ptr->size; n++) {
 		tactical.push_back(ptr->list[n].check);
-		board->doMove(ptr->list[n].move);
+		board->make(ptr->list[n].move);
 		ptr->list[n].score = -NegaScout(ptr->list[n].next, -b, -alpha, depth + 1, limit);
 
 		if (ptr->list[n].score > alpha && ptr->list[n].score < beta && n > 0)
 			ptr->list[n].score = -NegaScout(ptr->list[n].next, -beta, -alpha, depth + 1, limit);
-		board->undo(ptr->list[n].move);
+		board->unmake(ptr->list[n].move);
 		tactical.pop_back();
 
 		delete ptr->list[n].next;
@@ -139,7 +139,7 @@ void ComputerPlayer::think()
 {
 	srand(time(NULL));
 	tactical.clear();
-	tactical.push_back(board->inCheck(board->currentPlayer()));
+	tactical.push_back(board->incheck(board->currPlayer()));
 	for (int depth = 0; depth <= maxNg; depth++)
 		NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr);
@@ -233,7 +233,7 @@ void ComputerPlayer::debugTree()
 		if (cmd == "quit") {
 			break;
 		} else if (cmd == "up") {
-			board->undo(mstack.back());
+			board->unmake(mstack.back());
 			mstack.pop_back();
 			cDepth--;
 			mDepth++;
@@ -242,11 +242,11 @@ void ComputerPlayer::debugTree()
 			NegaScout(ptr, -INT_MAX, INT_MAX, 0, mDepth);
 		} else if (cmd == "down") {
 			cin >> cmd;
-			if (!parseMove(cmd, move)) {
+			if (!board->validMove(cmd, board->currPlayer(), move)) {
 				cout << "error\n";
 			} else {
 				mstack.push_back(move);
-				board->doMove(move);
+				board->unmake(move);
 				cDepth++;
 				mDepth--;
 				delete ptr;
@@ -258,7 +258,7 @@ void ComputerPlayer::debugTree()
 		}
 	}
 	for (int i = 0; i < mstack.size(); i++) {
-		board->undo(mstack.back());
+		board->unmake(mstack.back());
                 mstack.pop_back();
 	}
 	delete ptr;

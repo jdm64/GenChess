@@ -9,201 +9,191 @@
 
 using namespace std;
 
-const int Board::pieceValues[16] = {224, 224, 224, 224, 224, 224, 224, 224, 337, 337, 560, 560, 896, 896, 1456, 6834};
-
-const char Board::pieceSymbol[7] = {' ', 'P', 'N', 'B', 'R', 'Q', 'K'};
+const int pieceValue[16] = {224, 224, 224, 224, 224, 224, 224, 224, 337, 337, 560, 560, 896, 896, 1456, 6834};
 
 Board::Board()
 {
-	newGame();
+	reset();
 }
 
-char Board::currentPlayer()
+void Board::reset()
+{
+	square = {
+		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
+		EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY
+	};
+	piece = {
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+	};
+	curr = WHITE;
+	ply = 0;
+}
+
+char Board::currPlayer()
 {
 	return curr;
 }
 
-void Board::quitGame()
-{
-	curr = QUIT_GAME;
-}
-
-void Board::newGame()
-{
-	pieces = {
-		{PLACEABLE, BLACK_PAWN},	{PLACEABLE, BLACK_PAWN},
-		{PLACEABLE, BLACK_PAWN},	{PLACEABLE, BLACK_PAWN},
-		{PLACEABLE, BLACK_PAWN},	{PLACEABLE, BLACK_PAWN},
-		{PLACEABLE, BLACK_PAWN},	{PLACEABLE, BLACK_PAWN},
-		{PLACEABLE, BLACK_KNIGHT},	{PLACEABLE, BLACK_KNIGHT},
-		{PLACEABLE, BLACK_BISHOP},	{PLACEABLE, BLACK_BISHOP},
-		{PLACEABLE, BLACK_ROOK},	{PLACEABLE, BLACK_ROOK},
-		{PLACEABLE, BLACK_QUEEN},	{PLACEABLE, BLACK_KING},
-
-		{PLACEABLE, WHITE_PAWN},	{PLACEABLE, WHITE_PAWN},
-		{PLACEABLE, WHITE_PAWN},	{PLACEABLE, WHITE_PAWN},
-		{PLACEABLE, WHITE_PAWN},	{PLACEABLE, WHITE_PAWN},
-		{PLACEABLE, WHITE_PAWN},	{PLACEABLE, WHITE_PAWN},
-		{PLACEABLE, WHITE_KNIGHT},	{PLACEABLE, WHITE_KNIGHT},
-		{PLACEABLE, WHITE_BISHOP},	{PLACEABLE, WHITE_BISHOP},
-		{PLACEABLE, WHITE_ROOK},	{PLACEABLE, WHITE_ROOK},
-		{PLACEABLE, WHITE_QUEEN},	{PLACEABLE, WHITE_KING},
-	};
-	board = {0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0,
-		0, 0, 0, 0, 0, 0, 0, 0};
-	curr = WHITE;
-	hcounter = 0;
-	history.clear();
-}
-
-int Board::moveCount()
-{
-	return hcounter;
-}
-
-int Board::pieceIndex(int loc)
+int Board::pieceIndex(const int loc) const
 {
 	for (int i = 0; i < 32; i++)
-		if (pieces[i].loc == loc)
+		if (piece[i] == loc)
 			return i;
 	return NONE;
 }
 
-int Board::pieceIndex(int loc, int type)
+int Board::pieceIndex(const int loc, const int type) const
 {
 	static int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	int start = ((type < 0)? 0 : 16) + offset[abs(type)],
 		end = ((type < 0)? 0 : 16) + offset[abs(type) + 1];
 
 	for (int i = start; i < end; i++)
-		if (pieces[i].loc == loc)
+		if (piece[i] == loc)
 			return i;
 	return NONE;
 }
 
-bool Board::inCheck(char color)
+bool Board::incheck(const char color)
 {
-	MoveLookup ml(board);
+	MoveLookup ml(square);
 	int king = (color == WHITE)? 31:15;
 
-	return ml.isAttacked(pieces[king].loc);
+	return (piece[king] == PLACEABLE)? false : ml.isAttacked(piece[king]);
 }
 
-void Board::doMove(Move move)
+void Board::make(const Move move)
 {
 	// update board information
-	board[move.to] = pieces[move.index].type;
+	square[move.to] = pieceType[move.index];
 	if (move.from != PLACEABLE)
-		board[move.from] = EMPTY;
+		square[move.from] = EMPTY;
 	// update piece information
-	pieces[move.index].loc = move.to;
+	piece[move.index] = move.to;
 	if (move.xindex != NONE)
-		pieces[move.xindex].loc = DEAD;
+		piece[move.xindex] = DEAD;
 
 	curr ^= -2;
-	hcounter++;
+	ply++;
 }
 
-void Board::undo(Move move)
+void Board::unmake(const Move move)
 {
 	// TODO could this function fail?
-	pieces[move.index].loc = move.from;
+	piece[move.index] = move.from;
 	if (move.xindex == NONE) {
-		board[move.to] = EMPTY;
+		square[move.to] = EMPTY;
 	} else {
-		board[move.to] = pieces[move.xindex].type;
-		pieces[move.xindex].loc = move.to;
+		square[move.to] = pieceType[move.xindex];
+		piece[move.xindex] = move.to;
 	}
 	if (move.from != PLACEABLE)
-		board[move.from] = pieces[move.index].type;
+		square[move.from] = pieceType[move.index];
 
 	curr ^= -2;
-	hcounter--;
+	ply--;
 }
 
-int Board::validateMove(Move move, char color)
+bool Board::validMove(const Move move)
 {
-	MoveLookup moveLookup(board);
-
-	// are we moving our own piece?
-	if (pieces[move.index].type * color < 0)
-		return DONT_OWN;
-
-	// must place king first
-	if (history.size() < 2 && abs(pieces[move.index].type) != KING)
-		return KING_FIRST;
-
-	// are we placing on an empty square?
-	if (move.from == PLACEABLE) {
-		if (board[move.to] != EMPTY)
-			return NON_EMPTY_PLACE;
-		return VALID_MOVE;
-	} else if (board[move.to] * color > 0) {
-		return CAPTURE_OWN;
-	}
-	// check for correct piece movement
-	return moveLookup.fromto(move.from, move.to)? VALID_MOVE : INVALID_MOVEMENT;
-}
-
-int Board::doMove(Move move, char color)
-{
-	int valid = validateMove(move, color);
-
-	if (valid != VALID_MOVE)
-		return valid;
-	doMove(move);
-	if (inCheck(color)) {
-		undo(move);
-		return IN_CHECK;
-	}
-	if (move.from == PLACEABLE && inCheck(color ^ -2)) {
-		undo(move);
-		return IN_CHECK_PLACE;
-	}
-	// save move to history
-	history.push_back(move);
-	return VALID_MOVE;
-}
-
-bool Board::undo()
-{
-	if (!history.size())
+	// TODO: match by type not index
+	if (piece[move.index] != move.from)
 		return false;
-	Move move = history.back();
+	if (move.xindex != NONE && piece[move.xindex] != move.to)
+		return false;
+	else if (square[move.to] == EMPTY)
+		return false;
 
-	history.pop_back();
-
-	undo(move);
+	if (move.from != PLACEABLE) {
+		MoveLookup ml(square);
+		if (!ml.fromto(move.from, move.to))
+			return false;
+	}
+	if (ply < 2 && abs(pieceType[move.index]) != KING)
+		return false;
+	make(move);
+	if (incheck(curr ^ -2))
+		return false;
+	unmake(move);
 
 	return true;
 }
 
-int Board::CalcScore()
+int Board::validMove(string smove, const char color, Move &move)
+{
+	// pre-setup move
+	if (!move.parse(smove))
+		return INVALID_FORMAT;
+
+	// setup move.(x)index
+	if (move.from == PLACEABLE) {
+		move.index = pieceIndex(PLACEABLE, move.index * color);
+		if (move.index == NONE)
+			return NOPIECE_ERROR;
+		move.xindex = pieceIndex(move.to);
+		if (move.xindex != NONE)
+			return NON_EMPTY_PLACE;
+	} else {
+		move.index = pieceIndex(move.from);
+		if (move.index == NONE)
+			return NOPIECE_ERROR;
+		else if (square[move.from] * color < 0)
+			return DONT_OWN;
+		move.xindex = pieceIndex(move.to);
+		if (move.xindex != NONE && square[move.to] * color > 0)
+			return CAPTURE_OWN;
+	}
+	// must place king first
+	if (ply < 2 && abs(pieceType[move.index]) != KING)
+		return KING_FIRST;
+	if (move.from != PLACEABLE) {
+		MoveLookup ml(square);
+		if (!ml.fromto(move.from, move.to))
+			return INVALID_MOVEMENT;
+	}
+	make(move); // curr is opponent after make
+	if (incheck(curr ^ -2))
+		return IN_CHECK;
+	if (move.from == PLACEABLE && incheck(curr))
+		return IN_CHECK_PLACE;
+	unmake(move);
+
+	return VALID_MOVE;
+}
+
+int Board::eval() const
 {
 	int white = 0, black = 0;
 	for (int b = 0, w = 16; b < 15; b++, w++) {
-		switch (pieces[b].loc) {
+		switch (piece[b]) {
 		case PLACEABLE:
 		default:
-			black += pieceValues[b];
+			black += pieceValue[b];
 			break;
 		case DEAD:
-			black -= pieceValues[b];
+			black -= pieceValue[b];
 			break;
 		}
-		switch (pieces[w].loc) {
+		switch (piece[w]) {
 		case PLACEABLE:
 		default:
-			white += pieceValues[b];
+			white += pieceValue[b];
 			break;
 		case DEAD:
-			white -= pieceValues[b];
+			white -= pieceValue[b];
 			break;
 		}
 	}
@@ -211,49 +201,49 @@ int Board::CalcScore()
 	return (curr == WHITE)? -white : white;
 }
 
-int Board::getNumMoves(char color)
+int Board::getNumMoves(const char color)
 {
-	MoveLookup movelookup(board);
+	MoveLookup movelookup(square);
 	int n, num = 0, start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	Move move;
 	char *loc;
 
 	// we must place king first
-	if (hcounter < 2) {
+	if (ply < 2) {
 		int idx = pieceIndex(PLACEABLE, KING * color);
 
 		for (int loc = 0; loc < 64; loc++) {
-			if (board[loc] != EMPTY)
+			if (square[loc] != EMPTY)
 				continue;
 			move.to = loc;
 			move.index = idx;
 			move.xindex = NONE;
 			move.from = PLACEABLE;
 
-			doMove(move);
+			make(move);
 			// place moves are only valid if neither side is inCheck
-			if (!inCheck(color) && !inCheck(color ^ -2))
+			if (!incheck(color) && !incheck(color ^ -2))
 				num++;
-			undo(move);
+			unmake(move);
 		}
 		return num;
 	}
 	// generate piece moves
 	for (int idx = start; idx < end; idx++) {
-		if (pieces[idx].loc == PLACEABLE || pieces[idx].loc == DEAD)
+		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
-		loc = movelookup.genAll(pieces[idx].loc);
+		loc = movelookup.genAll(piece[idx]);
 		n = 0;
 		while (loc[n] != -1) {
-			move.xindex = (board[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], board[loc[n]]);
+			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			move.to = loc[n];
-			move.from = pieces[idx].loc;
+			move.from = piece[idx];
 			move.index = idx;
 
-			doMove(move);
-			if (!inCheck(color))
+			make(move);
+			if (!incheck(color))
 				num++;
-			undo(move);
+			unmake(move);
 
 			n++;
 		}
@@ -265,75 +255,75 @@ int Board::getNumMoves(char color)
 		if (idx == NONE)
 			continue;
 		for (int loc = 0; loc < 64; loc++) {
-			if (board[loc] != EMPTY)
+			if (square[loc] != EMPTY)
 				continue;
 			move.index = idx;
 			move.to = loc;
 			move.xindex = NONE;
 			move.from = PLACEABLE;
 
-			doMove(move);
+			make(move);
 			// place moves are only valid if neither side is inCheck
-			if (!inCheck(color) && !inCheck(color ^ -2))
+			if (!incheck(color) && !incheck(color ^ -2))
 				num++;
-			undo(move);
+			unmake(move);
 		}
 	}
 	return num;
 }
 
-MoveList* Board::getMovesList(char color)
+MoveList* Board::getMovesList(const char color)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	int n, start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	MoveList *data = new MoveList;
-	MoveLookup movelookup(board);
+	MoveLookup movelookup(square);
 	MoveNode item;
 	char *loc;
 
 	data->size = 0;
 	// we must place king first
-	if (hcounter < 2) {
+	if (ply < 2) {
 		int idx = pieceIndex(PLACEABLE, KING * color);
 
 		for (int loc = 0; loc < 64; loc++) {
-			if (board[loc] != EMPTY)
+			if (square[loc] != EMPTY)
 				continue;
 			item.move.to = loc;
 			item.move.index = idx;
 			item.move.xindex = NONE;
 			item.move.from = PLACEABLE;
 
-			doMove(item.move);
+			make(item.move);
 			// place moves are only valid if neither side is inCheck
-			if (!inCheck(color) && !inCheck(color ^ -2)) {
+			if (!incheck(color) && !incheck(color ^ -2)) {
 				item.check = false;
-				item.score = CalcScore();
+				item.score = eval();
 				data->list[data->size++] = item;
 			}
-			undo(item.move);
+			unmake(item.move);
 		}
 		return data;
 	}
 	// generate piece moves
 	for (int idx = start; idx < end; idx++) {
-		if (pieces[idx].loc == PLACEABLE || pieces[idx].loc == DEAD)
+		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
-		loc = movelookup.genAll(pieces[idx].loc);
+		loc = movelookup.genAll(piece[idx]);
 		n = 0;
 		while (loc[n] != -1) {
-			item.move.xindex = (board[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], board[loc[n]]);
+			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			item.move.to = loc[n];
-			item.move.from = pieces[idx].loc;
+			item.move.from = piece[idx];
 			item.move.index = idx;
 
-			doMove(item.move);
-			if (!inCheck(color)) {
-				item.check = inCheck(color ^ -2);
-				item.score = CalcScore();
+			make(item.move);
+			if (!incheck(color)) {
+				item.check = incheck(color ^ -2);
+				item.score = eval();
 				data->list[data->size++] = item;
 			}
-			undo(item.move);
+			unmake(item.move);
 
 			n++;
 		}
@@ -345,69 +335,41 @@ MoveList* Board::getMovesList(char color)
 		if (idx == NONE)
 			continue;
 		for (int loc = 0; loc < 64; loc++) {
-			if (board[loc] != EMPTY)
+			if (square[loc] != EMPTY)
 				continue;
 			item.move.index = idx;
 			item.move.to = loc;
 			item.move.xindex = NONE;
 			item.move.from = PLACEABLE;
 
-			doMove(item.move);
+			make(item.move);
 			// place moves are only valid if neither side is inCheck
-			if (!inCheck(color) && !inCheck(color ^ -2)) {
+			if (!incheck(color) && !incheck(color ^ -2)) {
 				item.check = false;
-				item.score = CalcScore();
+				item.score = eval();
 				data->list[data->size++] = item;
 			}
-			undo(item.move);
+			unmake(item.move);
 		}
 	}
 	return data;
 }
 
-string Board::printLoc(const char loc)
-{
-	string s;
-
-	if (loc > PLACEABLE) {
-		s += (char)('a' + (loc % 8));
-		s += (char)('8' - (loc / 8));
-		return s;
-	} else if (loc == PLACEABLE) {
-		return "aval";
-	} else {
-		return "dead";
-	}
-}
-
-string Board::printSquare(int index)
+string Board::printSquare(const int index) const
 {
 	string tmp;
 
-	if (!board[index])
+	if (!square[index])
 		return "  ";
-	tmp = { pieceSymbol[abs(board[index])],
-		(board[index] > 0)? ' ':'*', '\0' };
+	tmp = { pieceSymbol[abs(square[index])],
+		(square[index] > 0)? ' ':'*', '\0' };
 	return tmp;
 }
 
-string Board::printMove(Move move)
+void Board::printBoard() const
 {
-	string out;
-
-	if (move.from == PLACEABLE)
-		out += pieceSymbol[abs(pieces[move.index].type)];
-	else
-		out = printLoc(move.from);
-	out += printLoc(move.to);
-	return out.c_str();
-}
-
-void Board::printBoard()
-{
-	int rank = 8;
 	cout << "  / - + - + - + - + - + - + - + - \\\n";
-	for (int i = 0; i < 64;) {
+	for (int i = 0, rank = 8; ;) {
 		cout << rank-- << " |";
 		for (int j = 0; j < 8; j++)
 			cout << " " << printSquare(i++) << "|";
@@ -417,35 +379,4 @@ void Board::printBoard()
 	}
 	cout << "\n  \\ - + - + - + - + - + - + - + - /\n"
 		<< "    a   b   c   d   e   f   g   h\n";
-}
-
-void Board::printPieceList()
-{
-	string tmp;
-
-	cout << "White:";
-	for (int i = 16; i < 32; i++) {
-		if (!(i % 8))
-			cout << "\n\t";
-		cout << pieceSymbol[pieces[i].type] << "(";
-		tmp = printLoc(pieces[i].loc);
-		if (tmp.length() == 2)
-			cout << ' ' << tmp << ' ';
-		else
-			cout << tmp;
-		cout << ") ";
-	}
-	cout << "\nBlack:";
-	for (int i = 0; i < 16; i++) {
-		if (!(i % 8))
-			cout << "\n\t";
-		cout << pieceSymbol[-pieces[i].type] << "(";
-		tmp = printLoc(pieces[i].loc);
-		if (tmp.length() == 2)
-			cout << ' ' << tmp << ' ';
-		else
-			cout << tmp;
-		cout << ") ";
-	}
-	cout << endl;
 }

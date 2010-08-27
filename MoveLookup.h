@@ -1,7 +1,9 @@
 #ifndef __MOVE_LOOKUP_H__
 #define __MOVE_LOOKUP_H__
 
-#include "Data.h"
+#include <cstdlib>
+#include <cassert>
+#include "Defines.h"
 
 #define ATCK_CMP(A, B)		((A^B) >> 3) - ((A^(-B)) >> 3)
 #define CAPTURE_MOVE(A, B)	(A * B <  0)
@@ -19,10 +21,10 @@ private:
 
 	static char offsets[7][8];
 
-	char *board;
+	char *square;
 
 public:
-	MoveLookup(char *Board) : board(Board) {};
+	MoveLookup(char *Square) : square(Square) {}
 
 	char* genAll(const char &from) const;
 

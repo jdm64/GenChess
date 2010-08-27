@@ -35,7 +35,7 @@ char MoveLookup::offsets[7][8] = {
 
 char* MoveLookup::genAll(const char &from) const
 {
-	int type = abs(board[from]), next = 0, mfrom = mailbox64[from];
+	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
 	char to, *list = new char[28], *offset = offsets[type];
 
 	switch (type) {
@@ -45,7 +45,7 @@ char* MoveLookup::genAll(const char &from) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (CAPTURE_MOVE(board[from], board[to]))
+			else if (CAPTURE_MOVE(square[from], square[to]))
 				list[next++] = to;
 		}
 		// moves
@@ -53,7 +53,7 @@ char* MoveLookup::genAll(const char &from) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (EMPTY_MOVE(board[from], board[to]))
+			else if (EMPTY_MOVE(square[from], square[to]))
 				list[next++] = to;
 		}
 		break;
@@ -63,7 +63,7 @@ char* MoveLookup::genAll(const char &from) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (ANY_MOVE(board[from], board[to]))
+			else if (ANY_MOVE(square[from], square[to]))
 				list[next++] = to;
 		}
 		break;
@@ -74,10 +74,10 @@ char* MoveLookup::genAll(const char &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(board[from], board[to])) {
+				} else if (EMPTY_MOVE(square[from], square[to])) {
 					list[next++] = to;
 					continue;
-				} else if (CAPTURE_MOVE(board[from], board[to])) {
+				} else if (CAPTURE_MOVE(square[from], square[to])) {
 					list[next++] = to;
 				}
 				break;
@@ -90,10 +90,10 @@ char* MoveLookup::genAll(const char &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(board[from], board[to])) {
+				} else if (EMPTY_MOVE(square[from], square[to])) {
 					list[next++] = to;
 					continue;
-				} else if (CAPTURE_MOVE(board[from], board[to])) {
+				} else if (CAPTURE_MOVE(square[from], square[to])) {
 					list[next++] = to;
 				}
 				break;
@@ -109,7 +109,7 @@ char* MoveLookup::genAll(const char &from) const
 
 char* MoveLookup::genCapture(const char &from) const
 {
-	int type = abs(board[from]), next = 0, mfrom = mailbox64[from];
+	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
 	char to, *list = new char[28], *offset = offsets[type];
 
 	switch (type) {
@@ -119,7 +119,7 @@ char* MoveLookup::genCapture(const char &from) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (CAPTURE_MOVE(board[from], board[to]))
+			else if (CAPTURE_MOVE(square[from], square[to]))
 				list[next++] = to;
 		}
 		break;
@@ -129,7 +129,7 @@ char* MoveLookup::genCapture(const char &from) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (CAPTURE_MOVE(board[from], board[to]))
+			else if (CAPTURE_MOVE(square[from], square[to]))
 				list[next++] = to;
 		}
 		break;
@@ -140,9 +140,9 @@ char* MoveLookup::genCapture(const char &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1)
 					break;
-				else if (EMPTY_MOVE(board[from], board[to]))
+				else if (EMPTY_MOVE(square[from], square[to]))
 					continue;
-				else if (CAPTURE_MOVE(board[from], board[to]))
+				else if (CAPTURE_MOVE(square[from], square[to]))
 					list[next++] = to;
 				break;
 			}
@@ -154,9 +154,9 @@ char* MoveLookup::genCapture(const char &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1)
 					break;
-				else if (EMPTY_MOVE(board[from], board[to]))
+				else if (EMPTY_MOVE(square[from], square[to]))
 					continue;
-				else if (CAPTURE_MOVE(board[from], board[to]))
+				else if (CAPTURE_MOVE(square[from], square[to]))
 					list[next++] = to;
 				break;
 			}
@@ -171,7 +171,7 @@ char* MoveLookup::genCapture(const char &from) const
 
 char* MoveLookup::genMove(const char &from) const
 {
-	int type = abs(board[from]), next = 0, mfrom = mailbox64[from];
+	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
 	char to, *list = new char[28], *offset = offsets[type];
 
 	switch (type) {
@@ -181,7 +181,7 @@ char* MoveLookup::genMove(const char &from) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (EMPTY_MOVE(board[from], board[to]))
+			else if (EMPTY_MOVE(square[from], square[to]))
 				list[next++] = to;
 		}
 		break;
@@ -191,7 +191,7 @@ char* MoveLookup::genMove(const char &from) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (EMPTY_MOVE(board[from], board[to]))
+			else if (EMPTY_MOVE(square[from], square[to]))
 				list[next++] = to;
 		}
 		break;
@@ -202,7 +202,7 @@ char* MoveLookup::genMove(const char &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(board[from], board[to])) {
+				} else if (EMPTY_MOVE(square[from], square[to])) {
 					list[next++] = to;
 					continue;
 				}
@@ -216,7 +216,7 @@ char* MoveLookup::genMove(const char &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(board[from], board[to])) {
+				} else if (EMPTY_MOVE(square[from], square[to])) {
 					list[next++] = to;
 					continue;
 				}
@@ -233,7 +233,7 @@ char* MoveLookup::genMove(const char &from) const
 
 bool MoveLookup::fromto(const char &From, const char &To) const
 {
-	int type = abs(board[From]), mfrom = mailbox64[From];
+	int type = abs(square[From]), mfrom = mailbox64[From];
 	char to, *offset = offsets[type];
 
 	switch (type) {
@@ -243,7 +243,7 @@ bool MoveLookup::fromto(const char &From, const char &To) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (ANY_MOVE(board[From], board[to]) && to == To)
+			else if (ANY_MOVE(square[From], square[to]) && to == To)
 				return true;
 		}
 		// moves
@@ -251,7 +251,7 @@ bool MoveLookup::fromto(const char &From, const char &To) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (EMPTY_MOVE(board[From], board[to]) && to == To)
+			else if (EMPTY_MOVE(square[From], square[to]) && to == To)
 				return true;
 		}
 		break;
@@ -261,7 +261,7 @@ bool MoveLookup::fromto(const char &From, const char &To) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (ANY_MOVE(board[From], board[to]) && to == To)
+			else if (ANY_MOVE(square[From], square[to]) && to == To)
 				return true;
 		}
 		break;
@@ -272,11 +272,11 @@ bool MoveLookup::fromto(const char &From, const char &To) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(board[From], board[to])) {
+				} else if (EMPTY_MOVE(square[From], square[to])) {
 					if (to == To)
 						return true;
 					continue;
-				} else if (CAPTURE_MOVE(board[From], board[to])) {
+				} else if (CAPTURE_MOVE(square[From], square[to])) {
 					if (to == To)
 						return true;
 				}
@@ -290,11 +290,11 @@ bool MoveLookup::fromto(const char &From, const char &To) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(board[From], board[to])) {
+				} else if (EMPTY_MOVE(square[From], square[to])) {
 					if (to == To)
 						return true;
 					continue;
-				} else if (CAPTURE_MOVE(board[From], board[to])) {
+				} else if (CAPTURE_MOVE(square[From], square[to])) {
 					if (to == To)
 						return true;
 				}
@@ -319,13 +319,13 @@ bool MoveLookup::isAttacked(const char &from) const
 			to = mailbox[mfrom + k * offset[dir]];
 			if (to == -1)
 				break;
-			else if (EMPTY_MOVE(board[from], board[to]))
+			else if (EMPTY_MOVE(square[from], square[to]))
 				continue;
-			else if (OWN_PIECE(board[from], board[to]))
+			else if (OWN_PIECE(square[from], square[to]))
 				break;
-			else if (abs(board[to]) == ROOK || abs(board[to]) == QUEEN)
+			else if (abs(square[to]) == ROOK || abs(square[to]) == QUEEN)
 				return true;
-			else if (k == 1 && abs(board[to]) == KING)
+			else if (k == 1 && abs(square[to]) == KING)
 				return true;
 			break;
 		}
@@ -337,13 +337,13 @@ bool MoveLookup::isAttacked(const char &from) const
 			to = mailbox[mfrom + k * offset[dir]];
 			if (to == -1)
 				break;
-			else if (EMPTY_MOVE(board[from], board[to]))
+			else if (EMPTY_MOVE(square[from], square[to]))
 				continue;
-			else if (OWN_PIECE(board[from], board[to]))
+			else if (OWN_PIECE(square[from], square[to]))
 				break;
-			else if (abs(board[to]) == BISHOP || abs(board[to]) == QUEEN)
+			else if (abs(square[to]) == BISHOP || abs(square[to]) == QUEEN)
 				return true;
-			else if (k == 1 && (abs(board[to]) == PAWN || abs(board[to]) == KING))
+			else if (k == 1 && (abs(square[to]) == PAWN || abs(square[to]) == KING))
 				return true;
 			break;
 		}
@@ -354,9 +354,9 @@ bool MoveLookup::isAttacked(const char &from) const
 		to = mailbox[mfrom + offset[dir]];
 		if (to == -1)
 			continue;
-		else if (NOT_CAPTURE(board[from], board[to]))
+		else if (NOT_CAPTURE(square[from], square[to]))
 			continue;
-		else if (abs(board[to]) == KNIGHT)
+		else if (abs(square[to]) == KNIGHT)
 			return true;
 	}
 	return false;

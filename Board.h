@@ -11,69 +11,55 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "Data.h"
+#include "Move.h"
 #include "MoveLookup.h"
 
 using namespace std;
 
+extern const int pieceValue[16];
+
 class Board {
 private:
-	vector<Move> history;
+	char square[64];
 
-	char board[64];
+	char piece[32];
 
-	Piece pieces[32];
+	int ply;
 
 	char curr;
 
-	int hcounter;
+	int pieceIndex(const int loc, const int type) const;
 
-	int validateMove(Move move, char color);
-
-	string printSquare(int index);
-
-	string printLoc(const char loc);
+	int pieceIndex(const int loc) const;
 
 public:
 	Board();
 
-	static const char pieceSymbol[7];
+	char currPlayer();
 
-	static const int pieceValues[16];
+	void reset();
 
-	char currentPlayer();
+	int isMate();
 
-	void newGame();
+	bool incheck(const char color);
 
-	void quitGame();
+	void make(const Move move);
 
-	int moveCount();
+	void unmake(const Move move);
 
-	int pieceIndex(int loc, int type);
+	bool validMove(const Move move);
 
-	int pieceIndex(int loc);
+	int validMove(string smove, const char color, Move &move);
 
-	bool inCheck(char color);
+	int eval() const;
 
-	void doMove(Move move);
+	int getNumMoves(const char color);
 
-	void undo(Move move);
+	MoveList* getMovesList(const char color);
 
-	int doMove(Move move, char color);
+	string printSquare(const int index) const;
 
-	bool undo();
-
-	int CalcScore();
-
-	int getNumMoves(char color);
-
-	MoveList* getMovesList(char color);
-
-	string printMove(Move move);
-
-	void printBoard();
-
-	void printPieceList();
+	void printBoard() const;
 };
 
 #endif

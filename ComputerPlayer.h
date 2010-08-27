@@ -10,6 +10,7 @@
 
 #include <climits>
 #include "Player.h"
+#include "Board.h"
 
 class ComputerPlayer : public Player {
 private:
@@ -22,8 +23,7 @@ private:
 
 	vector<bool> tactical;
 
-	ScoresCapture cmpCapture;
-	ScoresHiLow cmpHiLow;
+	ScoreSort cmpScore;
 
 public:
 	ComputerPlayer(Board* b, char c): Player(b, c)
@@ -38,7 +38,7 @@ public:
 	{
 		delete[] killer1;
 		delete[] killer2;
-	};
+	}
 
 	void printList(MoveList *ptr);
 

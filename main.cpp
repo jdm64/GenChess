@@ -16,18 +16,19 @@ Board board;
 
 uint64 perft(int depth)
 {
-	MoveList *list = board.getMovesList(board.currentPlayer());
+	MoveList *list = board.getMovesList(board.currPlayer());
+	uint64 nodes;
 
 	if (depth == 1) {
-		uint64 nodes = list->size;
+		nodes = list->size;
 		delete list;
 		return nodes;
 	}
-	uint64 nodes = 0;
+	nodes = 0;
 	for (int i = 0; i < list->size; i++) {
-		board.doMove(list->list[i].move);
+		board.make(list->list[i].move);
 		nodes += perft(depth - 1);
-		board.undo(list->list[i].move);
+		board.unmake(list->list[i].move);
 	}
 	delete list;
 	return nodes;
