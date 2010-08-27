@@ -7,92 +7,24 @@
 
 #include "Game.h"
 
-#define AUTO_EXIT_COUNT 8
-
-Game::Game(bool whiteAI, bool blackAI, bool XMode)
+void Game::newGame()
 {
-	if (whiteAI)
-
-		white = new ComputerPlayer(&board, WHITE);
-	else
-		white = new HumanPlayer(&board, WHITE);
-	if (blackAI)
-		black = new ComputerPlayer(&board, BLACK);
-	else
-		black = new HumanPlayer(&board, BLACK);
-	xMode = XMode;
-	white->setPrintMode(xMode);
-	black->setPrintMode(xMode);
+	board->reset();
+	history.clear();
 }
 
-void Game::mainMenu()
+void Game::doMove(Move move)
 {
-	string cmd;
-
-	while (true) {
-		if (!xMode)
-			cout << "main> ";
-		cin >> cmd;
-
-		if (cmd == "quit") {
-			board.quitGame();
-			return;
-		} else if (cmd == "list") {
-			board.printPieceList();
-		} else if (cmd == "new") {
-			board.newGame();
-			return;
-		} else if (cmd == "help") {
-			cout << "list\tshows where each piece is located\n"
-				<< "new\tstarts a new game\n"
-				<< "quit\texits the game\n"
-				<< "help\tdisplays this help message\n";
-		} else {
-			cout << "? game is over, select new game\n";
-		}
-	}
+	board->make(move);
+	history.push_back(move);
 }
 
-void Game::run()
+bool Game::undoMove()
 {
-	bool check;
-	char state;
-	int nMoves;
-	string player;
+	if (!history.size())
+		return false;
+	board->unmake(history.back());
+        history.pop_back();
 
-	while (true) {
-		state = board.currentPlayer();
-
-		if (state == WHITE || state == BLACK) {
-			check = board.inCheck(state);
-			nMoves = board.getNumMoves(state);
-			player = (state == WHITE)? "white":"black";
-
-			if (check && nMoves) {
-				cout << "! " << player << " in check\n";
-			} else if (check && !nMoves) {
-				cout << "$ " << player << " in checkmate\n";
-				mainMenu();
-				continue;
-			} else if (!check && !nMoves) {
-				cout << "$ stalemate\n";
-				mainMenu();
-				continue;
-			}
-		}
-		switch (state) {
-		case WHITE:
-			white->think();
-			break;
-		case BLACK:
-			black->think();
-			break;
-		case QUIT_GAME:
-			return;
-		}
-#ifdef AUTO_EXIT_COUNT
-		if (board.moveCount() >= AUTO_EXIT_COUNT)
-			return;
-#endif
-	}
+        return true;
 }

@@ -8,29 +8,22 @@
 #ifndef __GAME_H__
 #define __GAME_H__
 
-#include "HumanPlayer.h"
-#include "ComputerPlayer.h"
+#include "Board.h"
 
 class Game {
 private:
-	Board board;
+	Board *board;
 
-	Player *white, *black;
-
-	bool xMode;
+	vector<Move> history;
 
 public:
-	Game(bool, bool, bool);
+	Game(Board *Board) : board(Board) {}
 
-	~Game()
-	{
-		delete white;
-		delete black;
-	}
+	void newGame();
 
-	void mainMenu();
+	void doMove(Move move);
 
-	void run();
+	bool undoMove();
 };
 
 #endif
