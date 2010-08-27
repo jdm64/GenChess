@@ -153,69 +153,6 @@ void ComputerPlayer::think()
 	curr = NULL;
 }
 
-bool ComputerPlayer::parseMove(string s, Move &move)
-{
-	int piece;
-	bool place = true;
-
-	// determin move type by first char
-	switch(s[0]) {
-	case 'a':	case 'b':
-	case 'c':	case 'd':
-	case 'e':	case 'f':
-	case 'g':	case 'h':
-		place = false;
-		break;
-	case 'P':
-		piece = PAWN;
-		break;
-	case 'N':
-		piece = KNIGHT;
-		break;
-	case 'B':
-		piece = BISHOP;
-		break;
-	case 'R':
-		piece = ROOK;
-		break;
-	case 'Q':
-		piece = QUEEN;
-		break;
-	case 'K':
-		piece = KING;
-		break;
-	default:
-		return NOT_MOVE;
-	}
-	// parse placement move
-	if (place) {
-		if (s[1] < 'a' || s[1] > 'h' || s[2] < '0' || s[2] > '9')
-			return false;
-		move.to = s[1] - 'a';
-		move.to += 8 * (8 - (s[2] - '0'));
-		move.from = PLACEABLE;
-		move.index = board->pieceIndex(PLACEABLE, color * piece);
-	} else {
-	// parse movement move
-		if (s[0] < 'a' || s[0] > 'h' ||
-				s[1] < '0' || s[1] > '9' ||
-				s[2] < 'a' || s[2] > 'h' ||
-				s[3] < '0' || s[3] > '9')
-			return false;
-		move.from = s[0] - 'a';
-		move.from += 8 * (8 - (s[1] - '0'));
-		move.to = s[2] - 'a';
-		move.to += 8 * (8 - (s[3] - '0'));
-		move.index = board->pieceIndex(move.from);
-	}
-	// are we talking about a valid piece?
-	if (move.index == NONE)
-		return false;
-	move.xindex = board->pieceIndex(move.to);
-	// return the code for what happends when trying to do the move
-	return true;
-}
-
 void ComputerPlayer::debugTree()
 {
 	MoveList *ptr = new MoveList(*curr);
