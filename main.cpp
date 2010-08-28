@@ -6,9 +6,7 @@
  */
 
 #include <unistd.h>
-#include "Game.h"
-
-#define VERSION		"2.0.75"
+#include "Terminal.h"
 
 using namespace std;
 
@@ -48,8 +46,9 @@ void show_help()
 
 int main(int argc, char **argv)
 {
-	bool white_ai = false, black_ai = false, error = false, xMode = false;
+	int white = HUMAN, black = COMPUTER;
 	char c;
+	bool error = false, xMode = false;
 
 	while ((c = getopt(argc, argv, "Xw:b:hp:v")) != -1) {
 		switch (c) {
@@ -58,17 +57,17 @@ int main(int argc, char **argv)
 			break;
 		case 'w':
 			if (optarg[0] == 'c' || optarg[0] == 'C')
-				white_ai = true;
+				white = COMPUTER;
 			else if (optarg[0] == 'h' || optarg[0] == 'H')
-				white_ai = false;
+				white = HUMAN;
 			else
 				error = true;
 			break;
 		case 'b':
 			if (optarg[0] == 'c' || optarg[0] == 'C')
-				black_ai = true;
+				black = COMPUTER;
 			else if (optarg[0] == 'h' || optarg[0] == 'H')
-				black_ai = false;
+				black = HUMAN;
 			else
 				error = true;
 			break;
@@ -89,9 +88,9 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 
-	Game game(white_ai, black_ai, xMode);
+	Terminal ui(white, black);
 
-	game.run();
+	ui.run();
 
 	return EXIT_SUCCESS;
 }

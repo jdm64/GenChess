@@ -135,7 +135,7 @@ int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, in
 	return bestScore;
 }
 
-void ComputerPlayer::think()
+Move ComputerPlayer::think()
 {
 	srand(time(NULL));
 	tactical.clear();
@@ -147,10 +147,10 @@ void ComputerPlayer::think()
 #ifdef DEBUG_SCORES
 	debugTree();
 #endif
-	assert(board->doMove(curr->list[0].move, color) == VALID_MOVE);
-	cout << board->printMove(curr->list[0].move) << endl;
+	Move move = curr->list[0].move;
 	delete curr;
 	curr = NULL;
+	return move;
 }
 
 void ComputerPlayer::debugTree()

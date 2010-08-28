@@ -9,12 +9,13 @@
 #define __COMPUTER_PLAYER_H__
 
 #include <climits>
-#include "Player.h"
 #include "Board.h"
 
-class ComputerPlayer : public Player {
+class ComputerPlayer {
 private:
 	MoveList *curr;
+
+	Board *board;
 
 	Move *killer1;
 	Move *killer2;
@@ -26,13 +27,7 @@ private:
 	ScoreSort cmpScore;
 
 public:
-	ComputerPlayer(Board* b, char c): Player(b, c)
-	{
-		// set this for how deep the search is. higher values
-		// will take longer, 4 takes about 3mins per move
-		maxNg = 3;
-		curr = NULL;
-	};
+	ComputerPlayer(Board* Board) : curr(NULL), board(Board), maxNg(3) {}
 
 	~ComputerPlayer()
 	{
@@ -58,7 +53,7 @@ public:
 
 	int NegaScout(MoveList *&ptr, int alpha, int beta, int depth, int limit);
 
-	void think();
+	Move think();
 
 	bool parseMove(string s, Move &move);
 

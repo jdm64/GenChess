@@ -75,6 +75,16 @@ bool Board::incheck(const char color)
 	return (piece[king] == PLACEABLE)? false : ml.isAttacked(piece[king]);
 }
 
+int Board::isMate()
+{
+	if (getNumMoves(curr))
+		return NOT_MATE;
+	if (incheck(curr))
+		return CHECK_MATE;
+	else
+		return STALE_MATE;
+}
+
 void Board::make(const Move move)
 {
 	// update board information
