@@ -27,7 +27,10 @@ private:
 	ScoreSort cmpScore;
 
 public:
-	ComputerPlayer(Board* Board) : curr(NULL), board(Board), maxNg(3) {}
+	ComputerPlayer(Board* Board) : curr(NULL), board(Board)
+	{
+		maxNg = 5;
+	}
 
 	~ComputerPlayer()
 	{
