@@ -179,11 +179,11 @@ void ComputerPlayer::debugTree()
 			NegaScout(ptr, -INT_MAX, INT_MAX, 0, mDepth);
 		} else if (cmd == "down") {
 			cin >> cmd;
-			if (!board->validMove(cmd, board->currPlayer(), move)) {
+			if (board->validMove(cmd, board->currPlayer(), move) != VALID_MOVE) {
 				cout << "error\n";
 			} else {
 				mstack.push_back(move);
-				board->unmake(move);
+				board->make(move);
 				cDepth++;
 				mDepth--;
 				delete ptr;
