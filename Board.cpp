@@ -214,9 +214,8 @@ int Board::eval() const
 int Board::getNumMoves(const char color)
 {
 	MoveLookup movelookup(square);
-	int n, num = 0, start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
+	int num = 0;
 	Move move;
-	char *loc;
 
 	// we must place king first
 	if (ply < 2) {
@@ -239,11 +238,12 @@ int Board::getNumMoves(const char color)
 		return num;
 	}
 	// generate piece moves
+	int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	for (int idx = start; idx < end; idx++) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
-		loc = movelookup.genAll(piece[idx]);
-		n = 0;
+		int n = 0;
+		char *loc = movelookup.genAll(piece[idx]);
 		while (loc[n] != -1) {
 			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			move.to = loc[n];
@@ -260,8 +260,8 @@ int Board::getNumMoves(const char color)
 		delete[] loc;
 	}
 	// generate piece place moves
-	for (int type = PAWN, idx; type <= KING; type++) {
-		idx = pieceIndex(PLACEABLE, type * color);
+	for (int type = PAWN; type <= KING; type++) {
+		int idx = pieceIndex(PLACEABLE, type * color);
 		if (idx == NONE)
 			continue;
 		for (int loc = 0; loc < 64; loc++) {
@@ -285,11 +285,9 @@ int Board::getNumMoves(const char color)
 MoveList* Board::getMovesList(const char color)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
-	int n, start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	MoveList *data = new MoveList;
 	MoveLookup movelookup(square);
 	MoveNode item;
-	char *loc;
 
 	data->size = 0;
 	// we must place king first
@@ -316,11 +314,12 @@ MoveList* Board::getMovesList(const char color)
 		return data;
 	}
 	// generate piece moves
-	for (int idx = start; idx < end; idx++) {
+	int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
+	for (int idx = start; idx >= end; idx--) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
-		loc = movelookup.genAll(piece[idx]);
-		n = 0;
+		char *loc = movelookup.genAll(piece[idx]);
+		int n = 0;
 		while (loc[n] != -1) {
 			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			item.move.to = loc[n];
@@ -340,8 +339,8 @@ MoveList* Board::getMovesList(const char color)
 		delete[] loc;
 	}
 	// generate piece place moves
-	for (int type = PAWN, idx; type <= KING; type++) {
-		idx = pieceIndex(PLACEABLE, type * color);
+	for (int type = QUEEN; type >= PAWN; type--) {
+		int idx = pieceIndex(PLACEABLE, type * color);
 		if (idx == NONE)
 			continue;
 		for (int loc = 0; loc < 64; loc++) {
