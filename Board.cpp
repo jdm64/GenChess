@@ -6,6 +6,9 @@
  */
 
 #include "Board.h"
+#include "MoveLookup.h"
+#include "TransTable.h"
+#include <iostream>
 
 using namespace std;
 

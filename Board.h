@@ -8,11 +8,8 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
-#include <vector>
-#include <string>
-#include <iostream>
+#include "Defines.h"
 #include "Move.h"
-#include "MoveLookup.h"
 
 using namespace std;
 

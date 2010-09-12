@@ -8,8 +8,9 @@
 #ifndef __COMPUTER_PLAYER_H__
 #define __COMPUTER_PLAYER_H__
 
-#include <climits>
 #include "Board.h"
+#include "TransTable.h"
+#include <vector>
 
 class ComputerPlayer {
 private:

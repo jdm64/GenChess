@@ -5,8 +5,9 @@
  *      main function and helpers
  */
 
-#include <unistd.h>
 #include "Terminal.h"
+#include <iostream>
+#include <getopt.h>
 
 using namespace std;
 

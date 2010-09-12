@@ -6,6 +6,8 @@
  */
 
 #include "ComputerPlayer.h"
+#include <climits>
+#include <iostream>
 
 #define DEBUG_SCORES
 #define RANDOM_MOVE_ORDER

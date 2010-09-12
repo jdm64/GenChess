@@ -6,6 +6,8 @@
  */
 
 #include "Terminal.h"
+#include "TransTable.h"
+#include <iostream>
 
 const string Terminal::moveError[NUM_MOVE_ERRORS] = {
 	"", "That's an invalid move format",

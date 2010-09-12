@@ -1,10 +1,6 @@
 #ifndef __MOVE_LOOKUP_H__
 #define __MOVE_LOOKUP_H__
 
-#include <cstdlib>
-#include <cassert>
-#include "Defines.h"
-
 #define ATCK_CMP(A, B)		((A^B) >> 3) - ((A^(-B)) >> 3)
 #define CAPTURE_MOVE(A, B)	(A * B <  0)
 #define ANY_MOVE(A, B)		(A * B <= 0)

@@ -6,6 +6,7 @@
  */
 
 #include "Move.h"
+#include "Defines.h"
 
 const char pieceType[32] = {
 	BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,

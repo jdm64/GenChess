@@ -8,10 +8,8 @@
 #ifndef __MOVE_H__
 #define __MOVE_H__
 
-#include <cstdlib>
 #include <string>
 #include <boost/array.hpp>
-#include "Defines.h"
 
 using namespace std;
 

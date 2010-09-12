@@ -9,6 +9,7 @@
 #define __GAME_H__
 
 #include "Board.h"
+#include <vector>
 
 class Game {
 private:
