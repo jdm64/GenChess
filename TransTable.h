@@ -33,7 +33,7 @@ class TransTable {
 private:
 	TransItem *table;
 	int size;
-	int hit, miss;
+	uint64 hit, miss;
 
 public:
 	TransTable(int num_MB);

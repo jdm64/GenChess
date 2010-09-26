@@ -38,8 +38,8 @@ enum {NOT_MATE, CHECK_MATE, STALE_MATE};
 enum {HUMAN, COMPUTER};
 
 struct intPair {
-	int one;
-	int two;
+	uint64 one;
+	uint64 two;
 };
 
 #endif
