@@ -129,11 +129,14 @@ int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, in
 		if (ptr->list[n].score > bestScore) {
 			bestScore = ptr->list[n].score;
 			alpha = max(bestScore, alpha);
-			if (alpha >= beta)
+			if (alpha >= beta) {
+				tt->setBest(board, limit - depth, -alpha, ptr->list[n].move);
 				return alpha;
+			}
 		}
 		b = alpha + 1;
 	}
+	tt->setScore(board, limit - depth, -bestScore);
 	return bestScore;
 }
 

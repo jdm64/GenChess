@@ -31,12 +31,15 @@ Terminal::Terminal(const int white, const int black)
 	again = true;
 	game = new Game(&board);
 	engine = new ComputerPlayer(&board);
+
+	tt = new TransTable(32);
 }
 
 Terminal::~Terminal()
 {
 	delete game;
 	delete engine;
+	delete tt;
 }
 
 bool Terminal::playerCmd()

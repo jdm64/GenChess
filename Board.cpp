@@ -41,13 +41,14 @@ void Board::reset()
 		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 	};
+	key = startHash;
 	curr = WHITE;
 	ply = 0;
 }
 
-char Board::currPlayer()
+void Board::initHash(uint64 hash)
 {
-	return curr;
+	key = hash;
 }
 
 int Board::pieceIndex(const int loc) const
@@ -99,6 +100,15 @@ void Board::make(const Move move)
 	if (move.xindex != NONE)
 		piece[move.xindex] = DEAD;
 
+	key += (curr == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
+	key += hashBox[12 * move.to + typeLookup[move.index]];
+	if (move.from != PLACEABLE)
+		key -= hashBox[12 * move.from + typeLookup[move.index]];
+	else
+		key -= hashBox[HOLD_START + typeLookup[move.index]];
+	if (move.xindex != NONE)
+		key -= hashBox[12 * move.to + typeLookup[move.xindex]];
+
 	curr ^= -2;
 	ply++;
 }
@@ -115,6 +125,15 @@ void Board::unmake(const Move move)
 	}
 	if (move.from != PLACEABLE)
 		square[move.from] = pieceType[move.index];
+
+	key += (curr == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
+	key -= hashBox[12 * move.to + typeLookup[move.index]];
+	if (move.from != PLACEABLE)
+		key += hashBox[12 * move.from + typeLookup[move.index]];
+	else
+		key += hashBox[HOLD_START + typeLookup[move.index]];
+	if (move.xindex != NONE)
+		key += hashBox[12 * move.to + typeLookup[move.xindex]];
 
 	curr ^= -2;
 	ply--;
@@ -309,7 +328,7 @@ MoveList* Board::getMovesList(const char color)
 			// place moves are only valid if neither side is inCheck
 			if (!incheck(color) && !incheck(color ^ -2)) {
 				item.check = false;
-				item.score = eval();
+				item.score = tt->getScore(this);
 				data->list[data->size++] = item;
 			}
 			unmake(item.move);
@@ -332,11 +351,10 @@ MoveList* Board::getMovesList(const char color)
 			make(item.move);
 			if (!incheck(color)) {
 				item.check = incheck(color ^ -2);
-				item.score = eval();
+				item.score = tt->getScore(this);
 				data->list[data->size++] = item;
 			}
 			unmake(item.move);
-
 			n++;
 		}
 		delete[] loc;
@@ -358,7 +376,7 @@ MoveList* Board::getMovesList(const char color)
 			// place moves are only valid if neither side is inCheck
 			if (!incheck(color) && !incheck(color ^ -2)) {
 				item.check = false;
-				item.score = eval();
+				item.score = tt->getScore(this);
 				data->list[data->size++] = item;
 			}
 			unmake(item.move);

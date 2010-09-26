@@ -17,6 +17,8 @@ extern const int pieceValue[16];
 
 class Board {
 private:
+	uint64 key;
+
 	char square[64];
 
 	char piece[32];
@@ -32,7 +34,17 @@ private:
 public:
 	Board();
 
-	char currPlayer();
+	char currPlayer() const
+	{
+		return curr;
+	}
+
+	uint64 hash() const
+	{
+		return key;
+	}
+
+	void initHash(uint64 hash);
 
 	void reset();
 
