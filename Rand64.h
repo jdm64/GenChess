@@ -19,7 +19,8 @@ private:
 	inline uint64 block()
 	{
 		int rn;
-		if (size < 2)
+
+		if (size < 6)
 			size = BLOCK - 1;
 		do {
 			rn = rand() % size;
