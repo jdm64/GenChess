@@ -15,6 +15,8 @@ using namespace std;
 
 extern const int pieceValue[16];
 
+extern const int locValue[6][64];
+
 class Board {
 private:
 	uint64 key;
