@@ -61,7 +61,7 @@ int Board::pieceIndex(const int loc) const
 
 int Board::pieceIndex(const int loc, const int type) const
 {
-	static int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
+	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	int start = ((type < 0)? 0 : 16) + offset[abs(type)],
 		end = ((type < 0)? 0 : 16) + offset[abs(type) + 1];
 
@@ -76,7 +76,7 @@ bool Board::incheck(const char color)
 	MoveLookup ml(square);
 	int king = (color == WHITE)? 31:15;
 
-	return (piece[king] == PLACEABLE)? false : ml.isAttacked(piece[king]);
+	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
 }
 
 int Board::isMate()
