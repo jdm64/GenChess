@@ -46,6 +46,11 @@ public:
 		return key;
 	}
 
+	bool vply() const
+	{
+		return (curr == WHITE)? !(ply % 2) : (ply % 2);
+	}
+
 	void initHash(uint64 hash);
 
 	void reset();
@@ -71,6 +76,10 @@ public:
 	string printSquare(const int index) const;
 
 	void printBoard() const;
+
+	void printPieceList() const;
+
+	void dumpDebug() const;
 };
 
 #endif

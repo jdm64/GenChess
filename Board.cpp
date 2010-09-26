@@ -463,3 +463,40 @@ void Board::printBoard() const
 	cout << "\n  \\ - + - + - + - + - + - + - + - /\n"
 		<< "    a   b   c   d   e   f   g   h\n";
 }
+
+void Board::printPieceList() const
+{
+	string tmp;
+
+	cout << "White:";
+	for (int i = 16; i < 32; i++) {
+		if (!(i % 8))
+			cout << "\n\t";
+		cout << pieceSymbol[pieceType[i]] << "(";
+		tmp = printLoc(piece[i]);
+		if (tmp.length() == 2)
+			cout << ' ' << tmp << ' ';
+		else
+			cout << tmp;
+		cout << ") ";
+	}
+	cout << "\nBlack:";
+	for (int i = 0; i < 16; i++) {
+		if (!(i % 8))
+			cout << "\n\t";
+		cout << pieceSymbol[-pieceType[i]] << "(";
+		tmp = printLoc(piece[i]);
+		if (tmp.length() == 2)
+			cout << ' ' << tmp << ' ';
+		else
+			cout << tmp;
+		cout << ") ";
+	}																																															cout << endl;
+}
+
+void Board::dumpDebug() const
+{
+	cout << "hash:" << key << " curr:" << (int)curr << " ply:" << ply << endl;
+	printBoard();
+	printPieceList();
+}
