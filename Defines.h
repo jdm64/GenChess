@@ -37,4 +37,9 @@ enum {NOT_MATE, CHECK_MATE, STALE_MATE};
 
 enum {HUMAN, COMPUTER};
 
+struct intPair {
+	int one;
+	int two;
+};
+
 #endif
