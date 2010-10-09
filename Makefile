@@ -11,13 +11,13 @@ objs = main.o Terminal.o Game.o ComputerPlayer.o \
 
 all : $(objs)
 	$(CXX) $(objs) -o $(TARGET)
-#	strip -s $(BIN)
+#	strip -s $(TARGET)
 
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean :
-	rm -f *~ *.o $(BIN)
+	rm -f *~ *.o $(TARGET)
 
 archive : clean
 	tar -caf ../genchess-$(VERSION).tar.xz ../$(DIR)
