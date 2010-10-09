@@ -17,7 +17,7 @@ using namespace std;
 
 extern const int pieceValue[16];
 
-extern const int locValue[6][64];
+extern const int locValue[7][64];
 
 void printPieceList(const char *piece);
 

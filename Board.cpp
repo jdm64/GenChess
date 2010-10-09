@@ -12,9 +12,17 @@
 
 using namespace std;
 
-const int pieceValue[16] = {224, 224, 224, 224, 224, 224, 224, 224, 337, 337, 560, 560, 896, 896, 1456, 6834};
+const int pieceValue[16] = {224, 224, 224, 224, 224, 224, 224, 224, 337, 337, 560, 560, 896, 896, 1456, 0};
 
-const int locValue[6][64] = {
+const int locValue[7][64] = {
+	{	0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0},
 	{	2, 3, 3, 3, 3, 3, 3, 2,
 		3, 4, 4, 4, 4, 4, 4, 3,
 		3, 4, 4, 4, 4, 4, 4, 3,
@@ -260,10 +268,10 @@ int Board::validMove(string smove, const char color, Move &move)
 int Board::eval() const
 {
 	int white = 0, black = 0;
-	for (int b = 0, w = 16; b < 15; b++, w++) {
+	for (int b = 0, w = 16; b < 16; b++, w++) {
 		switch (piece[b]) {
 		default:
-			black += locValue[pieceType[b]][piece[b]];
+			black += locValue[pieceType[w]][piece[b]];
 		case PLACEABLE:
 			black += pieceValue[b];
 			break;
