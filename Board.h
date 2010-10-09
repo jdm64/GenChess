@@ -10,12 +10,44 @@
 
 #include "Defines.h"
 #include "Move.h"
+#include <iostream>
+#include <cstring>
 
 using namespace std;
 
 extern const int pieceValue[16];
 
 extern const int locValue[6][64];
+
+void printPieceList(const char *piece);
+
+struct Position {
+	char piece[32];
+	char curr;
+
+	bool operator==(const Position &b)
+	{
+		if (curr != b.curr)
+			return false;
+		char board[66];
+
+		memset(board, 0, 66);
+		for (int i = 0; i < 32; i++)
+			board[b.piece[i] + 2] += pieceType[i];
+		for (int i = 0; i < 32; i++)
+			board[piece[i] + 2] -= pieceType[i];
+		for (int i = 0; i < 66; i++) {
+			if (board[i])
+				return false;
+		}
+		return true;
+	}
+	void print()
+	{
+		cout << "curr: " << (int)curr << endl;
+		printPieceList(piece);
+	}
+};
 
 class Board {
 private:
@@ -69,6 +101,8 @@ public:
 
 	int eval() const;
 
+	Position getPosition();
+
 	int getNumMoves(const char color);
 
 	MoveList* getMovesList(const char color);
@@ -76,8 +110,6 @@ public:
 	string printSquare(const int index) const;
 
 	void printBoard() const;
-
-	void printPieceList() const;
 
 	void dumpDebug() const;
 };

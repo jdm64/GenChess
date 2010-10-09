@@ -40,11 +40,37 @@ intPair TransTable::hitStats()
 	return {hit, miss};
 }
 
+int TransTable::numCollisions()
+{
+	return col_count;
+}
+
+bool TransTable::checkPosition(Board *board)
+{
+	uint64 hash = board->hash();
+
+	if (table[hash % size].hash != hash)
+		return true;
+	if (board->getPosition() == table[hash % size].pos)
+		return true;
+	board->dumpDebug();
+	table[hash % size].pos.print();
+	return false;
+}
+
 int TransTable::getScore(Board *board)
 {
 	uint64 hash = board->hash();
 	
 	if (table[hash % size].hash == hash) {
+#ifdef COLLISION_DEBUG
+		if (!(board->getPosition() == table[hash % size].pos)) {
+			board->dumpDebug();
+			table[hash % size].pos.print();
+			assert(0);
+			col_count++;
+		}
+#endif
 		hit++;
 		return table[hash % size].score;
 	} else {
@@ -64,6 +90,10 @@ bool TransTable::getMove(Board *board, Move &move)
 		miss++;
 		return false;
 	}
+#ifdef COLLISION_DEBUG
+	if (!(board->getPosition() == table[hash % size].pos))
+		col_count++;
+#endif
 	hit++;
 	move = table[hash % size].move;
 	return true;
@@ -78,6 +108,9 @@ void TransTable::setScore(Board *board, char depth, int score)
 	table[hash % size].score = score;
 	table[hash % size].depth = depth;
 	table[hash % size].type = ALL_NODE;
+#ifdef COLLISION_DEBUG
+	table[hash % size].pos = board->getPosition();
+#endif
 }
 
 void TransTable::setBest(Board *board, char depth, int score, Move move)
@@ -90,4 +123,7 @@ void TransTable::setBest(Board *board, char depth, int score, Move move)
 	table[hash % size].move = move;
 	table[hash % size].depth = depth;
 	table[hash % size].type = CUT_NODE;
+#ifdef COLLISION_DEBUG
+	table[hash % size].pos = board->getPosition();
+#endif
 }

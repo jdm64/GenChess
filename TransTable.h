@@ -3,6 +3,8 @@
 
 #include "Board.h"
 
+#define COLLISION_DEBUG
+
 #define ZBOX_SIZE 781
 #define WTM_HASH 780
 #define HOLD_START 768
@@ -16,6 +18,9 @@ extern uint64 hashBox[ZBOX_SIZE];
 extern const int typeLookup[32];
 
 struct TransItem {
+#ifdef COLLISION_DEBUG
+	Position pos;
+#endif
 	uint64 hash;
 	int score;
 	Move move;
@@ -32,7 +37,7 @@ struct TransItem {
 class TransTable {
 private:
 	TransItem *table;
-	int size;
+	int size, col_count;
 	uint64 hit, miss;
 
 public:
@@ -41,6 +46,11 @@ public:
 	~TransTable();
 	
 	intPair hitStats();
+
+#ifdef COLLISION_DEBUG
+	int numCollisions();
+#endif
+	bool checkPosition(Board *board);
 
 	int getScore(Board *board);
 

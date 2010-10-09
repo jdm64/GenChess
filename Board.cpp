@@ -286,6 +286,16 @@ int Board::eval() const
 	return (curr == WHITE)? -white : white;
 }
 
+Position Board::getPosition()
+{
+	Position pos;
+
+	for (int i = 0; i < 32; i++)
+		pos.piece[i] = piece[i];
+	pos.curr = curr;
+	return pos;
+}
+
 int Board::getNumMoves(const char color)
 {
 	MoveLookup movelookup(square);
@@ -464,7 +474,14 @@ void Board::printBoard() const
 		<< "    a   b   c   d   e   f   g   h\n";
 }
 
-void Board::printPieceList() const
+void Board::dumpDebug() const
+{
+	cout << "hash:" << key << " curr:" << (int)curr << " ply:" << ply << endl;
+	printBoard();
+	printPieceList(piece);
+}
+
+void printPieceList(const char *piece)
 {
 	string tmp;
 
@@ -492,11 +509,4 @@ void Board::printPieceList() const
 			cout << tmp;
 		cout << ") ";
 	}																																															cout << endl;
-}
-
-void Board::dumpDebug() const
-{
-	cout << "hash:" << key << " curr:" << (int)curr << " ply:" << ply << endl;
-	printBoard();
-	printPieceList();
 }
