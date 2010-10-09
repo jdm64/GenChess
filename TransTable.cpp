@@ -40,6 +40,7 @@ intPair TransTable::hitStats()
 	return {hit, miss};
 }
 
+#ifdef COLLISION_DEBUG
 int TransTable::numCollisions()
 {
 	return col_count;
@@ -57,6 +58,7 @@ bool TransTable::checkPosition(Board *board)
 	table[hash % size].pos.print();
 	return false;
 }
+#endif
 
 int TransTable::getScore(Board *board)
 {

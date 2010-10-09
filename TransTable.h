@@ -3,7 +3,7 @@
 
 #include "Board.h"
 
-#define COLLISION_DEBUG
+//#define COLLISION_DEBUG
 
 #define ZBOX_SIZE 781
 #define WTM_HASH 780
