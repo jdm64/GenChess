@@ -59,17 +59,6 @@ bool Terminal::playerCmd()
 			return true;
 		}
 		game->doMove(move);
-		switch (board.isMate()) {
-		case NOT_MATE:
-		default:
-			break;
-		case CHECK_MATE:
-			cout << playerString[board.currPlayer() ^ -2] << " got checkmate\n";
-			break;
-		case STALE_MATE:
-			cout << "game is stalemate";
-			break;
-		}
 	} else if (cmd == "new") {
 		game->newGame();
 	} else if (cmd == "quit") {
@@ -108,6 +97,18 @@ void Terminal::run()
 			Move move = engine->think();
 			game->doMove(move);
 			cout << "My move is: " << move.toString() << endl;
+		}
+
+		switch (board.isMate()) {
+		case NOT_MATE:
+		default:
+			break;
+		case CHECK_MATE:
+			cout << playerString[board.currPlayer() ^ -2] << " got checkmate\n";
+			break;
+		case STALE_MATE:
+			cout << "game is stalemate\n";
+			break;
 		}
 	}
 }
