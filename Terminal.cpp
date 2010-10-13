@@ -118,15 +118,18 @@ void Terminal::displayHelp()
 
 void Terminal::run()
 {
+	board.printBoard();
+
 	while (again) {
 		if (playerType[board.currPlayer()] == HUMAN) {
-			board.printBoard();
 			while (playerCmd());
 		} else {
 			Move move = engine->think();
 			game->doMove(move);
 			cout << "My move is: " << move.toString() << endl;
 		}
+		if (again)
+			board.printBoard();
 
 		switch (board.isMate()) {
 		case NOT_MATE:
