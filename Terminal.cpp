@@ -42,6 +42,35 @@ Terminal::~Terminal()
 	delete tt;
 }
 
+bool Terminal::mainMenu()
+{
+	string cmd;
+
+	cout << "main> ";
+	cin >> cmd;
+	if (cmd == "new") {
+		game->newGame();
+	} else if (cmd == "quit") {
+		again = false;
+	} else if (cmd == "undo") {
+		game->undoMove();
+		// recheck player, print error if not undo-able
+	} else if (cmd == "dundo") {
+		game->undoMove();
+		game->undoMove();
+	} else if (cmd == "list") {
+		printPieceList(board.getPosition().piece);
+		return true;
+	} else if (cmd == "help") {
+		displayHelp();
+		return true;
+	} else {
+		cout << "Error: \"" << cmd << "\" not recognized\n";
+		return true;
+	}
+	return false;
+}
+
 bool Terminal::playerCmd()
 {
 	string cmd;
@@ -70,7 +99,7 @@ bool Terminal::playerCmd()
 		game->undoMove();
 		game->undoMove();
 	} else if (cmd == "list") {
-		// print list of pieces
+		printPieceList(board.getPosition().piece);
 		return true;
 	} else if (cmd == "help") {
 		displayHelp();
@@ -105,9 +134,11 @@ void Terminal::run()
 			break;
 		case CHECK_MATE:
 			cout << playerString[board.currPlayer() ^ -2] << " got checkmate\n";
+			while (mainMenu());
 			break;
 		case STALE_MATE:
 			cout << "game is stalemate\n";
+			while (mainMenu());
 			break;
 		}
 	}

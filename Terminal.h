@@ -37,6 +37,8 @@ public:
 
 	~Terminal();
 
+	bool mainMenu();
+
 	bool playerCmd();
 
 	void displayHelp();
