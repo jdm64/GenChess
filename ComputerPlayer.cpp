@@ -9,7 +9,7 @@
 #include <climits>
 #include <iostream>
 
-#define DEBUG_SCORES
+//#define DEBUG_SCORES
 #define RANDOM_MOVE_ORDER
 
 void ComputerPlayer::printList(MoveList *ptr)
