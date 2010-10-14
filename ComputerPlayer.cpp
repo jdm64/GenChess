@@ -109,7 +109,7 @@ int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, in
 	if (!ptr)
 		ptr = board->getMovesList(board->currPlayer());
 	if (!ptr->size)
-		return -(INT_MAX - 2);
+		return tactical.back()? -(INT_MAX - 2) : -(INT_MAX / 2);
 	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	int b = beta, bestScore = -INT_MAX;
