@@ -83,6 +83,11 @@ public:
 		return (curr == WHITE)? !(ply % 2) : (ply % 2);
 	}
 
+	int getPly() const
+	{
+		return ply;
+	}
+
 	void initHash(uint64 hash);
 
 	void reset();

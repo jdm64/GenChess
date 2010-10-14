@@ -7,7 +7,7 @@ VERSION = $(shell grep "define VERSION" main.cpp | cut -d'"' -f2)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
 objs = main.o Terminal.o Game.o ComputerPlayer.o \
-	TransTable.o Board.o Move.o MoveLookup.o
+	TransTable.o Board.o Move.o MoveLookup.o AutoPlay.o
 
 all : $(objs)
 	$(CXX) $(objs) -o $(TARGET)
