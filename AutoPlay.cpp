@@ -48,6 +48,12 @@ void AutoPlay::run()
 			switch (board.isMate()) {
 			case NOT_MATE:
 			default:
+				if (board.getPly() > 600) {
+					again = false;
+					winner[i] = 0;
+					plyCount[i] = 600;
+					game->newGame();
+				}
 				break;
 			case CHECK_MATE:
 				again = false;
