@@ -63,6 +63,7 @@ void AutoPlay::run()
 				break;
 			}
 		}
+		again = true;
 	}
 	printStats();
 }
