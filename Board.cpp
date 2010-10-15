@@ -463,7 +463,7 @@ string Board::printSquare(const int index) const
 	if (!square[index])
 		return "  ";
 	tmp = { pieceSymbol[abs(square[index])],
-		(square[index] > 0)? ' ':'*', '\0' };
+		(square[index] > 0)? ' ':'*' };
 	return tmp;
 }
 
