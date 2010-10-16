@@ -110,6 +110,25 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 		else
 			limit++;
 	}
+	int bestScore = -INT_MAX;
+	Move move;
+
+	if (tt->getMove(board, move)) {
+		if (!board->validMove(move))
+			goto hashMiss;
+		board->make(move);
+		tactical.push_back(board->incheck(board->currPlayer()));
+
+		bestScore = -NegaScout(-beta, -alpha, depth + 1, limit);
+
+		board->unmake(move);
+		tactical.pop_back();
+
+		if (bestScore >= beta)
+			return bestScore;
+		alpha = max(bestScore, alpha);
+	}
+hashMiss:
 	MoveList *ptr = (!depth && curr)? curr : board->getMovesList(board->currPlayer());
 	if (!ptr->size) {
 		delete ptr;
@@ -117,16 +136,16 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 	}
 	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
-	int b = beta, bestScore = -INT_MAX;
+	int b = alpha + 1;
 	for (int n = 0; n < ptr->size; n++) {
-		tactical.push_back(ptr->list[n].check);
 		board->make(ptr->list[n].move);
+		tactical.push_back(ptr->list[n].check);
 		ptr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
 
-		if (ptr->list[n].score > alpha && ptr->list[n].score < beta && n > 0)
+		if (ptr->list[n].score > alpha && ptr->list[n].score < beta)
 			ptr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
-		board->unmake(ptr->list[n].move);
 		tactical.pop_back();
+		board->unmake(ptr->list[n].move);
 
 		if (ptr->list[n].score > bestScore) {
 			bestScore = ptr->list[n].score;
