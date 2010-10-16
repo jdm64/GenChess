@@ -69,36 +69,40 @@ int ComputerPlayer::getMaxScore(MoveList *ptr)
 	return max;
 }
 
-int ComputerPlayer::Quiescence(MoveList *&ptr, int alpha, int beta, int depth)
+int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
-	if (!ptr)
-		ptr = board->getMovesList(board->currPlayer());
+	MoveList *ptr = board->getMovesList(board->currPlayer());
 
 	int score = getMaxScore(ptr);
-	if (score >= beta)
+	if (score >= beta) {
+		delete ptr;
 		return score;
+	}
 	alpha = max(alpha, score);
-	if (depth >= maxNg)
+	if (depth >= maxNg) {
+		delete ptr;
 		return alpha;
+	}
 	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	for (int n = 0; n < ptr->size; n++) {
 		if (ptr->list[n].move.xindex == NONE && !ptr->list[n].check)
 			break;
 		board->make(ptr->list[n].move);
-		score = -Quiescence(ptr->list[n].next, -beta, -alpha, depth + 1);
+		score = -Quiescence(-beta, -alpha, depth + 1);
 		board->unmake(ptr->list[n].move);
 
-		delete ptr->list[n].next;
-		ptr->list[n].next = NULL;
-		if (score >= beta)
+		if (score >= beta) {
+			delete ptr;
 			return score;
+		}
 		alpha = max(alpha, score);
 	}
+	delete ptr;
 	return alpha;
 }
 
-int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, int limit)
+int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 {
 	if (depth >= limit) {
 		if (!tactical.back())
@@ -106,47 +110,51 @@ int ComputerPlayer::NegaScout(MoveList *&ptr, int alpha, int beta, int depth, in
 		else
 			limit++;
 	}
-	if (!ptr)
-		ptr = board->getMovesList(board->currPlayer());
-	if (!ptr->size)
+	MoveList *ptr = (!depth && curr)? curr : board->getMovesList(board->currPlayer());
+	if (!ptr->size) {
+		delete ptr;
 		return tactical.back()? -(INT_MAX - 2) : -(INT_MAX / 2);
+	}
 	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	int b = beta, bestScore = -INT_MAX;
 	for (int n = 0; n < ptr->size; n++) {
 		tactical.push_back(ptr->list[n].check);
 		board->make(ptr->list[n].move);
-		ptr->list[n].score = -NegaScout(ptr->list[n].next, -b, -alpha, depth + 1, limit);
+		ptr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
 
 		if (ptr->list[n].score > alpha && ptr->list[n].score < beta && n > 0)
-			ptr->list[n].score = -NegaScout(ptr->list[n].next, -beta, -alpha, depth + 1, limit);
+			ptr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(ptr->list[n].move);
 		tactical.pop_back();
-
-		delete ptr->list[n].next;
-		ptr->list[n].next = NULL;
 
 		if (ptr->list[n].score > bestScore) {
 			bestScore = ptr->list[n].score;
 			alpha = max(bestScore, alpha);
 			if (alpha >= beta) {
 				tt->setBest(board, limit - depth, -alpha, ptr->list[n].move);
+				delete ptr;
 				return alpha;
 			}
 		}
 		b = alpha + 1;
 	}
 	tt->setScore(board, limit - depth, -bestScore);
+	if (depth)
+		delete ptr;
+	else
+		curr = ptr;
 	return bestScore;
 }
 
 Move ComputerPlayer::think()
 {
 	srand(time(NULL));
+	curr = NULL;
 	tactical.clear();
 	tactical.push_back(board->incheck(board->currPlayer()));
 	for (int depth = 0; depth <= maxNg; depth++)
-		NegaScout(curr, -INT_MAX, INT_MAX, 0, depth);
+		NegaScout(-INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr);
 
 #ifdef DEBUG_SCORES
@@ -154,7 +162,6 @@ Move ComputerPlayer::think()
 #endif
 	Move move = curr->list[0].move;
 	delete curr;
-	curr = NULL;
 	return move;
 }
 
@@ -181,7 +188,7 @@ void ComputerPlayer::debugTree()
 			mDepth++;
 			delete ptr;
 			ptr = NULL;
-			NegaScout(ptr, -INT_MAX, INT_MAX, 0, mDepth);
+			NegaScout(-INT_MAX, INT_MAX, 0, mDepth);
 		} else if (cmd == "down") {
 			cin >> cmd;
 			if (board->validMove(cmd, board->currPlayer(), move) != VALID_MOVE) {
@@ -193,13 +200,13 @@ void ComputerPlayer::debugTree()
 				mDepth--;
 				delete ptr;
 				ptr = NULL;
-				NegaScout(ptr, -INT_MAX, INT_MAX, 0, mDepth);
+				NegaScout(-INT_MAX, INT_MAX, 0, mDepth);
 			}
 		} else {
 			cout << "error\n";
 		}
 	}
-	for (int i = 0; i < mstack.size(); i++) {
+	for (unsigned int i = 0; i < mstack.size(); i++) {
 		board->unmake(mstack.back());
                 mstack.pop_back();
 	}

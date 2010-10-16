@@ -34,10 +34,7 @@ struct MoveList;
 struct MoveNode {
 	Move move;
 	int score;
-	MoveList *next;
 	bool check;
-
-	MoveNode() : next(NULL) {}
 };
 
 struct MoveList {

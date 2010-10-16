@@ -53,9 +53,9 @@ public:
 	// returns the maximum score in ptr->list[].score
 	int getMaxScore(MoveList *ptr);
 
-	int Quiescence(MoveList *&ptr, int alpha, int beta, int depth);
+	int Quiescence(int alpha, int beta, int depth);
 
-	int NegaScout(MoveList *&ptr, int alpha, int beta, int depth, int limit);
+	int NegaScout(int alpha, int beta, int depth, int limit);
 
 	Move think();
 
