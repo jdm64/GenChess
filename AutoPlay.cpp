@@ -1,6 +1,7 @@
 #include "AutoPlay.h"
 #include "TransTable.h"
 #include <iostream>
+#include <cmath>
 
 AutoPlay::AutoPlay(const int NumGames)
 {
@@ -34,8 +35,12 @@ void AutoPlay::printStats()
 	}
 	avgPly /= numGames;
 
+	double ratio = abs(double(winSum[0] - winSum[2])/double(winSum[0] + winSum[2])),
+		error = (erf(ratio/ sqrt(2.0)) - 1.0) / 2.0;
+
 	cout << "White: " << winSum[2] << " Black: " << winSum[0]
-		<< " Tie: " << winSum[1] << " AvgPly: " << avgPly << endl;
+		<< " Tie: " << winSum[1] << " AvgPly: " << avgPly
+		<< " Error: " << error << endl;
 }
 
 void AutoPlay::run()
