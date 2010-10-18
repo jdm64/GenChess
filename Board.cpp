@@ -198,15 +198,16 @@ void Board::unmake(const Move move)
 	ply--;
 }
 
-bool Board::validMove(const Move move)
+bool Board::validMove(Move &move)
 {
-	// TODO: match by type not index
-	if (piece[move.index] != move.from)
+	if ((move.index = pieceIndex(move.from, pieceType[move.index])) == NONE)
 		return false;
-	if (move.xindex != NONE && piece[move.xindex] != move.to)
+	if (move.xindex != NONE) {
+		if ((move.xindex = pieceIndex(move.to, pieceType[move.xindex])) == NONE)
+			return false;
+	} else if (square[move.to] == EMPTY) {
 		return false;
-	else if (square[move.to] == EMPTY)
-		return false;
+	}
 
 	if (move.from != PLACEABLE) {
 		MoveLookup ml(square);

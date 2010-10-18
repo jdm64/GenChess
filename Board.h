@@ -100,7 +100,7 @@ public:
 
 	void unmake(const Move move);
 
-	bool validMove(const Move move);
+	bool validMove(Move &move);
 
 	int validMove(string smove, const char color, Move &move);
 
