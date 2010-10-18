@@ -256,14 +256,17 @@ int Board::validMove(string smove, const char color, Move &move)
 		if (!ml.fromto(move.from, move.to))
 			return INVALID_MOVEMENT;
 	}
-	make(move); // curr is opponent after make
+	int ret = VALID_MOVE;
+
+	make(move);
+	// curr is opponent after make
 	if (incheck(curr ^ -2))
-		return IN_CHECK;
+		ret = IN_CHECK;
 	if (move.from == PLACEABLE && incheck(curr))
-		return IN_CHECK_PLACE;
+		ret = IN_CHECK_PLACE;
 	unmake(move);
 
-	return VALID_MOVE;
+	return ret;
 }
 
 int Board::eval() const
