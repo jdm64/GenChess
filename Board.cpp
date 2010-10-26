@@ -511,10 +511,8 @@ MoveList* Board::getPerftMovesList(const char color)
 
 			makeP(item.move);
 			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2)) {
-				item.check = false;
+			if (!incheck(color) && !incheck(color ^ -2))
 				data->list[data->size++] = item;
-			}
 			unmakeP(item.move);
 		}
 		return data;
@@ -533,10 +531,8 @@ MoveList* Board::getPerftMovesList(const char color)
 			item.move.index = idx;
 
 			makeP(item.move);
-			if (!incheck(color)) {
-				item.check = incheck(color ^ -2);
+			if (!incheck(color))
 				data->list[data->size++] = item;
-			}
 			unmakeP(item.move);
 			n++;
 		}
@@ -557,10 +553,8 @@ MoveList* Board::getPerftMovesList(const char color)
 
 			makeP(item.move);
 			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2)) {
-				item.check = false;
+			if (!incheck(color) && !incheck(color ^ -2))
 				data->list[data->size++] = item;
-			}
 			unmakeP(item.move);
 		}
 	}
