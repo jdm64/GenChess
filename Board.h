@@ -100,6 +100,10 @@ public:
 
 	void unmake(const Move move);
 
+	void makeP(const Move move);
+
+	void unmakeP(const Move move);
+
 	bool validMove(Move &move);
 
 	int validMove(string smove, const char color, Move &move);
@@ -111,6 +115,8 @@ public:
 	int getNumMoves(const char color);
 
 	MoveList* getMovesList(const char color);
+
+	MoveList* getPerftMovesList(const char color);
 
 	string printSquare(const int index) const;
 

@@ -14,9 +14,14 @@ using namespace std;
 
 Board board;
 
+/* depth=1	nodes=64
+ * depth=2	nodes=3612
+ * depth=3	nodes=953632
+ * depth=4	nodes=248188772
+ */
 uint64 perft(int depth)
 {
-	MoveList *list = board.getMovesList(board.currPlayer());
+	MoveList *list = board.getPerftMovesList(board.currPlayer());
 	uint64 nodes;
 
 	if (depth == 1) {
@@ -26,9 +31,9 @@ uint64 perft(int depth)
 	}
 	nodes = 0;
 	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
+		board.makeP(list->list[i].move);
 		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move);
+		board.unmakeP(list->list[i].move);
 	}
 	delete list;
 	return nodes;
