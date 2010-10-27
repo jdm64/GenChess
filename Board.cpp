@@ -542,7 +542,7 @@ MoveList* Board::getPerftMovesList(const char color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			char *loc = movelookup.genMove(piece[idx]);
+			char *loc = movelookup.genAll(piece[idx]);
 			int n = 0;
 			while (loc[n] != -1) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
