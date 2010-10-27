@@ -489,74 +489,161 @@ MoveList* Board::getMovesList(const char color)
 	return data;
 }
 
-MoveList* Board::getPerftMovesList(const char color)
+MoveList* Board::getPerftMovesList(const char color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
 	MoveLookup movelookup(square);
 	MoveNode item;
+	int start, end;
 
 	data->size = 0;
-	// we must place king first
-	if (ply < 2) {
-		int idx = pieceIndex(PLACEABLE, KING * color);
+	switch (movetype) {
+	case MOVE_ALL:
+		if (ply < 2) {
+			int idx = pieceIndex(PLACEABLE, KING * color);
+			for (int loc = 0; loc < 64; loc++) {
+				if (square[loc] != EMPTY)
+					continue;
+				item.move.to = loc;
+				item.move.index = idx;
+				item.move.xindex = NONE;
+				item.move.from = PLACEABLE;
 
-		for (int loc = 0; loc < 64; loc++) {
-			if (square[loc] != EMPTY)
+				makeP(item.move);
+				// place moves are only valid if neither side is inCheck
+				if (!incheck(color) && !incheck(color ^ -2))
+					data->list[data->size++] = item;
+				unmakeP(item.move);
+			}
+			break;
+		}
+		for (int type = QUEEN; type >= PAWN; type--) {
+			int idx = pieceIndex(PLACEABLE, type * color);
+			if (idx == NONE)
 				continue;
-			item.move.to = loc;
-			item.move.index = idx;
-			item.move.xindex = NONE;
-			item.move.from = PLACEABLE;
+			for (int loc = 0; loc < 64; loc++) {
+				if (square[loc] != EMPTY)
+					continue;
+				item.move.index = idx;
+				item.move.to = loc;
+				item.move.xindex = NONE;
+				item.move.from = PLACEABLE;
 
-			makeP(item.move);
-			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2))
-				data->list[data->size++] = item;
-			unmakeP(item.move);
+				makeP(item.move);
+				// place moves are only valid if neither side is inCheck
+				if (!incheck(color) && !incheck(color ^ -2))
+					data->list[data->size++] = item;
+				unmakeP(item.move);
+			}
 		}
-		return data;
-	}
-	// generate piece moves
-	int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
-	for (int idx = start; idx >= end; idx--) {
-		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
-			continue;
-		char *loc = movelookup.genAll(piece[idx]);
-		int n = 0;
-		while (loc[n] != -1) {
-			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
-			item.move.to = loc[n];
-			item.move.from = piece[idx];
-			item.move.index = idx;
-
-			makeP(item.move);
-			if (!incheck(color))
-				data->list[data->size++] = item;
-			unmakeP(item.move);
-			n++;
-		}
-		delete[] loc;
-	}
-	// generate piece place moves
-	for (int type = QUEEN; type >= PAWN; type--) {
-		int idx = pieceIndex(PLACEABLE, type * color);
-		if (idx == NONE)
-			continue;
-		for (int loc = 0; loc < 64; loc++) {
-			if (square[loc] != EMPTY)
+		start = (color == BLACK)? 15:31;
+		end = (color == BLACK)? 0:16;
+		for (int idx = start; idx >= end; idx--) {
+			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			item.move.index = idx;
-			item.move.to = loc;
-			item.move.xindex = NONE;
-			item.move.from = PLACEABLE;
+			char *loc = movelookup.genMove(piece[idx]);
+			int n = 0;
+			while (loc[n] != -1) {
+				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
+				item.move.to = loc[n];
+				item.move.from = piece[idx];
+				item.move.index = idx;
 
-			makeP(item.move);
-			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2))
-				data->list[data->size++] = item;
-			unmakeP(item.move);
+				makeP(item.move);
+				if (!incheck(color))
+					data->list[data->size++] = item;
+				unmakeP(item.move);
+				n++;
+			}
+			delete[] loc;
 		}
+		break;
+	case MOVE_CAPTURE:
+		start = (color == BLACK)? 15:31;
+		end = (color == BLACK)? 0:16;
+		for (int idx = start; idx >= end; idx--) {
+			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
+				continue;
+			char *loc = movelookup.genCapture(piece[idx]);
+			int n = 0;
+			while (loc[n] != -1) {
+				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
+				item.move.to = loc[n];
+				item.move.from = piece[idx];
+				item.move.index = idx;
+
+				makeP(item.move);
+				if (!incheck(color))
+					data->list[data->size++] = item;
+				unmakeP(item.move);
+				n++;
+			}
+			delete[] loc;
+		}
+		break;
+	case MOVE_MOVE:
+		start = (color == BLACK)? 15:31;
+		end = (color == BLACK)? 0:16;
+		for (int idx = start; idx >= end; idx--) {
+			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
+				continue;
+			char *loc = movelookup.genMove(piece[idx]);
+			int n = 0;
+			while (loc[n] != -1) {
+				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
+				item.move.to = loc[n];
+				item.move.from = piece[idx];
+				item.move.index = idx;
+
+				makeP(item.move);
+				if (!incheck(color))
+					data->list[data->size++] = item;
+				unmakeP(item.move);
+				n++;
+			}
+			delete[] loc;
+		}
+		break;
+	case MOVE_PLACE:
+		if (ply < 2) {
+			int idx = pieceIndex(PLACEABLE, KING * color);
+			for (int loc = 0; loc < 64; loc++) {
+				if (square[loc] != EMPTY)
+					continue;
+				item.move.to = loc;
+				item.move.index = idx;
+				item.move.xindex = NONE;
+				item.move.from = PLACEABLE;
+
+				makeP(item.move);
+				// place moves are only valid if neither side is inCheck
+				if (!incheck(color) && !incheck(color ^ -2))
+					data->list[data->size++] = item;
+				unmakeP(item.move);
+			}
+			break;
+		}
+		for (int type = QUEEN; type >= PAWN; type--) {
+			int idx = pieceIndex(PLACEABLE, type * color);
+			if (idx == NONE)
+				continue;
+			for (int loc = 0; loc < 64; loc++) {
+				if (square[loc] != EMPTY)
+					continue;
+				item.move.index = idx;
+				item.move.to = loc;
+				item.move.xindex = NONE;
+				item.move.from = PLACEABLE;
+
+				makeP(item.move);
+				// place moves are only valid if neither side is inCheck
+				if (!incheck(color) && !incheck(color ^ -2))
+					data->list[data->size++] = item;
+				unmakeP(item.move);
+			}
+		}
+		break;
 	}
 	return data;
 }

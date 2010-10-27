@@ -18,23 +18,53 @@ Board board;
  * depth=2	nodes=3612
  * depth=3	nodes=953632
  * depth=4	nodes=248188772
+ * depth=5	nodes=64518625428
  */
 uint64 perft(int depth)
 {
-	MoveList *list = board.getPerftMovesList(board.currPlayer());
+	MoveList *list;
 	uint64 nodes;
 
 	if (depth == 1) {
+		list = board.getPerftMovesList(board.currPlayer(), MOVE_ALL);
 		nodes = list->size;
 		delete list;
 		return nodes;
 	}
 	nodes = 0;
+
+	// Placement Moves
+	list = board.getPerftMovesList(board.currPlayer(), MOVE_PLACE);
+	if (list->size == 0)
+		goto moves;
 	for (int i = 0; i < list->size; i++) {
 		board.makeP(list->list[i].move);
 		nodes += perft(depth - 1);
 		board.unmakeP(list->list[i].move);
 	}
+moves:
+	delete list;
+	// Movement Moves
+	list = board.getPerftMovesList(board.currPlayer(), MOVE_MOVE);
+	if (list->size == 0)
+		goto captures;
+	for (int i = 0; i < list->size; i++) {
+		board.makeP(list->list[i].move);
+		nodes += perft(depth - 1);
+		board.unmakeP(list->list[i].move);
+	}
+captures:
+	delete list;
+	// Capture Moves
+	list = board.getPerftMovesList(board.currPlayer(), MOVE_CAPTURE);
+	if (list->size == 0)
+		goto done;
+	for (int i = 0; i < list->size; i++) {
+		board.makeP(list->list[i].move);
+		nodes += perft(depth - 1);
+		board.unmakeP(list->list[i].move);
+	}
+done:
 	delete list;
 	return nodes;
 }
