@@ -7,6 +7,7 @@
 
 #include "Terminal.h"
 #include "AutoPlay.h"
+#include "CVEP.h"
 #include <iostream>
 #include <getopt.h>
 
@@ -86,6 +87,9 @@ int main(int argc, char **argv)
 	int white = HUMAN, black = COMPUTER, autoNum;
 	char c;
 	bool error = false, xMode = false, autoTest = false;
+
+	// set I/O to unbuffered
+	cout.setf(ios::unitbuf);
 
 	while ((c = getopt(argc, argv, "Xw:b:ha:p:v")) != -1) {
 		switch (c) {
