@@ -94,11 +94,10 @@ void initEngines()
 	engine2 = connectIO(eng2Bin);
 }
 
-double playerError(AsColor a, AsColor b)
+double LOS(AsColor a)
 {
-	int num = 2 * (2 * (a.win - a.lose) + (b.win - b.lose)),
-		den = a.win + a.lose + b.win + b.lose;
-	double ratio = double(abs(num)) / double(den);
+	int num = a.win - a.lose, den = a.win + a.lose;
+	double ratio = double(num) / double(den);
 
 	return 100.0 * erf(ratio / sqrt(2.0)) / 2.0;
 }
@@ -127,12 +126,12 @@ void printStats()
 		<< " ply:" << eng2res.asblack.ply
 		<< endl;
 
-	cout << "1W-1B = " << playerError(eng1res.aswhite, eng1res.asblack) << endl
-		<< "2W-2B = " << playerError(eng2res.aswhite, eng2res.asblack) << endl
-		<< "1W-2W = " << playerError(eng1res.aswhite, eng2res.aswhite) << endl
-		<< "1B-2B = " << playerError(eng1res.asblack, eng2res.asblack) << endl
-		<< "1W-2B = " << playerError(eng1res.aswhite, eng2res.asblack) << endl
-		<< "1B-2W = " << playerError(eng1res.asblack, eng2res.aswhite) << endl;
+	cout << "1W-1B = " << LOS(eng1res.aswhite, eng1res.asblack) << endl
+		<< "2W-2B = " << LOS(eng2res.aswhite, eng2res.asblack) << endl
+		<< "1W-2W = " << LOS(eng1res.aswhite, eng2res.aswhite) << endl
+		<< "1B-2B = " << LOS(eng1res.asblack, eng2res.asblack) << endl
+		<< "1W-2B = " << LOS(eng1res.aswhite, eng2res.asblack) << endl
+		<< "1B-2W = " << LOS(eng1res.asblack, eng2res.aswhite) << endl;
 }
 
 GameResults runGame(IOptr white, IOptr black)
