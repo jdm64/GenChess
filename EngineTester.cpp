@@ -2,6 +2,7 @@
 #include <sstream>
 #include <cassert>
 #include <cmath>
+#include <cstdio>
 #include "Defines.h"
 
 using namespace std;
@@ -104,34 +105,54 @@ double LOS(AsColor a)
 
 void printStats()
 {
-	cout << "Engine One:\n\tAsWhite:\n\t\t"
-		<< "win:" << eng1res.aswhite.win
-		<< " loss:" << eng1res.aswhite.lose
-		<< " draw:" << eng1res.aswhite.draw
-		<< " ply:" << eng1res.aswhite.ply
-		<< "\n\tAsBlack:\n\t\t"
-		<< "win:" << eng1res.asblack.win
-		<< " loss:" << eng1res.asblack.lose
-		<< " draw:" << eng1res.asblack.draw
-		<< " ply:" << eng1res.asblack.ply
-		<< "\nEngine Two:\n\tAsWhite:\n\t\t"
-		<< "win:" << eng2res.aswhite.win
-		<< " loss:" << eng2res.aswhite.lose
-		<< " draw:" << eng2res.aswhite.draw
-		<< " ply:" << eng2res.aswhite.ply
-		<< "\n\tAsBlack:\n\t\t"
-		<< "win:" << eng2res.asblack.win
-		<< " loss:" << eng2res.asblack.lose
-		<< " draw:" << eng2res.asblack.draw
-		<< " ply:" << eng2res.asblack.ply
-		<< endl;
+	AsColor w, x, y, z;
 
-	cout << "1W-1B = " << LOS(eng1res.aswhite, eng1res.asblack) << endl
-		<< "2W-2B = " << LOS(eng2res.aswhite, eng2res.asblack) << endl
-		<< "1W-2W = " << LOS(eng1res.aswhite, eng2res.aswhite) << endl
-		<< "1B-2B = " << LOS(eng1res.asblack, eng2res.asblack) << endl
-		<< "1W-2B = " << LOS(eng1res.aswhite, eng2res.asblack) << endl
-		<< "1B-2W = " << LOS(eng1res.asblack, eng2res.aswhite) << endl;
+	w.win = eng1res.aswhite.win + eng1res.asblack.win;
+	w.lose = eng1res.aswhite.lose + eng1res.asblack.lose;
+	x.win = eng2res.aswhite.win + eng2res.asblack.win;
+	x.lose = eng2res.aswhite.lose + eng2res.asblack.lose;
+	y.win = eng1res.aswhite.win + eng2res.aswhite.win;
+	y.lose = eng1res.aswhite.lose + eng2res.aswhite.lose;
+	z.win = eng1res.asblack.win + eng2res.asblack.win;
+	z.lose = eng1res.asblack.lose + eng2res.asblack.lose;
+
+	double w1 = LOS(eng1res.aswhite), b1 = LOS(eng1res.asblack),
+		w2 = LOS(eng2res.aswhite), b2 = LOS(eng2res.asblack),
+		wb1 = LOS(w), wb2 = LOS(x), w12 = LOS(y), b12 = LOS(z),
+		color = (w1 + w12 + w2) / 3.0, engine = (w1 + wb1 + b1) / 3.0;
+
+	cout.setf(ios::showpoint);
+
+	cout << "Engine 1: " << eng1Bin << endl
+		<< "White: win:" << eng1res.aswhite.win
+			<< " loss:" << eng1res.aswhite.lose
+			<< " draw:" << eng1res.aswhite.draw
+			<< " ply:" << eng1res.aswhite.ply
+			<< endl
+		<< "Black: win:" << eng1res.asblack.win
+			<< " loss:" << eng1res.asblack.lose
+			<< " draw:" << eng1res.asblack.draw
+			<< " ply:" << eng1res.asblack.ply
+			<< "\n\n"
+
+		<< "Engine 2: " << eng2Bin << endl
+		<< "White: win:" << eng2res.aswhite.win
+			<< " loss:" << eng2res.aswhite.lose
+			<< " draw:" << eng2res.aswhite.draw
+			<< " ply:" << eng2res.aswhite.ply
+			<< endl
+		<< "Black: win:" << eng2res.asblack.win
+			<< " loss:" << eng2res.asblack.lose
+			<< " draw:" << eng2res.asblack.draw
+			<< " ply:" << eng2res.asblack.ply
+			<< "\n\n";
+
+	printf("Stats:\n");
+	printf("\twhite\t\tblack\n");
+	printf("one\t%+4.2f\t%+4.2f\t%+4.2f\n", w1, wb1, b1);
+	printf("\t%+4.2f\t\t%+4.2f\n", w12, b12);
+	printf("two\t%+4.2f\t%+4.2f\t%+4.2f\n\n", w2, wb2, b2);
+	printf("Color: %+4.2f\tEngine: %+4.2f\n", color, engine);
 }
 
 GameResults runGame(IOptr white, IOptr black)
