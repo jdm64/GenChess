@@ -10,6 +10,7 @@
 
 #include "Board.h"
 #include "TransTable.h"
+#include "Array.h"
 #include <vector>
 
 class ComputerPlayer {
@@ -23,7 +24,7 @@ private:
 
 	int maxNg;
 
-	vector<bool> tactical;
+	Array<bool> tactical;
 
 	ScoreSort cmpScore;
 

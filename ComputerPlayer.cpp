@@ -105,7 +105,7 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 {
 	if (depth >= limit) {
-		if (!tactical.back())
+		if (!tactical[depth])
 			return -board->eval();
 		else
 			limit++;
@@ -117,12 +117,11 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 		if (!board->validMove(move))
 			goto hashMiss;
 		board->make(move);
-		tactical.push_back(board->incheck(board->currPlayer()));
+		tactical[depth] = board->incheck(board->currPlayer());
 
 		bestScore = -NegaScout(-beta, -alpha, depth + 1, limit);
 
 		board->unmake(move);
-		tactical.pop_back();
 
 		if (bestScore >= beta)
 			return bestScore;
@@ -132,19 +131,18 @@ hashMiss:
 	MoveList *ptr = (!depth && curr)? curr : board->getMovesList(board->currPlayer());
 	if (!ptr->size) {
 		delete ptr;
-		return tactical.back()? -(INT_MAX - 2) : -(INT_MAX / 2);
+		return tactical[depth]? -(INT_MAX - 2) : -(INT_MAX / 2);
 	}
 	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	int b = alpha + 1;
 	for (int n = 0; n < ptr->size; n++) {
 		board->make(ptr->list[n].move);
-		tactical.push_back(ptr->list[n].check);
+		tactical[depth] = ptr->list[n].check;
 		ptr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
 
 		if (ptr->list[n].score > alpha && ptr->list[n].score < beta)
 			ptr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
-		tactical.pop_back();
 		board->unmake(ptr->list[n].move);
 
 		if (ptr->list[n].score > bestScore) {
@@ -170,8 +168,7 @@ Move ComputerPlayer::think()
 {
 	srand(time(NULL));
 	curr = NULL;
-	tactical.clear();
-	tactical.push_back(board->incheck(board->currPlayer()));
+	tactical[0] = board->incheck(board->currPlayer());
 	for (int depth = 0; depth <= maxNg; depth++)
 		NegaScout(-INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr);
