@@ -28,7 +28,7 @@ struct GameResults {
 };
 
 struct AsColor {
-	uint64 time;
+	timespec time;
 	int win;
 	int lose;
 	int draw;
@@ -41,8 +41,8 @@ struct EngineResults {
 
 	EngineResults()
 	{
-		aswhite = {0, 0, 0, 0, 0};
-		asblack = {0, 0, 0, 0, 0};
+		aswhite = {{0, 0}, 0, 0, 0, 0};
+		asblack = {{0, 0}, 0, 0, 0, 0};
 	}
 };
 
@@ -110,25 +110,21 @@ void printStats()
 		<< " loss:" << eng1res.aswhite.lose
 		<< " draw:" << eng1res.aswhite.draw
 		<< " ply:" << eng1res.aswhite.ply
-		<< " time:" << eng1res.aswhite.time
 		<< "\n\tAsBlack:\n\t\t"
 		<< "win:" << eng1res.asblack.win
 		<< " loss:" << eng1res.asblack.lose
 		<< " draw:" << eng1res.asblack.draw
 		<< " ply:" << eng1res.asblack.ply
-		<< " time:" << eng1res.asblack.time
 		<< "\nEngine Two:\n\tAsWhite:\n\t\t"
 		<< "win:" << eng2res.aswhite.win
 		<< " loss:" << eng2res.aswhite.lose
 		<< " draw:" << eng2res.aswhite.draw
 		<< " ply:" << eng2res.aswhite.ply
-		<< " time:" << eng2res.aswhite.time
 		<< "\n\tAsBlack:\n\t\t"
 		<< "win:" << eng2res.asblack.win
 		<< " loss:" << eng2res.asblack.lose
 		<< " draw:" << eng2res.asblack.draw
 		<< " ply:" << eng2res.asblack.ply
-		<< " time:" << eng2res.asblack.time
 		<< endl;
 
 	cout << "1W-1B = " << playerError(eng1res.aswhite, eng1res.asblack) << endl
@@ -144,7 +140,6 @@ GameResults runGame(IOptr white, IOptr black)
 	istringstream line;
 	string move, word;
 	GameResults res;
-	timespec tm1, tm2;
 
 	fputs("newgame\n", white.in);
 	fputs("newgame\n", black.in);
@@ -153,10 +148,7 @@ GameResults runGame(IOptr white, IOptr black)
 		// get white's move
 		res.ply++;
 		fputs("go\n", white.in);
-		clock_gettime(CLOCK_REALTIME, &tm1);
 		fgets(buff, 256, white.out);
-		clock_gettime(CLOCK_REALTIME, &tm2);
-		res.whiteTime = tm2.tv_nsec - tm1.tv_nsec;
 
 		move = string(buff);
 		fgets(buff, 256, white.out);
@@ -175,15 +167,7 @@ GameResults runGame(IOptr white, IOptr black)
 		// get black's move
 		res.ply++;
 		fputs("go\n", black.in);
-		clock_gettime(CLOCK_REALTIME, &tm1);
 		fgets(buff, 256, black.out);
-		clock_gettime(CLOCK_REALTIME, &tm2);
-		res.blackTime = tm2.tv_nsec - tm1.tv_nsec;
-
-		if (res.blackTime <= 0) {
-			cout << tm2.tv_nsec << " " << tm1.tv_nsec << endl;
-			assert(0);
-		}
 
 		move = string(buff);
 		fgets(buff, 256, black.out);
@@ -215,10 +199,8 @@ void runMatch()
 		// One=white; Two=black
 		results = runGame(engine1, engine2);
 
-		eng1res.aswhite.time += results.whiteTime;
 		eng1res.aswhite.ply += results.ply;
 
-		eng2res.asblack.time += results.blackTime;
 		eng2res.asblack.ply += results.ply;
 
 		switch (results.winner) {
@@ -238,13 +220,10 @@ void runMatch()
 		// One=black; Two=white
 		results = runGame(engine2, engine1);
 
-		eng2res.aswhite.time += results.whiteTime;
 		eng2res.aswhite.ply += results.ply;
 
-		eng1res.asblack.time += results.blackTime;
 		eng1res.asblack.ply += results.ply;
 
-		assert(eng1res.asblack.time > 0);
 		switch (results.winner) {
 		case 'W':
 			eng2res.aswhite.win++;
