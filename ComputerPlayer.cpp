@@ -117,14 +117,16 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 		if (!board->validMove(move))
 			goto hashMiss;
 		board->make(move);
-		tactical[depth] = board->incheck(board->currPlayer());
+		tactical[depth + 1] = board->incheck(board->currPlayer());
 
 		bestScore = -NegaScout(-beta, -alpha, depth + 1, limit);
 
 		board->unmake(move);
 
-		if (bestScore >= beta)
+		if (bestScore >= beta) {
+			tt->setBest(board, limit - depth, -bestScore, move);
 			return bestScore;
+		}
 		alpha = max(bestScore, alpha);
 	}
 hashMiss:
@@ -138,7 +140,7 @@ hashMiss:
 	int b = alpha + 1;
 	for (int n = 0; n < ptr->size; n++) {
 		board->make(ptr->list[n].move);
-		tactical[depth] = ptr->list[n].check;
+		tactical[depth + 1] = ptr->list[n].check;
 		ptr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
 
 		if (ptr->list[n].score > alpha && ptr->list[n].score < beta)
