@@ -7,6 +7,8 @@
 
 using namespace std;
 
+#define NSEC_PER_SEC 1000000000L
+
 enum {SINGLE, DUAL};
 
 struct IOptr {
@@ -15,16 +17,16 @@ struct IOptr {
 };
 
 struct GameResults {
-	uint64 whiteTime;
-	uint64 blackTime;
+	timespec whiteTime;
+	timespec blackTime;
 	int ply;
 	char winner;
 
 	GameResults()
 	{
 		ply = 0;
-		whiteTime = 0;
-		blackTime = 0;
+		whiteTime = {0, 0};
+		blackTime = {0, 0};
 	}
 };
 
@@ -56,6 +58,33 @@ int numGames, testType;
 string eng1Bin, eng2Bin;
 
 char buff[256];
+
+timespec operator-(const timespec l, const timespec r)
+{
+	timespec ret = l;
+
+	if (l.tv_nsec < r.tv_nsec) {
+		ret.tv_sec--;
+		ret.tv_nsec += NSEC_PER_SEC;
+	}
+	ret.tv_sec = l.tv_sec - r.tv_sec;
+	ret.tv_nsec = l.tv_nsec - r.tv_nsec;
+
+	return ret;
+}
+
+timespec& operator+=(timespec &l, const timespec r)
+{
+	l.tv_nsec += r.tv_nsec;
+
+	while (l.tv_nsec >= NSEC_PER_SEC) {
+		l.tv_sec++;
+		l.tv_nsec -= NSEC_PER_SEC;
+	}
+	l.tv_sec += r.tv_sec;
+
+	return l;
+}
 
 IOptr connectIO(string program)
 {
@@ -128,11 +157,13 @@ void printStats()
 			<< " loss:" << eng1res.aswhite.lose
 			<< " draw:" << eng1res.aswhite.draw
 			<< " ply:" << eng1res.aswhite.ply
+			<< " time:" << eng1res.aswhite.time.tv_sec
 			<< endl
 		<< "Black: win:" << eng1res.asblack.win
 			<< " loss:" << eng1res.asblack.lose
 			<< " draw:" << eng1res.asblack.draw
 			<< " ply:" << eng1res.asblack.ply
+			<< " time:" << eng1res.asblack.time.tv_sec
 			<< "\n\n"
 
 		<< "Engine 2: " << eng2Bin << endl
@@ -140,11 +171,13 @@ void printStats()
 			<< " loss:" << eng2res.aswhite.lose
 			<< " draw:" << eng2res.aswhite.draw
 			<< " ply:" << eng2res.aswhite.ply
+			<< " time:" << eng2res.aswhite.time.tv_sec
 			<< endl
 		<< "Black: win:" << eng2res.asblack.win
 			<< " loss:" << eng2res.asblack.lose
 			<< " draw:" << eng2res.asblack.draw
 			<< " ply:" << eng2res.asblack.ply
+			<< " time:" << eng2res.asblack.time.tv_sec
 			<< "\n\n";
 
 	printf("Stats:\n");
@@ -160,6 +193,7 @@ GameResults runGame(IOptr white, IOptr black)
 	istringstream line;
 	string move, word;
 	GameResults res;
+	timespec tm1, tm2;
 
 	fputs("newgame\n", white.in);
 	fputs("newgame\n", black.in);
@@ -168,7 +202,10 @@ GameResults runGame(IOptr white, IOptr black)
 		// get white's move
 		res.ply++;
 		fputs("go\n", white.in);
+		clock_gettime(CLOCK_REALTIME, &tm1);
 		fgets(buff, 256, white.out);
+		clock_gettime(CLOCK_REALTIME, &tm2);
+		res.whiteTime = tm2 - tm1;
 
 		move = string(buff);
 		fgets(buff, 256, white.out);
@@ -187,7 +224,10 @@ GameResults runGame(IOptr white, IOptr black)
 		// get black's move
 		res.ply++;
 		fputs("go\n", black.in);
+		clock_gettime(CLOCK_REALTIME, &tm1);
 		fgets(buff, 256, black.out);
+		clock_gettime(CLOCK_REALTIME, &tm2);
+		res.blackTime = tm2 - tm1;
 
 		move = string(buff);
 		fgets(buff, 256, black.out);
@@ -219,8 +259,10 @@ void runMatch()
 		// One=white; Two=black
 		results = runGame(engine1, engine2);
 
+		eng1res.aswhite.time += results.whiteTime;
 		eng1res.aswhite.ply += results.ply;
 
+		eng2res.asblack.time += results.blackTime;
 		eng2res.asblack.ply += results.ply;
 
 		switch (results.winner) {
@@ -240,8 +282,10 @@ void runMatch()
 		// One=black; Two=white
 		results = runGame(engine2, engine1);
 
+		eng2res.aswhite.time += results.whiteTime;
 		eng2res.aswhite.ply += results.ply;
 
+		eng1res.asblack.time += results.blackTime;
 		eng1res.asblack.ply += results.ply;
 
 		switch (results.winner) {
