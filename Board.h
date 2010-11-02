@@ -1,19 +1,10 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      Board class declarations
- */
-
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
-#include "Defines.h"
-#include "Move.h"
-#include <iostream>
 #include <cstring>
-
-using namespace std;
+#include <iostream>
+#include "Move.h"
+#include "Defines.h"
 
 extern const int pieceValue[16];
 

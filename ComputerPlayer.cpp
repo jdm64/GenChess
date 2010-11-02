@@ -1,13 +1,5 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      ComputerPlayer class functions
- */
-
-#include "ComputerPlayer.h"
 #include <climits>
-#include <iostream>
+#include "ComputerPlayer.h"
 
 //#define DEBUG_SCORES
 #define RANDOM_MOVE_ORDER

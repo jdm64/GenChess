@@ -1,10 +1,3 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      Data declarations
- */
-
 #ifndef __DEFINES_H__
 #define __DEFINES_H__
 

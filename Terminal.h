@@ -1,16 +1,8 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      HumanPlayer class functions
- */
-
 #ifndef __TERMINAL_H__
 #define __TERMINAL_H__
 
-#include "Board.h"
-#include "Game.h"
 #include "ComputerPlayer.h"
+#include "Game.h"
 
 class Terminal {
 private:

@@ -1,14 +1,6 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      Data declarations
- */
-
 #ifndef __MOVE_H__
 #define __MOVE_H__
 
-#include <string>
 #include <boost/array.hpp>
 
 using namespace std;

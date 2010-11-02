@@ -1,15 +1,14 @@
 #ifndef __RAND64_H__
 #define __RAND64_H__
 
-#include <algorithm>
 #include <cstdint>
+#include <cstdlib>
+#include <algorithm>
 #include <ctime>
 
 typedef uint64_t uint64;
 
 #define BLOCK 8192
-
-using namespace std;
 
 class Rand64 {
 private:

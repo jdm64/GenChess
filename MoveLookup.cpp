@@ -1,7 +1,7 @@
-#include "MoveLookup.h"
-#include "Defines.h"
 #include <cstdlib>
 #include <cassert>
+#include "MoveLookup.h"
+#include "Defines.h"
 
 char MoveLookup::mailbox[120] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,

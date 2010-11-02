@@ -1,6 +1,4 @@
-#include <iostream>
 #include "CVEP.h"
-#include "TransTable.h"
 
 const string CVEP::moveError[NUM_MOVE_ERRORS] = {
 	"", "That's an invalid move format",

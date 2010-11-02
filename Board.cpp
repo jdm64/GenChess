@@ -1,16 +1,6 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      Board class functions
- */
-
 #include "Board.h"
 #include "MoveLookup.h"
 #include "TransTable.h"
-#include <iostream>
-
-using namespace std;
 
 const int pieceValue[16] = {224, 224, 224, 224, 224, 224, 224, 224, 336, 336, 560, 560, 896, 896, 1456, 0};
 

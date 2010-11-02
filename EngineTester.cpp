@@ -1,8 +1,6 @@
+#include <cmath>
 #include <iostream>
 #include <sstream>
-#include <cassert>
-#include <cmath>
-#include <cstdio>
 #include "Defines.h"
 
 using namespace std;

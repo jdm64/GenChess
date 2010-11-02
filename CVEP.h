@@ -1,7 +1,6 @@
 #ifndef __CVEP_H__
 #define __CVEP_H__
 
-#include "Board.h"
 #include "Game.h"
 #include "ComputerPlayer.h"
 

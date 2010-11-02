@@ -1,17 +1,9 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      ComputerPlayer class declarations
- */
-
 #ifndef __COMPUTER_PLAYER_H__
 #define __COMPUTER_PLAYER_H__
 
-#include "Board.h"
-#include "TransTable.h"
-#include "Array.h"
 #include <vector>
+#include "Array.h"
+#include "TransTable.h"
 
 class ComputerPlayer {
 private:

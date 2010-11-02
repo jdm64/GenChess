@@ -1,13 +1,4 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      HumanPlayer class functions
- */
-
 #include "Terminal.h"
-#include "TransTable.h"
-#include <iostream>
 
 const string Terminal::moveError[NUM_MOVE_ERRORS] = {
 	"", "That's an invalid move format",

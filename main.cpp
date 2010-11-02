@@ -1,16 +1,5 @@
-/*      Justin Madru (jdm64@gawab.com)
- *      CPSC 386 - Game Design
- *      Assignment #6 - (2010-5-7)
- *
- *      main function and helpers
- */
-
 #include "Terminal.h"
 #include "CVEP.h"
-#include <iostream>
-#include <getopt.h>
-
-using namespace std;
 
 Board board;
 

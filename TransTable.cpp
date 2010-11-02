@@ -1,8 +1,5 @@
 #include "TransTable.h"
-#include "Defines.h"
 #include "Rand64.h"
-
-using namespace std;
 
 uint64 startHash;
 
