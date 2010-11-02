@@ -7,7 +7,7 @@ VERSION = $(shell grep "define VERSION" main.cpp | cut -d'"' -f2)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
 objs = main.o Terminal.o Game.o ComputerPlayer.o CVEP.o \
-	TransTable.o Board.o Move.o MoveLookup.o AutoPlay.o
+	TransTable.o Board.o Move.o MoveLookup.o
 
 all : genchess enginetester
 

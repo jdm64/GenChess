@@ -6,7 +6,6 @@
  */
 
 #include "Terminal.h"
-#include "AutoPlay.h"
 #include "CVEP.h"
 #include <iostream>
 #include <getopt.h>
@@ -84,14 +83,14 @@ void show_help()
 
 int main(int argc, char **argv)
 {
-	int white = HUMAN, black = COMPUTER, autoNum;
+	int white = HUMAN, black = COMPUTER;
 	char c;
-	bool error = false, xMode = false, autoTest = false;
+	bool error = false, xMode = false;
 
 	// set I/O to unbuffered
 	cout.setf(ios::unitbuf);
 
-	while ((c = getopt(argc, argv, "Xw:b:ha:p:v")) != -1) {
+	while ((c = getopt(argc, argv, "Xw:b:hp:v")) != -1) {
 		switch (c) {
 		case 'X':
 			xMode = true;
@@ -115,10 +114,6 @@ int main(int argc, char **argv)
 		case 'h':
 			show_help();
 			return EXIT_SUCCESS;
-		case 'a':
-			autoTest = true;
-			autoNum = atoi(optarg);
-			break;
 		case 'p':
 			cout << perft(atoi(optarg)) << endl;
 			return EXIT_SUCCESS;
@@ -129,18 +124,16 @@ int main(int argc, char **argv)
 		}
 	}
 	if (error) {
-		cout << "invalid command line";
+		cout << "invalid command line\n";
 		return EXIT_FAILURE;
 	}
-	if (autoTest) {
-		AutoPlay ui(autoNum);
+	if (xMode) {
+		Terminal ui(white, black);
 		ui.run();
-		return EXIT_SUCCESS;
+	} else {
+		CVEP ui;
+		ui.run();
 	}
-
-	Terminal ui(white, black);
-
-	ui.run();
 
 	return EXIT_SUCCESS;
 }
