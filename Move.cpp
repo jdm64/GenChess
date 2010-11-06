@@ -21,6 +21,15 @@ bool Move::operator==(const Move &rhs) const
 	return false;
 }
 
+string Move::dump() const
+{
+	char data[24];
+
+	sprintf(data, "[%d %d %d %d]", (int)index, (int)xindex, (int)from, (int)to);
+
+	return string(data);
+}
+
 string Move::toString() const
 {
 	string out;

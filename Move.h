@@ -15,6 +15,7 @@ struct Move {
 	char xindex;
 
 	bool operator==(const Move &rhs) const;
+	string dump() const;
 	string toString() const;
 	bool parse(string s);
 };
