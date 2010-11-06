@@ -235,12 +235,17 @@ bool Board::validMove(Move &move)
 	}
 	if (ply < 2 && abs(pieceType[move.index]) != KING)
 		return false;
+
+	bool ret = true;
+
 	make(move);
 	if (incheck(curr ^ -2))
-		return false;
+		ret = false;
+	if (move.from == PLACEABLE && incheck(curr))
+		ret = false;
 	unmake(move);
 
-	return true;
+	return ret;
 }
 
 int Board::validMove(string smove, const char color, Move &move)
