@@ -224,7 +224,7 @@ bool Board::validMove(Move &move)
 	if (move.xindex != NONE) {
 		if ((move.xindex = pieceIndex(move.to, pieceType[move.xindex])) == NONE)
 			return false;
-	} else if (square[move.to] == EMPTY) {
+	} else if (square[move.to] != EMPTY) {
 		return false;
 	}
 
