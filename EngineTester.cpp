@@ -71,7 +71,7 @@ timespec operator-(const timespec l, const timespec r)
 	return ret;
 }
 
-timespec& operator+=(timespec &l, const timespec r)
+void sum(timespec &l, const timespec r)
 {
 	l.tv_nsec += r.tv_nsec;
 
@@ -80,8 +80,6 @@ timespec& operator+=(timespec &l, const timespec r)
 		l.tv_nsec -= NSEC_PER_SEC;
 	}
 	l.tv_sec += r.tv_sec;
-
-	return l;
 }
 
 IOptr connectIO(string program)
@@ -203,7 +201,7 @@ GameResults runGame(IOptr white, IOptr black)
 		clock_gettime(CLOCK_REALTIME, &tm1);
 		fgets(buff, 256, white.out);
 		clock_gettime(CLOCK_REALTIME, &tm2);
-		res.whiteTime = tm2 - tm1;
+		sum(res.whiteTime, tm2 - tm1);
 
 		move = string(buff);
 		fgets(buff, 256, white.out);
@@ -225,7 +223,7 @@ GameResults runGame(IOptr white, IOptr black)
 		clock_gettime(CLOCK_REALTIME, &tm1);
 		fgets(buff, 256, black.out);
 		clock_gettime(CLOCK_REALTIME, &tm2);
-		res.blackTime = tm2 - tm1;
+		sum(res.blackTime, tm2 - tm1);
 
 		move = string(buff);
 		fgets(buff, 256, black.out);
@@ -257,10 +255,10 @@ void runMatch()
 		// One=white; Two=black
 		results = runGame(engine1, engine2);
 
-		eng1res.aswhite.time += results.whiteTime;
+		sum(eng1res.aswhite.time, results.whiteTime);
 		eng1res.aswhite.ply += results.ply;
 
-		eng2res.asblack.time += results.blackTime;
+		sum(eng2res.asblack.time, results.blackTime);
 		eng2res.asblack.ply += results.ply;
 
 		switch (results.winner) {
@@ -280,10 +278,10 @@ void runMatch()
 		// One=black; Two=white
 		results = runGame(engine2, engine1);
 
-		eng2res.aswhite.time += results.whiteTime;
+		sum(eng2res.aswhite.time, results.whiteTime);
 		eng2res.aswhite.ply += results.ply;
 
-		eng1res.asblack.time += results.blackTime;
+		sum(eng1res.asblack.time, results.blackTime);
 		eng1res.asblack.ply += results.ply;
 
 		switch (results.winner) {
