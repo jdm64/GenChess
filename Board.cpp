@@ -267,6 +267,8 @@ bool Board::validMove(Move &move)
 {
 	if ((move.index = pieceIndex(move.from, pieceType[move.index])) == NONE)
 		return false;
+	if (pieceType[move.index] * curr <= 0)
+		return false;
 	if (move.xindex != NONE) {
 		if ((move.xindex = pieceIndex(move.to, pieceType[move.xindex])) == NONE)
 			return false;
