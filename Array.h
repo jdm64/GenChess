@@ -16,7 +16,7 @@ public:
 		data = new T[size];
 	}
 
-	~Array() { delete data; }
+	~Array() { delete[] data; }
 
 	const T operator[](const int i) const
 	{
