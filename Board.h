@@ -97,7 +97,7 @@ public:
 
 	void unmakeP(const Move move);
 
-	bool validMove(Move &move);
+	bool validMove(const Move moveIn, Move &move);
 
 	int validMove(string smove, const char color, Move &move);
 

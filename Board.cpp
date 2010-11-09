@@ -263,8 +263,10 @@ void Board::unmakeP(const Move move)
 	ply--;
 }
 
-bool Board::validMove(Move &move)
+bool Board::validMove(const Move moveIn, Move &move)
 {
+	move = moveIn;
+
 	if ((move.index = pieceIndex(move.from, pieceType[move.index])) == NONE)
 		return false;
 	if (pieceType[move.index] * curr <= 0)
