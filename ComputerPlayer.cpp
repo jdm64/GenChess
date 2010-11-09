@@ -106,7 +106,7 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 	Move move;
 
 	if (tt->getMove(board, move)) {
-		if (!board->validMove(move))
+		if (!board->validMove(move, move))
 			goto hashMiss;
 		board->make(move);
 		tactical[depth + 1] = board->incheck(board->currPlayer());
