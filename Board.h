@@ -6,6 +6,8 @@
 #include "Move.h"
 #include "Defines.h"
 
+//#define DEBUG_MAKE_MOVE
+
 extern const int pieceValue[16];
 
 extern const int locValue[7][64];

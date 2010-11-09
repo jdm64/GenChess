@@ -140,6 +140,19 @@ int Board::isMate()
 
 void Board::make(const Move move)
 {
+#ifdef DEBUG_MAKE_MOVE
+	assert(pieceType[move.index] * curr > 0);
+	assert(piece[move.index] == move.from);
+	if (move.from != PLACEABLE)
+		assert(square[move.from] == pieceType[move.index]);
+	if (move.xindex == NONE) {
+		assert(square[move.to] == EMPTY);
+	} else {
+		assert(square[move.to] == pieceType[move.xindex]);
+		assert(piece[move.xindex] == move.to);
+	}
+#endif
+
 	// update board information
 	square[move.to] = pieceType[move.index];
 	if (move.from != PLACEABLE)
@@ -160,6 +173,16 @@ void Board::make(const Move move)
 
 	curr ^= -2;
 	ply++;
+
+#ifdef DEBUG_MAKE_MOVE
+	assert(pieceType[move.index] * curr < 0);
+	assert(piece[move.index] == move.to);
+	assert(square[move.to] == pieceType[move.index]);
+	if (move.from != PLACEABLE)
+		assert(square[move.from] == EMPTY);
+	if (move.xindex != NONE)
+		assert(piece[move.xindex] == DEAD);
+#endif
 }
 
 void Board::makeP(const Move move)
@@ -178,6 +201,16 @@ void Board::makeP(const Move move)
 
 void Board::unmake(const Move move)
 {
+#ifdef DEBUG_MAKE_MOVE
+	assert(pieceType[move.index] * curr < 0);
+	assert(piece[move.index] == move.to);
+	assert(square[move.to] == pieceType[move.index]);
+	if (move.from != PLACEABLE)
+		assert(square[move.from] == EMPTY);
+	if (move.xindex != NONE)
+		assert(piece[move.xindex] == DEAD);
+#endif
+
 	// TODO could this function fail?
 	piece[move.index] = move.from;
 	if (move.xindex == NONE) {
@@ -200,6 +233,19 @@ void Board::unmake(const Move move)
 
 	curr ^= -2;
 	ply--;
+
+#ifdef DEBUG_MAKE_MOVE
+	assert(pieceType[move.index] * curr > 0);
+	assert(piece[move.index] == move.from);
+	if (move.from != PLACEABLE)
+		assert(square[move.from] == pieceType[move.index]);
+	if (move.xindex == NONE) {
+		assert(square[move.to] == EMPTY);
+	} else {
+		assert(square[move.to] == pieceType[move.xindex]);
+		assert(piece[move.xindex] == move.to);
+	}
+#endif
 }
 
 void Board::unmakeP(const Move move)
