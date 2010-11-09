@@ -11,12 +11,14 @@ private:
 
 	Board *board;
 
-	Move *killer1;
-	Move *killer2;
+	Array<Move> captureKiller;
+	Array<Move> moveKiller;
+	Array<Move> placeKiller;
 
 	int maxNg;
 
 	Array<bool> tactical;
+	Array<bool> ismate;
 
 	ScoreSort cmpScore;
 
@@ -28,8 +30,6 @@ public:
 
 	~ComputerPlayer()
 	{
-		delete[] killer1;
-		delete[] killer2;
 	}
 
 	void printList(MoveList *ptr);
@@ -38,17 +38,21 @@ public:
 
 	// swaps any ptr->list[].move that matches
 	// killer1/killer2 to the front of ptr->list[]
-	void getKillerMoves(MoveList *ptr, int depth);
+//	void getKillerMoves(MoveList *ptr, int depth);
 
 	// sets move to be one of the killermoves
-	void setKillerMoves(Move move, int depth);
+//	void setKillerMoves(Move move, int depth);
 
 	// returns the maximum score in ptr->list[].score
-	int getMaxScore(MoveList *ptr);
+//	int getMaxScore(MoveList *ptr);
 
 	int Quiescence(int alpha, int beta, int depth);
 
+	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<Move> &killer, const int type);
+
 	int NegaScout(int alpha, int beta, int depth, int limit);
+
+	void search(int alpha, int beta, int depth, int limit);
 
 	Move think();
 

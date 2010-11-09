@@ -534,6 +534,186 @@ MoveList* Board::getMovesList(const char color)
 	return data;
 }
 
+MoveList* Board::getMovesList(const char color, const int movetype)
+{
+	// TODO list might work better as a stl::list, or initialize to prev size
+	MoveList *data = new MoveList;
+	MoveLookup movelookup(square);
+	MoveNode item;
+	int start, end;
+
+	data->size = 0;
+	switch (movetype) {
+	case MOVE_ALL:
+		if (ply < 2) {
+			int idx = pieceIndex(PLACEABLE, KING * color);
+			for (int loc = 0; loc < 64; loc++) {
+				if (square[loc] != EMPTY)
+					continue;
+				item.move.to = loc;
+				item.move.index = idx;
+				item.move.xindex = NONE;
+				item.move.from = PLACEABLE;
+
+				make(item.move);
+				// place moves are only valid if neither side is inCheck
+				if (!incheck(color) && !incheck(color ^ -2)) {
+					item.check = false;
+					item.score = tt->getScore(this);
+					data->list[data->size++] = item;
+				}
+				unmake(item.move);
+			}
+			break;
+		}
+		for (int type = QUEEN; type >= PAWN; type--) {
+			int idx = pieceIndex(PLACEABLE, type * color);
+			if (idx == NONE)
+				continue;
+			for (int loc = 0; loc < 64; loc++) {
+				if (square[loc] != EMPTY)
+					continue;
+				item.move.index = idx;
+				item.move.to = loc;
+				item.move.xindex = NONE;
+				item.move.from = PLACEABLE;
+
+				make(item.move);
+				// place moves are only valid if neither side is inCheck
+				if (!incheck(color) && !incheck(color ^ -2)) {
+					item.check = false;
+					item.score = tt->getScore(this);
+					data->list[data->size++] = item;
+				}
+				unmake(item.move);
+			}
+		}
+		start = (color == BLACK)? 15:31;
+		end = (color == BLACK)? 0:16;
+		for (int idx = start; idx >= end; idx--) {
+			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
+				continue;
+			char *loc = movelookup.genAll(piece[idx]);
+			int n = 0;
+			while (loc[n] != -1) {
+				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
+				item.move.to = loc[n];
+				item.move.from = piece[idx];
+				item.move.index = idx;
+
+				make(item.move);
+				if (!incheck(color)) {
+					item.check = incheck(color ^ -2);
+					item.score = tt->getScore(this);
+					data->list[data->size++] = item;
+				}
+				unmake(item.move);
+				n++;
+			}
+			delete[] loc;
+		}
+		break;
+	case MOVE_CAPTURE:
+		start = (color == BLACK)? 15:31;
+		end = (color == BLACK)? 0:16;
+		for (int idx = start; idx >= end; idx--) {
+			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
+				continue;
+			char *loc = movelookup.genCapture(piece[idx]);
+			int n = 0;
+			while (loc[n] != -1) {
+				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
+				item.move.to = loc[n];
+				item.move.from = piece[idx];
+				item.move.index = idx;
+
+				make(item.move);
+				if (!incheck(color)) {
+					item.check = incheck(color ^ -2);
+					item.score = tt->getScore(this);
+					data->list[data->size++] = item;
+				}
+				unmake(item.move);
+				n++;
+			}
+			delete[] loc;
+		}
+		break;
+	case MOVE_MOVE:
+		start = (color == BLACK)? 15:31;
+		end = (color == BLACK)? 0:16;
+		for (int idx = start; idx >= end; idx--) {
+			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
+				continue;
+			char *loc = movelookup.genMove(piece[idx]);
+			int n = 0;
+			while (loc[n] != -1) {
+				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
+				item.move.to = loc[n];
+				item.move.from = piece[idx];
+				item.move.index = idx;
+
+				make(item.move);
+				if (!incheck(color)) {
+					item.check = incheck(color ^ -2);
+					item.score = tt->getScore(this);
+					data->list[data->size++] = item;
+				}
+				unmake(item.move);
+				n++;
+			}
+			delete[] loc;
+		}
+		break;
+	case MOVE_PLACE:
+		if (ply < 2) {
+			int idx = pieceIndex(PLACEABLE, KING * color);
+			for (int loc = 0; loc < 64; loc++) {
+				if (square[loc] != EMPTY)
+					continue;
+				item.move.to = loc;
+				item.move.index = idx;
+				item.move.xindex = NONE;
+				item.move.from = PLACEABLE;
+
+				make(item.move);
+				// place moves are only valid if neither side is inCheck
+				if (!incheck(color) && !incheck(color ^ -2)) {
+					item.check = false;
+					item.score = tt->getScore(this);
+					data->list[data->size++] = item;
+				}
+				unmake(item.move);
+			}
+			break;
+		}
+		for (int type = QUEEN; type >= PAWN; type--) {
+			int idx = pieceIndex(PLACEABLE, type * color);
+			if (idx == NONE)
+				continue;
+			for (int loc = 0; loc < 64; loc++) {
+				if (square[loc] != EMPTY)
+					continue;
+				item.move.index = idx;
+				item.move.to = loc;
+				item.move.xindex = NONE;
+				item.move.from = PLACEABLE;
+
+				make(item.move);
+				// place moves are only valid if neither side is inCheck
+				if (!incheck(color) && !incheck(color ^ -2)) {
+					item.check = false;
+					item.score = tt->getScore(this);
+					data->list[data->size++] = item;
+				}
+				unmake(item.move);
+			}
+		}
+		break;
+	}
+	return data;
+}
+
 MoveList* Board::getPerftMovesList(const char color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size

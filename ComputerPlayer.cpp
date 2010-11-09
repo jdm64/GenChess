@@ -12,6 +12,7 @@ void ComputerPlayer::printList(MoveList *ptr)
 	cout << "\n\n";
 }
 
+/****
 void ComputerPlayer::getKillerMoves(MoveList *ptr, int depth)
 {
 	for (int i = 1, n = 0; i < ptr->size; i++) {
@@ -33,6 +34,7 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 	killer2[depth] = killer1[depth];
 	killer1[depth] = move;
 }
+****/
 
 void ComputerPlayer::pickMove(MoveList *ptr)
 {
@@ -50,6 +52,7 @@ void ComputerPlayer::pickMove(MoveList *ptr)
 #endif
 }
 
+/****
 int ComputerPlayer::getMaxScore(MoveList *ptr)
 {
 	int max = ptr->list[0].score;
@@ -93,6 +96,70 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 	delete ptr;
 	return alpha;
 }
+****/
+
+bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
+		const int depth, const int limit, Array<Move> &killer, const int type)
+{
+	Move move;
+
+	best = -INT_MAX;
+
+	// Try Killer Move
+	if (board->validMove(killer[depth], move)) {
+		ismate[depth] = false;
+
+		board->make(move);
+
+		// set check for opponent
+		tactical[depth + 1] = board->incheck(board->currPlayer());
+
+		best = -NegaScout(-beta, -alpha, depth + 1, limit);
+		board->unmake(move);
+
+		if (best >= beta) {
+			tt->setBest(board, limit - depth, -best, move);
+			return true;
+		}
+		alpha = max(alpha, best);
+	}
+	// Try all of moveType Moves
+	MoveList *ptr = board->getMovesList(board->currPlayer(), type);
+
+	if (!ptr->size) {
+		delete ptr;
+		return false;
+	}
+	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
+
+	ismate[depth] = false;
+	int b = alpha + 1;
+	for (int n = 0; n < ptr->size; n++) {
+		board->make(ptr->list[n].move);
+
+		// set check for opponent
+		tactical[depth + 1] = ptr->list[n].check;
+
+		ptr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
+		if (ptr->list[n].score > alpha && ptr->list[n].score < beta)
+			ptr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
+		board->unmake(ptr->list[n].move);
+
+		if (ptr->list[n].score > best) {
+			best = ptr->list[n].score;
+			alpha = max(alpha, best);
+			if (alpha >= beta) {
+				killer[depth] = ptr->list[n].move;
+				tt->setBest(board, limit - depth, -alpha, ptr->list[n].move);
+				delete ptr;
+				return true;
+			}
+		}
+		b = alpha + 1;
+	}
+	delete ptr;
+	return false;
+}
 
 int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 {
@@ -102,69 +169,77 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 		else
 			limit++;
 	}
-	int bestScore = -INT_MAX;
+	int score, best = -INT_MAX;
 	Move move;
 
+	ismate[depth] = true;
+
+	// Transposition Move
 	if (tt->getMove(board, move)) {
 		if (!board->validMove(move, move))
 			goto hashMiss;
+		ismate[depth] = false;
 		board->make(move);
+
+		// set check for opponent
 		tactical[depth + 1] = board->incheck(board->currPlayer());
 
-		bestScore = -NegaScout(-beta, -alpha, depth + 1, limit);
-
+		best = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(move);
 
-		if (bestScore >= beta) {
-			tt->setBest(board, limit - depth, -bestScore, move);
-			return bestScore;
+		if (best >= beta) {
+			tt->setBest(board, limit - depth, -best, move);
+			return best;
 		}
-		alpha = max(bestScore, alpha);
+		alpha = max(alpha, best);
 	}
 hashMiss:
-	MoveList *ptr = (!depth && curr)? curr : board->getMovesList(board->currPlayer());
-	if (!ptr->size) {
-		delete ptr;
-		return tactical[depth]? -(INT_MAX - 2) : -(INT_MAX / 2);
-	}
-	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
+	if (NegaMoveType(alpha, beta, score, depth, limit, captureKiller, MOVE_CAPTURE))
+		return score;
+	best = max(best, score);
+	if (NegaMoveType(alpha, beta, score, depth, limit, moveKiller, MOVE_MOVE))
+		return score;
+	best = max(best, score);
+	if (NegaMoveType(alpha, beta, score, depth, limit, placeKiller, MOVE_PLACE))
+		return score;
+	best = max(best, score);
 
-	int b = alpha + 1;
-	for (int n = 0; n < ptr->size; n++) {
-		board->make(ptr->list[n].move);
-		tactical[depth + 1] = ptr->list[n].check;
-		ptr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
+	if (ismate[depth])
+		best = tactical[depth]? (INT_MAX - 2) : (INT_MAX / 2);
+	tt->setScore(board, limit - depth, -best);
 
-		if (ptr->list[n].score > alpha && ptr->list[n].score < beta)
-			ptr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
-		board->unmake(ptr->list[n].move);
+	return best;
+}
 
-		if (ptr->list[n].score > bestScore) {
-			bestScore = ptr->list[n].score;
-			alpha = max(bestScore, alpha);
-			if (alpha >= beta) {
-				tt->setBest(board, limit - depth, -alpha, ptr->list[n].move);
-				delete ptr;
-				return alpha;
-			}
-		}
+void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
+{
+	curr = curr? curr : board->getMovesList(board->currPlayer());
+
+	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
+
+	int b = beta;
+	for (int n = 0; n < curr->size; n++) {
+		tactical[depth + 1] = curr->list[n].check;
+
+		board->make(curr->list[n].move);
+		curr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
+		if (curr->list[n].score > alpha && curr->list[n].score < beta && n > 0)
+			curr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
+		board->unmake(curr->list[n].move);
+
+		alpha = max(alpha, curr->list[n].score);
+		if (alpha >= beta)
+			return;
 		b = alpha + 1;
 	}
-	tt->setScore(board, limit - depth, -bestScore);
-	if (depth)
-		delete ptr;
-	else
-		curr = ptr;
-	return bestScore;
 }
 
 Move ComputerPlayer::think()
 {
 	srand(time(NULL));
 	curr = NULL;
-	tactical[0] = board->incheck(board->currPlayer());
 	for (int depth = 0; depth <= maxNg; depth++)
-		NegaScout(-INT_MAX, INT_MAX, 0, depth);
+		search(-INT_MAX, INT_MAX, 0, depth);
 	pickMove(curr);
 
 #ifdef DEBUG_SCORES

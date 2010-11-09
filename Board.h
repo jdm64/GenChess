@@ -109,6 +109,8 @@ public:
 
 	MoveList* getMovesList(const char color);
 
+	MoveList* getMovesList(const char color, const int movetype);
+
 	MoveList* getPerftMovesList(const char color, const int movetype);
 
 	string printSquare(const int index) const;
