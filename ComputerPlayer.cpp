@@ -103,7 +103,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 {
 	Move move;
 
-	best = -INT_MAX;
+	best = MIN_SCORE;
 
 	// Try Killer Move
 	if (board->validMove(killer[depth], move)) {
@@ -169,7 +169,7 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 		else
 			limit++;
 	}
-	int score, best = -INT_MAX;
+	int score, best = MIN_SCORE;
 	Move move;
 
 	ismate[depth] = true;
@@ -205,7 +205,7 @@ hashMiss:
 	best = max(best, score);
 
 	if (ismate[depth])
-		best = tactical[depth]? (INT_MAX - 2) : (INT_MAX / 2);
+		best = tactical[depth]? CHECKMATE_SCORE : STALEMATE_SCORE;
 	tt->setScore(board, limit - depth, -best);
 
 	return best;
@@ -239,7 +239,7 @@ Move ComputerPlayer::think()
 	srand(time(NULL));
 	curr = NULL;
 	for (int depth = 0; depth <= maxNg; depth++)
-		search(-INT_MAX, INT_MAX, 0, depth);
+		search(MIN_SCORE, MAX_SCORE, 0, depth);
 	pickMove(curr);
 
 #ifdef DEBUG_SCORES

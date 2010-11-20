@@ -5,6 +5,11 @@
 #include "Array.h"
 #include "TransTable.h"
 
+#define MIN_SCORE		-INT_MAX
+#define MAX_SCORE		INT_MAX
+#define CHECKMATE_SCORE		-(INT_MAX - 2)
+#define STALEMATE_SCORE		-(INT_MAX / 2)
+
 class ComputerPlayer {
 private:
 	MoveList *curr;
