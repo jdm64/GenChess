@@ -7,14 +7,9 @@ typedef uint64_t uint64;
 
 #define VERSION		"2.0.75"
 
-#define NONE		-1
-#define PLACEABLE	-2
-#define DEAD		-4
+enum {NONE = -1, PLACEABLE = -2, DEAD = -4};
 
-#define QUIT_GAME	-4
-#define NEW_GAME	-2
-#define BLACK		-1
-#define WHITE		1
+enum {BLACK = -1, WHITE = 1};
 
 enum {BLACK_KING = -6, BLACK_QUEEN, BLACK_ROOK, BLACK_BISHOP, BLACK_KNIGHT,
 	BLACK_PAWN = -1, EMPTY = 0, WHITE_PAWN = 1, WHITE_KNIGHT, WHITE_BISHOP,
