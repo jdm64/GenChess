@@ -63,26 +63,36 @@ int ComputerPlayer::getMaxScore(MoveList *ptr)
 	}
 	return max;
 }
+****/
 
 int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
-	MoveList *ptr = board->getMovesList(board->currPlayer());
+	MoveList *ptr;
+	int score;
 
-	int score = getMaxScore(ptr);
-	if (score >= beta) {
-		delete ptr;
-		return score;
+	if (depth >= MAX_DEPTH) {
+		return -board->eval();
+	} else if (tactical[depth]) {
+		ptr = board->getMovesList(board->currPlayer());
+		if (!ptr->size) {
+			delete ptr;
+			return CHECKMATE_SCORE;
+		}
+	} else {
+		score = -board->eval();
+		if (score >= beta)
+			return beta;
+		alpha = max(alpha, score);
+
+		ptr = board->getMovesList(board->currPlayer(), MOVE_CAPTURE);
 	}
-	alpha = max(alpha, score);
-	if (depth >= maxNg) {
-		delete ptr;
-		return alpha;
-	}
-	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
+
+	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	for (int n = 0; n < ptr->size; n++) {
-		if (ptr->list[n].move.xindex == NONE && !ptr->list[n].check)
-			break;
+		// set check for opponent
+		tactical[depth + 1] = ptr->list[n].check;
+
 		board->make(ptr->list[n].move);
 		score = -Quiescence(-beta, -alpha, depth + 1);
 		board->unmake(ptr->list[n].move);
@@ -96,7 +106,6 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 	delete ptr;
 	return alpha;
 }
-****/
 
 bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		const int depth, const int limit, Array<Move> &killer, const int type)
@@ -165,7 +174,7 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 {
 	if (depth >= limit) {
 		if (!tactical[depth])
-			return -board->eval();
+			return Quiescence(alpha, beta, depth);
 		else
 			limit++;
 	}

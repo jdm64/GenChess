@@ -5,6 +5,7 @@
 #include "Array.h"
 #include "TransTable.h"
 
+#define MAX_DEPTH		10
 #define MIN_SCORE		-INT_MAX
 #define MAX_SCORE		INT_MAX
 #define CHECKMATE_SCORE		-(INT_MAX - 2)
