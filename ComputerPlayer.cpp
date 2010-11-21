@@ -126,11 +126,14 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		best = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(move);
 
-		if (best >= beta) {
-			tt->setBest(board, limit - depth, -best, move);
-			return true;
+		if (best > alpha) {
+			alpha = best;
+
+			if (alpha >= beta) {
+				tt->setBest(board, limit - depth, -alpha, move);
+				return true;
+			}
 		}
-		alpha = max(alpha, best);
 	}
 	// Try all of moveType Moves
 	MoveList *ptr = board->getMovesList(board->currPlayer(), type);
@@ -156,12 +159,16 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 
 		if (ptr->list[n].score > best) {
 			best = ptr->list[n].score;
-			alpha = max(alpha, best);
-			if (alpha >= beta) {
-				killer[depth] = ptr->list[n].move;
-				tt->setBest(board, limit - depth, -alpha, ptr->list[n].move);
-				delete ptr;
-				return true;
+
+			if (best > alpha) {
+				alpha = best;
+
+				if (alpha >= beta) {
+					killer[depth] = ptr->list[n].move;
+					tt->setBest(board, limit - depth, -alpha, killer[depth]);
+					delete ptr;
+					return true;
+				}
 			}
 		}
 		b = alpha + 1;
@@ -196,11 +203,14 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 		best = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(move);
 
-		if (best >= beta) {
-			tt->setBest(board, limit - depth, -best, move);
-			return best;
+		if (best > alpha) {
+			alpha = best;
+
+			if (alpha >= beta) {
+				tt->setBest(board, limit - depth, -alpha, move);
+				return alpha;
+			}
 		}
-		alpha = max(alpha, best);
 	}
 hashMiss:
 	if (NegaMoveType(alpha, beta, score, depth, limit, captureKiller, MOVE_CAPTURE))
