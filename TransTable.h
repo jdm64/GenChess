@@ -9,7 +9,7 @@
 #define WTM_HASH 780
 #define HOLD_START 768
 
-enum {NONE_NODE = 0, ALL_NODE = 1, CUT_NODE = 3};
+enum {NONE_NODE = 0, ALL_NODE = 1, CUT_NODE = 2, PV_NODE = 6};
 
 extern uint64 startHash;
 
@@ -59,6 +59,8 @@ public:
 	void setScore(Board *board, char depth, int score);
 
 	void setBest(Board *board, char depth, int score, Move move);
+
+	void setPV(Board *board, char depth, int score, Move move);
 };
 
 extern TransTable *tt;
