@@ -7,7 +7,7 @@ typedef uint64_t uint64;
 
 #define VERSION		"2.0.75"
 
-enum {NONE = -1, PLACEABLE = -2, DEAD = -4};
+enum {NONE = -1, PLACEABLE = -2, DEAD = -4, NULL_MOVE = -8};
 
 enum {BLACK = -1, WHITE = 1};
 

@@ -21,6 +21,21 @@ bool Move::operator==(const Move &rhs) const
 	return false;
 }
 
+void Move::setNull()
+{
+	index = NULL_MOVE;
+	xindex = NULL_MOVE;
+	from = NULL_MOVE;
+	to = NULL_MOVE;
+}
+
+bool Move::isNull()
+{
+	if (index == NULL_MOVE && xindex == NULL_MOVE && from == NULL_MOVE && to == NULL_MOVE)
+		return true;
+	return false;
+}
+
 string Move::dump() const
 {
 	char data[24];
