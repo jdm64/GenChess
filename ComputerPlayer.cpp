@@ -2,7 +2,7 @@
 #include "ComputerPlayer.h"
 
 //#define DEBUG_SCORES
-#define RANDOM_MOVE_ORDER
+//#define RANDOM_MOVE_ORDER
 
 void ComputerPlayer::printList(MoveList *ptr)
 {
@@ -38,7 +38,6 @@ void ComputerPlayer::setKillerMoves(Move move, int depth)
 
 void ComputerPlayer::pickMove(MoveList *ptr)
 {
-	stable_sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 #ifdef RANDOM_MOVE_ORDER
 	int score = ptr->list[0].score;
 	vector<int> match(1, 0);
@@ -234,8 +233,6 @@ void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 {
 	curr = curr? curr : board->getMovesList(board->currPlayer());
 
-	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
-
 	int b = beta;
 	for (int n = 0; n < curr->size; n++) {
 		tactical[depth + 1] = curr->list[n].check;
@@ -251,6 +248,7 @@ void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 			return;
 		b = alpha + 1;
 	}
+	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
 }
 
 Move ComputerPlayer::think()
