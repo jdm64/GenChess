@@ -25,7 +25,8 @@ public:
 		if (i >= size) {
 			tmp = new T[i + 1];
 			memcpy(tmp, data, size * sizeof(T));
-			delete data;
+			memset(&tmp[size], 0, (i - size + 1) * sizeof(T));
+			delete[] data;
 			data = tmp;
 			size = i + 1;
 		}
