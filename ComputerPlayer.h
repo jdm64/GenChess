@@ -20,6 +20,7 @@ private:
 	Array<Move> captureKiller;
 	Array<Move> moveKiller;
 	Array<Move> placeKiller;
+	Array<Move> pvMove;
 
 	int maxNg;
 

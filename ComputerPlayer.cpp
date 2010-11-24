@@ -125,13 +125,12 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		best = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(move);
 
-		if (best > alpha) {
+		if (best >= beta) {
+			tt->setBest(board, limit - depth, -best, move);
+			return true;
+		} else if (best > alpha) {
 			alpha = best;
-
-			if (alpha >= beta) {
-				tt->setBest(board, limit - depth, -alpha, move);
-				return true;
-			}
+			pvMove[depth] = move;
 		}
 	}
 	// Try all of moveType Moves
@@ -156,19 +155,15 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 			ptr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(ptr->list[n].move);
 
-		if (ptr->list[n].score > best) {
-			best = ptr->list[n].score;
-
-			if (best > alpha) {
-				alpha = best;
-
-				if (alpha >= beta) {
-					killer[depth] = ptr->list[n].move;
-					tt->setBest(board, limit - depth, -alpha, killer[depth]);
-					delete ptr;
-					return true;
-				}
-			}
+		best = max(best, ptr->list[n].score);
+		if (best >= beta) {
+			killer[depth] = ptr->list[n].move;
+			tt->setBest(board, limit - depth, -best, killer[depth]);
+			delete ptr;
+			return true;
+		} else if (best > alpha) {
+			alpha = best;
+			pvMove[depth] = ptr->list[n].move;
 		}
 		b = alpha + 1;
 	}
@@ -188,6 +183,7 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 	Move move;
 
 	ismate[depth] = true;
+	pvMove[depth].setNull();
 
 	// Transposition Move
 	if (tt->getMove(board, move)) {
@@ -202,13 +198,12 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 		best = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(move);
 
-		if (best > alpha) {
+		if (best >= beta) {
+			tt->setBest(board, limit - depth, -best, move);
+			return best;
+		} else if (best > alpha) {
 			alpha = best;
-
-			if (alpha >= beta) {
-				tt->setBest(board, limit - depth, -alpha, move);
-				return alpha;
-			}
+			pvMove[depth] = move;
 		}
 	}
 hashMiss:
@@ -224,7 +219,10 @@ hashMiss:
 
 	if (ismate[depth])
 		best = tactical[depth]? CHECKMATE_SCORE : STALEMATE_SCORE;
-	tt->setScore(board, limit - depth, -best);
+	if (pvMove[depth].isNull())
+		tt->setScore(board, limit - depth, -best);
+	else
+		tt->setPV(board, limit - depth, -best, pvMove[depth]);
 
 	return best;
 }
