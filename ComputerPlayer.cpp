@@ -244,8 +244,6 @@ void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 		board->unmake(curr->list[n].move);
 
 		alpha = max(alpha, curr->list[n].score);
-		if (alpha >= beta)
-			return;
 		b = alpha + 1;
 	}
 	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
