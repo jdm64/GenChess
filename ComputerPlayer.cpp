@@ -72,7 +72,7 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 	if (depth >= MAX_DEPTH) {
 		return -board->eval();
 	} else if (tactical[depth]) {
-		ptr = board->getMovesList(board->currPlayer());
+		ptr = board->getMovesList(board->currPlayer(), false);
 		if (!ptr->size) {
 			delete ptr;
 			return CHECKMATE_SCORE;
@@ -83,7 +83,7 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 			return beta;
 		alpha = max(alpha, score);
 
-		ptr = board->getMovesList(board->currPlayer(), MOVE_CAPTURE);
+		ptr = board->getMovesList(board->currPlayer(), MOVE_CAPTURE, false);
 	}
 
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);

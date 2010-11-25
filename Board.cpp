@@ -453,7 +453,7 @@ int Board::getNumMoves(const char color)
 	return num;
 }
 
-MoveList* Board::getMovesList(const char color)
+MoveList* Board::getMovesList(const char color, bool usehash)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
@@ -477,7 +477,7 @@ MoveList* Board::getMovesList(const char color)
 			// place moves are only valid if neither side is inCheck
 			if (!incheck(color) && !incheck(color ^ -2)) {
 				item.check = false;
-				item.score = tt->getScore(this);
+				item.score = usehash? tt->getScore(this) : eval();
 				data->list[data->size++] = item;
 			}
 			unmake(item.move);
@@ -500,7 +500,7 @@ MoveList* Board::getMovesList(const char color)
 			make(item.move);
 			if (!incheck(color)) {
 				item.check = incheck(color ^ -2);
-				item.score = tt->getScore(this);
+				item.score = usehash? tt->getScore(this) : eval();
 				data->list[data->size++] = item;
 			}
 			unmake(item.move);
@@ -525,7 +525,7 @@ MoveList* Board::getMovesList(const char color)
 			// place moves are only valid if neither side is inCheck
 			if (!incheck(color) && !incheck(color ^ -2)) {
 				item.check = false;
-				item.score = tt->getScore(this);
+				item.score = usehash? tt->getScore(this) : eval();
 				data->list[data->size++] = item;
 			}
 			unmake(item.move);
@@ -534,7 +534,7 @@ MoveList* Board::getMovesList(const char color)
 	return data;
 }
 
-MoveList* Board::getMovesList(const char color, const int movetype)
+MoveList* Board::getMovesList(const char color, const int movetype, bool usehash)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
@@ -559,7 +559,7 @@ MoveList* Board::getMovesList(const char color, const int movetype)
 				// place moves are only valid if neither side is inCheck
 				if (!incheck(color) && !incheck(color ^ -2)) {
 					item.check = false;
-					item.score = tt->getScore(this);
+					item.score = usehash? tt->getScore(this) : eval();
 					data->list[data->size++] = item;
 				}
 				unmake(item.move);
@@ -582,7 +582,7 @@ MoveList* Board::getMovesList(const char color, const int movetype)
 				// place moves are only valid if neither side is inCheck
 				if (!incheck(color) && !incheck(color ^ -2)) {
 					item.check = false;
-					item.score = tt->getScore(this);
+					item.score = usehash? tt->getScore(this) : eval();
 					data->list[data->size++] = item;
 				}
 				unmake(item.move);
@@ -604,7 +604,7 @@ MoveList* Board::getMovesList(const char color, const int movetype)
 				make(item.move);
 				if (!incheck(color)) {
 					item.check = incheck(color ^ -2);
-					item.score = tt->getScore(this);
+					item.score = usehash? tt->getScore(this) : eval();
 					data->list[data->size++] = item;
 				}
 				unmake(item.move);
@@ -630,7 +630,7 @@ MoveList* Board::getMovesList(const char color, const int movetype)
 				make(item.move);
 				if (!incheck(color)) {
 					item.check = incheck(color ^ -2);
-					item.score = tt->getScore(this);
+					item.score = usehash? tt->getScore(this) : eval();
 					data->list[data->size++] = item;
 				}
 				unmake(item.move);
@@ -656,7 +656,7 @@ MoveList* Board::getMovesList(const char color, const int movetype)
 				make(item.move);
 				if (!incheck(color)) {
 					item.check = incheck(color ^ -2);
-					item.score = tt->getScore(this);
+					item.score = usehash? tt->getScore(this) : eval();
 					data->list[data->size++] = item;
 				}
 				unmake(item.move);
@@ -680,7 +680,7 @@ MoveList* Board::getMovesList(const char color, const int movetype)
 				// place moves are only valid if neither side is inCheck
 				if (!incheck(color) && !incheck(color ^ -2)) {
 					item.check = false;
-					item.score = tt->getScore(this);
+					item.score = usehash? tt->getScore(this) : eval();
 					data->list[data->size++] = item;
 				}
 				unmake(item.move);
@@ -703,7 +703,7 @@ MoveList* Board::getMovesList(const char color, const int movetype)
 				// place moves are only valid if neither side is inCheck
 				if (!incheck(color) && !incheck(color ^ -2)) {
 					item.check = false;
-					item.score = tt->getScore(this);
+					item.score = usehash? tt->getScore(this) : eval();
 					data->list[data->size++] = item;
 				}
 				unmake(item.move);
