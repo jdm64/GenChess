@@ -107,9 +107,9 @@ public:
 
 	int getNumMoves(const char color);
 
-	MoveList* getMovesList(const char color, bool usehash = true);
+	MoveList* getMovesList(const char color);
 
-	MoveList* getMovesList(const char color, const int movetype, bool usehash = true);
+	MoveList* getMovesList(const char color, const int movetype);
 
 	MoveList* getPerftMovesList(const char color, const int movetype);
 
