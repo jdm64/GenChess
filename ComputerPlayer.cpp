@@ -12,58 +12,6 @@ void ComputerPlayer::printList(MoveList *ptr)
 	cout << "\n\n";
 }
 
-/****
-void ComputerPlayer::getKillerMoves(MoveList *ptr, int depth)
-{
-	for (int i = 1, n = 0; i < ptr->size; i++) {
-		if (ptr->list[i].move == killer1[depth])
-			swap(ptr->list[i], ptr->list[n++]);
-		else if (ptr->list[i].move == killer2[depth])
-			swap(ptr->list[i], ptr->list[n++]);
-		else if (n >= 2)
-			return;
-	}
-}
-
-void ComputerPlayer::setKillerMoves(Move move, int depth)
-{
-	if (move == killer1[depth])
-		return;
-	else if (move == killer2[depth])
-		return;
-	killer2[depth] = killer1[depth];
-	killer1[depth] = move;
-}
-****/
-
-void ComputerPlayer::pickMove(MoveList *ptr)
-{
-#ifdef RANDOM_MOVE_ORDER
-	int score = ptr->list[0].score;
-	vector<int> match(1, 0);
-	for (int i = 1; i < ptr->size; i++) {
-		if (ptr->list[i].score != score)
-			break;
-		match.push_back(i);
-	}
-	int x = rand() % match.size();
-	swap(ptr->list[0], ptr->list[match[x]]);
-#endif
-}
-
-/****
-int ComputerPlayer::getMaxScore(MoveList *ptr)
-{
-	int max = ptr->list[0].score;
-
-	for (int i = 1; i < ptr->size; i++) {
-		if (ptr->list[i].score > max)
-			max = ptr->list[i].score;
-	}
-	return max;
-}
-****/
-
 int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
 	MoveList *ptr;
@@ -241,7 +189,10 @@ void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 			curr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(curr->list[n].move);
 
-		alpha = max(alpha, curr->list[n].score);
+		if (curr->list[n].score > alpha) {
+			alpha = curr->list[n].score;
+			pvMove[depth] = curr->list[n].move;
+		}
 		b = alpha + 1;
 	}
 	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
@@ -253,14 +204,12 @@ Move ComputerPlayer::think()
 	curr = NULL;
 	for (int depth = 0; depth <= maxNg; depth++)
 		search(MIN_SCORE, MAX_SCORE, 0, depth);
-	pickMove(curr);
 
 #ifdef DEBUG_SCORES
 	debugTree();
 #endif
-	Move move = curr->list[0].move;
 	delete curr;
-	return move;
+	return pvMove[0];
 }
 
 void ComputerPlayer::debugTree()
