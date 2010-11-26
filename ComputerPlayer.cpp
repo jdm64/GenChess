@@ -98,7 +98,7 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 
 		if (score >= beta) {
 			delete ptr;
-			return score;
+			return beta;
 		}
 		alpha = max(alpha, score);
 	}
