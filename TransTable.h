@@ -9,7 +9,8 @@
 #define WTM_HASH 780
 #define HOLD_START 768
 
-enum {NONE_NODE = 0, ALL_NODE = 1, CUT_NODE = 2, PV_NODE = 6};
+enum {NONE_NODE = 0, ALL_NODE = 3, CUT_NODE = 6, PV_NODE = 7};
+enum {HAS_SCORE = 2, HAS_MOVE = 4};
 
 extern uint64 startHash;
 
@@ -18,9 +19,6 @@ extern uint64 hashBox[ZBOX_SIZE];
 extern const int typeLookup[32];
 
 struct TransItem {
-#ifdef COLLISION_DEBUG
-	Position pos;
-#endif
 	uint64 hash;
 	int score;
 	Move move;
@@ -32,35 +30,56 @@ struct TransItem {
 		hash = 0;
 		type = NONE_NODE;
 	}
+
+	bool getScore(const int alpha, const int beta, const int inDepth, int &inScore)
+	{
+		if ((type & HAS_SCORE) && depth >= inDepth) {
+			switch (type) {
+			case PV_NODE:
+				inScore = min(max(score, alpha), beta);
+				break;
+			case CUT_NODE:
+				inScore = beta;
+				break;
+			case ALL_NODE:
+				inScore = alpha;
+				break;
+			case NONE_NODE:
+				assert(0);
+			}
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	bool getMove(Move &inMove)
+	{
+		if (type & HAS_MOVE) {
+			inMove = move;
+			return true;
+		} else {
+			return false;
+		}
+	}
 };
 
 class TransTable {
 private:
 	TransItem *table;
-	int size, col_count;
+	int size;
 	uint64 hit, miss;
 
 public:
-	TransTable(int num_MB);
+	TransTable(const int num_MB);
 
 	~TransTable();
 	
 	intPair hitStats();
 
-#ifdef COLLISION_DEBUG
-	int numCollisions();
-#endif
-	bool checkPosition(Board *board);
+	bool getItem(const uint64 hash, TransItem *&item);
 
-	int getScore(Board *board);
-
-	bool getMove(Board *board, Move &move);
-
-	void setScore(Board *board, char depth, int score);
-
-	void setBest(Board *board, char depth, int score, Move move);
-
-	void setPV(Board *board, char depth, int score, Move move);
+	void setItem(const uint64 hash, const int score, const Move move, const char depth, const char type);
 };
 
 extern TransTable *tt;

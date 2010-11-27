@@ -74,7 +74,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		board->unmake(move);
 
 		if (best >= beta) {
-			tt->setBest(board, limit - depth, -best, move);
+			tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
 			return true;
 		} else if (best > alpha) {
 			alpha = best;
@@ -106,7 +106,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		best = max(best, ptr->list[n].score);
 		if (best >= beta) {
 			killer[depth] = ptr->list[n].move;
-			tt->setBest(board, limit - depth, -best, killer[depth]);
+			tt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
 			delete ptr;
 			return true;
 		} else if (best > alpha) {
@@ -127,31 +127,40 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 		else
 			limit++;
 	}
+	TransItem *tt_item;
 	int score, best = MIN_SCORE;
 	Move move;
 
 	ismate[depth] = true;
 	pvMove[depth].setNull();
 
-	// Transposition Move
-	if (tt->getMove(board, move)) {
-		if (!board->validMove(move, move))
-			goto hashMiss;
-		ismate[depth] = false;
-		board->make(move);
+	// Try Transposition Table
+	if (tt->getItem(board->hash(), tt_item)) {
+		// Try score
+		if (tt_item->getScore(alpha, beta, limit - depth, score))
+			return score;
 
-		// set check for opponent
-		tactical[depth + 1] = board->incheck(board->currPlayer());
+		// Try Move
+		if (tt_item->getMove(move)) {
+			if (!board->validMove(move, move))
+				goto hashMiss;
+			ismate[depth] = false;
 
-		best = -NegaScout(-beta, -alpha, depth + 1, limit);
-		board->unmake(move);
+			board->make(move);
 
-		if (best >= beta) {
-			tt->setBest(board, limit - depth, -best, move);
-			return best;
-		} else if (best > alpha) {
-			alpha = best;
-			pvMove[depth] = move;
+			// set check for opponent
+			tactical[depth + 1] = board->incheck(board->currPlayer());
+
+			best = -NegaScout(-beta, -alpha, depth + 1, limit);
+			board->unmake(move);
+
+			if (best >= beta) {
+				tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
+				return best;
+			} else if (best > alpha) {
+				alpha = best;
+				pvMove[depth] = move;
+			}
 		}
 	}
 hashMiss:
@@ -167,10 +176,7 @@ hashMiss:
 
 	if (ismate[depth])
 		best = tactical[depth]? CHECKMATE_SCORE : STALEMATE_SCORE;
-	if (pvMove[depth].isNull())
-		tt->setScore(board, limit - depth, -best);
-	else
-		tt->setPV(board, limit - depth, -best, pvMove[depth]);
+	tt->setItem(board->hash(), best, pvMove[depth], limit - depth, (pvMove[depth].isNull())? ALL_NODE : PV_NODE);
 
 	return best;
 }
@@ -192,6 +198,7 @@ void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 		if (curr->list[n].score > alpha) {
 			alpha = curr->list[n].score;
 			pvMove[depth] = curr->list[n].move;
+			tt->setItem(board->hash(), alpha, pvMove[depth], limit - depth, PV_NODE);
 		}
 		b = alpha + 1;
 	}
