@@ -6,10 +6,10 @@
 #include "TransTable.h"
 
 #define MAX_DEPTH		10
-#define MIN_SCORE		-INT_MAX
-#define MAX_SCORE		INT_MAX
-#define CHECKMATE_SCORE		-(INT_MAX - 2)
-#define STALEMATE_SCORE		-(INT_MAX / 2)
+#define MIN_SCORE		-(INT_MAX - 4)
+#define MAX_SCORE		(INT_MAX - 4)
+#define CHECKMATE_SCORE		-(INT_MAX - 4)
+#define STALEMATE_SCORE		0
 
 class ComputerPlayer {
 private:
