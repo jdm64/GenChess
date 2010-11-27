@@ -32,7 +32,7 @@ private:
 public:
 	ComputerPlayer(Board* Board) : curr(NULL), board(Board)
 	{
-		maxNg = 5;
+		maxNg = 6;
 	}
 
 	~ComputerPlayer()

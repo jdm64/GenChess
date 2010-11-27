@@ -17,9 +17,7 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 	MoveList *ptr;
 	int score;
 
-	if (depth >= MAX_DEPTH) {
-		return -board->eval();
-	} else if (tactical[depth]) {
+	if (tactical[depth]) {
 		ptr = board->getMovesList(board->currPlayer());
 		if (!ptr->size) {
 			delete ptr;
