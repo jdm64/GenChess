@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Move.h"
 #include "Defines.h"
 
@@ -34,6 +35,16 @@ bool Move::isNull()
 	if (index == NULL_MOVE && xindex == NULL_MOVE && from == NULL_MOVE && to == NULL_MOVE)
 		return true;
 	return false;
+}
+
+int Move::type()
+{
+	if (from == PLACEABLE)
+		return MOVE_PLACE;
+	else if (xindex != NONE)
+		return MOVE_CAPTURE;
+	else
+		return MOVE_MOVE;
 }
 
 string Move::dump() const
@@ -124,4 +135,11 @@ string printLoc(const char loc)
 	} else {
 		return "dead";
 	}
+}
+
+void MoveList::print() const
+{
+	for (int i = 0; i < size; i++)
+		cout << list[i].move.toString() << "[" << list[i].score << "] ";
+	cout << "\n";
 }

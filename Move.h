@@ -17,6 +17,7 @@ struct Move {
 	bool operator==(const Move &rhs) const;
 	void setNull();
 	bool isNull();
+	int type();
 	string dump() const;
 	string toString() const;
 	bool parse(string s);
@@ -37,6 +38,8 @@ struct MoveList {
 	int size;
 
 	MoveList() : size(0) {}
+
+	void print() const;
 };
 
 struct ScoreSort {

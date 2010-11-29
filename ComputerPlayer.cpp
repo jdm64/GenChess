@@ -4,14 +4,6 @@
 //#define DEBUG_SCORES
 //#define RANDOM_MOVE_ORDER
 
-void ComputerPlayer::printList(MoveList *ptr)
-{
-	for (int i = 0; i < ptr->size; i++)
-		cout << ptr->list[i].move.toString() << "[" <<
-			ptr->list[i].score << "] ";
-	cout << "\n\n";
-}
-
 int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
 	MoveList *ptr;
