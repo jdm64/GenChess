@@ -31,26 +31,30 @@ struct TransItem {
 		type = NONE_NODE;
 	}
 
-	bool getScore(const int alpha, const int beta, const int inDepth, int &inScore)
+	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore)
 	{
 		if ((type & HAS_SCORE) && depth >= inDepth) {
 			switch (type) {
 			case PV_NODE:
-				inScore = min(max(score, alpha), beta);
-				break;
+				outScore = score;
+				return true;
 			case CUT_NODE:
-				inScore = beta;
+				if (score >= beta) {
+					outScore = score;
+					return true;
+				}
 				break;
 			case ALL_NODE:
-				inScore = alpha;
+				if (score <= alpha) {
+					outScore = score;
+					return true;
+				}
 				break;
 			case NONE_NODE:
 				assert(0);
 			}
-			return true;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	bool getMove(Move &inMove)
