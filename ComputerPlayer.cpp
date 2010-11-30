@@ -6,23 +6,20 @@
 
 int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
-	MoveList *ptr;
-	int score;
+	MoveList *ptr = board->getMovesList(board->currPlayer(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
 
-	if (tactical[depth]) {
-		ptr = board->getMovesList(board->currPlayer());
-		if (!ptr->size) {
-			delete ptr;
-			return CHECKMATE_SCORE;
-		}
-	} else {
-		score = -board->eval();
-		if (score >= beta)
-			return beta;
-		alpha = max(alpha, score);
-
-		ptr = board->getMovesList(board->currPlayer(), MOVE_CAPTURE);
+	if (!ptr->size) {
+		delete ptr;
+		return tactical[depth]? CHECKMATE_SCORE : -board->eval();
 	}
+
+	int best = MIN_SCORE, score = -board->eval();
+
+	if (score >= beta) {
+		delete ptr;
+		return score;
+	}
+	alpha = max(alpha, score);
 
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
@@ -36,12 +33,13 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 
 		if (score >= beta) {
 			delete ptr;
-			return beta;
+			return score;
 		}
+		best = max(best, score);
 		alpha = max(alpha, score);
 	}
 	delete ptr;
-	return alpha;
+	return best;
 }
 
 bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
