@@ -218,7 +218,7 @@ void ComputerPlayer::debugTree()
 	vector<Move> mstack;
 
 	while (true) {
-		printList(ptr);
+		ptr->print();
 
 		cout << "<" << cDepth << "/" << mDepth << "> ";
 		cin >> cmd;
