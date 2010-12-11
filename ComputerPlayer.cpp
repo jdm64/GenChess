@@ -10,7 +10,7 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 
 	if (!ptr->size) {
 		delete ptr;
-		return tactical[depth]? CHECKMATE_SCORE : -board->eval();
+		return tactical[depth]? CHECKMATE_SCORE + board->getPly() : -board->eval();
 	}
 
 	int best = MIN_SCORE, score = -board->eval();
@@ -163,7 +163,7 @@ hashMiss:
 	best = max(best, score);
 
 	if (ismate[depth])
-		best = tactical[depth]? CHECKMATE_SCORE : STALEMATE_SCORE;
+		best = tactical[depth]? CHECKMATE_SCORE + board->getPly() : STALEMATE_SCORE;
 	tt->setItem(board->hash(), best, pvMove[depth], limit - depth, (pvMove[depth].isNull())? ALL_NODE : PV_NODE);
 
 	return best;
