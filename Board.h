@@ -81,7 +81,7 @@ public:
 		return ply;
 	}
 
-	void initHash(uint64 hash);
+	void rebuildHash();
 
 	void reset();
 

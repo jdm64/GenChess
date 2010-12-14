@@ -95,9 +95,24 @@ void Board::reset()
 	ply = 0;
 }
 
-void Board::initHash(uint64 hash)
+void Board::rebuildHash()
 {
-	key = hash;
+	key = startHash;
+	key += (curr == WHITE)? 0 : -hashBox[WTM_HASH];
+
+	for (int i = 0; i < 32; i++) {
+		switch (piece[i]) {
+		default:
+			key -= hashBox[HOLD_START + typeLookup[i]];
+			key += hashBox[12 * piece[i] + typeLookup[i]];
+			break;
+		case DEAD:
+			key -= hashBox[HOLD_START + typeLookup[i]];
+			break;
+		case PLACEABLE:
+			break;
+		}
+	}
 }
 
 int Board::pieceIndex(const int loc) const

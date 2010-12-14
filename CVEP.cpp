@@ -16,6 +16,8 @@ CVEP::CVEP()
 	game = new Game(&board);
 	engine = new ComputerPlayer(&board);
 	tt = new TransTable(32);
+
+	board.rebuildHash();
 }
 
 CVEP::~CVEP()

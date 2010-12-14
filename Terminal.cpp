@@ -22,8 +22,9 @@ Terminal::Terminal(const int white, const int black)
 	again = true;
 	game = new Game(&board);
 	engine = new ComputerPlayer(&board);
-
 	tt = new TransTable(32);
+
+	board.rebuildHash();
 }
 
 Terminal::~Terminal()
