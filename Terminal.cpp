@@ -51,7 +51,7 @@ bool Terminal::mainMenu()
 		game->undoMove();
 		game->undoMove();
 	} else if (cmd == "list") {
-		printPieceList(board.getPosition().piece);
+		board.printPieceList();
 		return true;
 	} else if (cmd == "help") {
 		displayHelp();
@@ -91,7 +91,7 @@ bool Terminal::playerCmd()
 		game->undoMove();
 		game->undoMove();
 	} else if (cmd == "list") {
-		printPieceList(board.getPosition().piece);
+		board.printPieceList();
 		return true;
 	} else if (cmd == "help") {
 		displayHelp();

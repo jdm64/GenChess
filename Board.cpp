@@ -115,6 +115,15 @@ void Board::rebuildHash()
 	}
 }
 
+void Board::setBoard(Position pos)
+{
+	memcpy(square, pos.square, 64);
+	memcpy(piece, pos.piece, 32);
+	ply = pos.ply;
+	curr = (pos.ply % 2)? BLACK : WHITE;
+	rebuildHash();
+}
+
 int Board::pieceIndex(const int loc) const
 {
 	for (int i = 0; i < 32; i++)
@@ -387,13 +396,14 @@ int Board::eval() const
 	return (curr == WHITE)? -white : white;
 }
 
-Position Board::getPosition()
+Position Board::getPosition() const
 {
 	Position pos;
 
-	for (int i = 0; i < 32; i++)
-		pos.piece[i] = piece[i];
-	pos.curr = curr;
+	memcpy(pos.square, square, 64);
+	memcpy(pos.piece, piece, 32);
+	pos.ply = ply;
+
 	return pos;
 }
 
@@ -918,16 +928,16 @@ void Board::dumpDebug() const
 {
 	cout << "hash:" << key << " curr:" << (int)curr << " ply:" << ply << endl;
 	printBoard();
-	printPieceList(piece);
+	printPieceList();
 }
 
-void printPieceList(const char *piece)
+void Board::printPieceList() const
 {
 	string tmp;
 
-	cout << "White:";
+	cout << "White:\t";
 	for (int i = 16; i < 32; i++) {
-		if (!(i % 8))
+		if (i != 16 && !(i % 8))
 			cout << "\n\t";
 		cout << pieceSymbol[pieceType[i]] << "(";
 		tmp = printLoc(piece[i]);
@@ -937,9 +947,9 @@ void printPieceList(const char *piece)
 			cout << tmp;
 		cout << ") ";
 	}
-	cout << "\nBlack:";
+	cout << "\nBlack:\t";
 	for (int i = 0; i < 16; i++) {
-		if (!(i % 8))
+		if (i && !(i % 8))
 			cout << "\n\t";
 		cout << pieceSymbol[-pieceType[i]] << "(";
 		tmp = printLoc(piece[i]);
