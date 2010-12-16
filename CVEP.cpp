@@ -104,6 +104,29 @@ bool CVEP::gameCmd()
 		game->doMove(move);
 		cout << "move " << move.toString() << endl;
 		return moveResults();
+	} else if (cmd == "setboard") {
+		cin >> cmd;
+
+		Position pos;
+		if (cmd == "fen") {
+			getline(cin, cmd);
+			if (!pos.parseFen(cmd)) {
+				cout << "error\n";
+			} else {
+				board.setBoard(pos);
+				cout << "ok\n";
+			}
+		} else if (cmd == "zfen") {
+			cin >> cmd;
+			if (!pos.parseZfen(cmd)) {
+				cout << "error\n";
+			} else {
+				board.setBoard(pos);
+				cout << "ok\n";
+			}
+		} else {
+			cout << "error\n";
+		}
 	} else {
 		cout << "error (command not recognized): " << cmd << endl;
 	}

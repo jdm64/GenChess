@@ -93,6 +93,25 @@ bool Terminal::playerCmd()
 	} else if (cmd == "list") {
 		board.printPieceList();
 		return true;
+	} else if (cmd == "set") {
+		cin >> cmd;
+
+		Position pos;
+		if (cmd == "fen") {
+			getline(cin, cmd);
+			if (!pos.parseFen(cmd))
+				cout << "error in setting board\n";
+			else
+				board.setBoard(pos);
+		} else if (cmd == "zfen") {
+			cin >> cmd;
+			if (!pos.parseZfen(cmd))
+				cout << "error in setting board\n";
+			else
+				board.setBoard(pos);
+		} else {
+			cout << "error in setting board\n";
+		}
 	} else if (cmd == "help") {
 		displayHelp();
 		return true;
