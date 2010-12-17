@@ -111,21 +111,21 @@ bool CVEP::gameCmd()
 		if (cmd == "fen") {
 			getline(cin, cmd);
 			if (!pos.parseFen(cmd)) {
-				cout << "error\n";
+				cout << "error (invalid format)" << endl;
 			} else {
 				board.setBoard(pos);
-				cout << "ok\n";
+				cout << "ok" << endl;
 			}
 		} else if (cmd == "zfen") {
 			cin >> cmd;
 			if (!pos.parseZfen(cmd)) {
-				cout << "error\n";
+				cout << "error (invalid format)" << endl;
 			} else {
 				board.setBoard(pos);
-				cout << "ok\n";
+				cout << "ok" << endl;
 			}
 		} else {
-			cout << "error\n";
+			cout << "error (must specify fen or zfen)" << endl;
 		}
 	} else {
 		cout << "error (command not recognized): " << cmd << endl;
