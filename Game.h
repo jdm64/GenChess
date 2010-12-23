@@ -15,7 +15,7 @@ public:
 
 	void newGame();
 
-	void doMove(Move move);
+	void doMove(const Move move);
 
 	bool undoMove();
 };

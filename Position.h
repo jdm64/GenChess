@@ -1,7 +1,6 @@
 #ifndef __POSITION_H__
 #define __POSITION_H__
 
-#include <cstring>
 #include "Defines.h"
 #include "Move.h"
 #include "MoveLookup.h"
@@ -14,17 +13,17 @@ public:
 
 	void reset();
 
-	bool setPiece(char loc, char type);
+	bool setPiece(const char loc, const char type);
 
 	bool incheck(const char color);
 
-	bool parseFen(string st);
+	bool parseFen(const string st);
 
-	bool parseZfen(string st);
+	bool parseZfen(const string st);
 
-	string printFen();
+	string printFen() const;
 
-	string printZfen();
+	string printZfen() const;
 };
 
 #endif

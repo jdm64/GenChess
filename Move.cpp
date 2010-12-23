@@ -15,6 +15,21 @@ const char pieceType[32] = {
 
 const char pieceSymbol[7] = {' ', 'P', 'N', 'B', 'R', 'Q', 'K'};
 
+string printLoc(const char loc)
+{
+	string s;
+
+	if (loc > PLACEABLE) {
+		s += (char)('a' + (loc % 8));
+		s += (char)('8' - (loc / 8));
+		return s;
+	} else if (loc == PLACEABLE) {
+		return "aval";
+	} else {
+		return "dead";
+	}
+}
+
 bool Move::operator==(const Move &rhs) const
 {
 	if (to == rhs.to && from == rhs.from && index == rhs.index && xindex == rhs.xindex)
@@ -30,14 +45,14 @@ void Move::setNull()
 	to = NULL_MOVE;
 }
 
-bool Move::isNull()
+bool Move::isNull() const
 {
 	if (index == NULL_MOVE && xindex == NULL_MOVE && from == NULL_MOVE && to == NULL_MOVE)
 		return true;
 	return false;
 }
 
-int Move::type()
+int Move::type() const
 {
 	if (from == PLACEABLE)
 		return MOVE_PLACE;
@@ -45,15 +60,6 @@ int Move::type()
 		return MOVE_CAPTURE;
 	else
 		return MOVE_MOVE;
-}
-
-string Move::dump() const
-{
-	char data[24];
-
-	sprintf(data, "[%d %d %d %d]", (int)index, (int)xindex, (int)from, (int)to);
-
-	return string(data);
 }
 
 string Move::toString() const
@@ -68,7 +74,7 @@ string Move::toString() const
 	return out;
 }
 
-bool Move::parse(string s)
+bool Move::parse(const string s)
 {
 	char piece;
 	bool place = true;
@@ -122,19 +128,13 @@ bool Move::parse(string s)
 	return true;
 }
 
-string printLoc(const char loc)
+string Move::dump() const
 {
-	string s;
+	char data[24];
 
-	if (loc > PLACEABLE) {
-		s += (char)('a' + (loc % 8));
-		s += (char)('8' - (loc / 8));
-		return s;
-	} else if (loc == PLACEABLE) {
-		return "aval";
-	} else {
-		return "dead";
-	}
+	sprintf(data, "[%d %d %d %d]", (int)index, (int)xindex, (int)from, (int)to);
+
+	return string(data);
 }
 
 void MoveList::print() const

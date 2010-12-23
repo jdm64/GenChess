@@ -13,6 +13,7 @@ typedef uint64_t uint64;
 class Rand64 {
 private:
 	uint64 box[BLOCK];
+
 	int size, last;
 
 	inline uint64 block()
@@ -38,6 +39,7 @@ public:
 			box[i] = i;
 		srand(time(NULL));
 	}
+
 	uint64 next()
 	{
 		uint64 val = 0;

@@ -31,7 +31,7 @@ struct TransItem {
 		type = NONE_NODE;
 	}
 
-	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore)
+	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
 	{
 		if ((type & HAS_SCORE) && depth >= inDepth) {
 			switch (type) {
@@ -57,7 +57,7 @@ struct TransItem {
 		return false;
 	}
 
-	bool getMove(Move &inMove)
+	bool getMove(Move &inMove) const
 	{
 		if (type & HAS_MOVE) {
 			inMove = move;
@@ -71,15 +71,15 @@ struct TransItem {
 class TransTable {
 private:
 	TransItem *table;
-	int size;
 	uint64 hit, miss;
+	int size;
 
 public:
 	TransTable(const int num_MB);
 
 	~TransTable();
 	
-	intPair hitStats();
+	intPair hitStats() const;
 
 	bool getItem(const uint64 hash, TransItem *&item);
 

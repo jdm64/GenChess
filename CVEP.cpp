@@ -1,3 +1,4 @@
+#include <iostream>
 #include "CVEP.h"
 
 bool CVEP::moveResults()
@@ -21,27 +22,6 @@ bool CVEP::moveResults()
 		cout << "result N-N (stalemate)" << endl;
 		return false;
 	}
-}
-
-bool CVEP::mainCmd()
-{
-	string cmd;
-
-	cin >> cmd;
-	if (cmd == "newgame") {
-		game->newGame();
-	} else if (cmd == "quit") {
-		again = false;
-	} else if (cmd == "undo") {
-		game->undoMove();
-	} else if (cmd == "retract") {
-		game->undoMove();
-		game->undoMove();
-	} else {
-		cout << "error (command not recognized): " << cmd << endl;
-		return true;
-	}
-	return false;
 }
 
 bool CVEP::gameCmd()
@@ -104,6 +84,27 @@ bool CVEP::gameCmd()
 		cout << "error (command not recognized): " << cmd << endl;
 	}
 	return true;
+}
+
+bool CVEP::mainCmd()
+{
+	string cmd;
+
+	cin >> cmd;
+	if (cmd == "newgame") {
+		game->newGame();
+	} else if (cmd == "quit") {
+		again = false;
+	} else if (cmd == "undo") {
+		game->undoMove();
+	} else if (cmd == "retract") {
+		game->undoMove();
+		game->undoMove();
+	} else {
+		cout << "error (command not recognized): " << cmd << endl;
+		return true;
+	}
+	return false;
 }
 
 void CVEP::run()

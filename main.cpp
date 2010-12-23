@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Terminal.h"
 #include "CVEP.h"
 
@@ -15,7 +16,7 @@ uint64 perft(int depth)
 	uint64 nodes;
 
 	if (depth == 1) {
-		list = board.getPerftMovesList(board.currPlayer(), MOVE_ALL);
+		list = board.getPerftMoveList(board.currPlayer(), MOVE_ALL);
 		nodes = list->size;
 		delete list;
 		return nodes;
@@ -23,7 +24,7 @@ uint64 perft(int depth)
 	nodes = 0;
 
 	// Placement Moves
-	list = board.getPerftMovesList(board.currPlayer(), MOVE_PLACE);
+	list = board.getPerftMoveList(board.currPlayer(), MOVE_PLACE);
 	if (list->size == 0)
 		goto moves;
 	for (int i = 0; i < list->size; i++) {
@@ -34,7 +35,7 @@ uint64 perft(int depth)
 moves:
 	delete list;
 	// Movement Moves
-	list = board.getPerftMovesList(board.currPlayer(), MOVE_MOVE);
+	list = board.getPerftMoveList(board.currPlayer(), MOVE_MOVE);
 	if (list->size == 0)
 		goto captures;
 	for (int i = 0; i < list->size; i++) {
@@ -45,7 +46,7 @@ moves:
 captures:
 	delete list;
 	// Capture Moves
-	list = board.getPerftMovesList(board.currPlayer(), MOVE_CAPTURE);
+	list = board.getPerftMoveList(board.currPlayer(), MOVE_CAPTURE);
 	if (list->size == 0)
 		goto done;
 	for (int i = 0; i < list->size; i++) {

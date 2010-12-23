@@ -32,7 +32,7 @@ TransTable::~TransTable()
 	delete[] table;
 }
 
-intPair TransTable::hitStats()
+intPair TransTable::hitStats() const
 {
 	return {hit, miss};
 }

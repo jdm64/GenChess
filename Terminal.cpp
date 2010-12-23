@@ -1,3 +1,4 @@
+#include <iostream>
 #include "Terminal.h"
 
 const string Terminal::PS[3] = {"black", "", "white"};
@@ -10,33 +11,9 @@ Terminal::Terminal(const int white, const int black)
 	playerString = PS + 1;
 }
 
-bool Terminal::mainMenu()
+void Terminal::displayHelp()
 {
-	string cmd;
-
-	cout << "main> ";
-	cin >> cmd;
-	if (cmd == "new") {
-		game->newGame();
-	} else if (cmd == "quit") {
-		again = false;
-	} else if (cmd == "undo") {
-		game->undoMove();
-		// recheck player, print error if not undo-able
-	} else if (cmd == "dundo") {
-		game->undoMove();
-		game->undoMove();
-	} else if (cmd == "list") {
-		board.printPieceList();
-		return true;
-	} else if (cmd == "help") {
-		displayHelp();
-		return true;
-	} else {
-		cout << "Error: \"" << cmd << "\" not recognized\n";
-		return true;
-	}
-	return false;
+	cout << "help messages comming soon...";
 }
 
 bool Terminal::playerCmd()
@@ -98,9 +75,33 @@ bool Terminal::playerCmd()
 	return false;
 }
 
-void Terminal::displayHelp()
+bool Terminal::mainMenu()
 {
-	cout << "help messages comming soon...";
+	string cmd;
+
+	cout << "main> ";
+	cin >> cmd;
+	if (cmd == "new") {
+		game->newGame();
+	} else if (cmd == "quit") {
+		again = false;
+	} else if (cmd == "undo") {
+		game->undoMove();
+		// recheck player, print error if not undo-able
+	} else if (cmd == "dundo") {
+		game->undoMove();
+		game->undoMove();
+	} else if (cmd == "list") {
+		board.printPieceList();
+		return true;
+	} else if (cmd == "help") {
+		displayHelp();
+		return true;
+	} else {
+		cout << "Error: \"" << cmd << "\" not recognized\n";
+		return true;
+	}
+	return false;
 }
 
 void Terminal::run()

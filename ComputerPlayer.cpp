@@ -1,3 +1,4 @@
+#include <iostream>
 #include <climits>
 #include "ComputerPlayer.h"
 
@@ -6,7 +7,7 @@
 
 int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
-	MoveList *ptr = board->getMovesList(board->currPlayer(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
+	MoveList *ptr = board->getMoveList(board->currPlayer(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -70,7 +71,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		}
 	}
 	// Try all of moveType Moves
-	MoveList *ptr = board->getMovesList(board->currPlayer(), type);
+	MoveList *ptr = board->getMoveList(board->currPlayer(), type);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -171,7 +172,7 @@ hashMiss:
 
 void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 {
-	curr = curr? curr : board->getMovesList(board->currPlayer());
+	curr = curr? curr : board->getMoveList(board->currPlayer());
 
 	int b = beta;
 	for (int n = 0; n < curr->size; n++) {

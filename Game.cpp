@@ -6,7 +6,7 @@ void Game::newGame()
 	history.clear();
 }
 
-void Game::doMove(Move move)
+void Game::doMove(const Move move)
 {
 	board->make(move);
 	history.push_back(move);

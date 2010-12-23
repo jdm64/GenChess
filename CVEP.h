@@ -7,9 +7,9 @@ class CVEP : public UI {
 public:
 	bool moveResults();
 
-	bool mainCmd();
-
 	bool gameCmd();
+
+	bool mainCmd();
 
 	void run();
 };

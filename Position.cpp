@@ -1,3 +1,4 @@
+#include <cstring>
 #include <sstream>
 #include "Position.h"
 
@@ -38,7 +39,7 @@ bool Position::incheck(const char color)
 	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
 }
 
-bool Position::parseFen(string st)
+bool Position::parseFen(const string st)
 {
 	reset();
 
@@ -131,7 +132,7 @@ bool Position::parseFen(string st)
 	return true;
 }
 
-bool Position::parseZfen(string st)
+bool Position::parseZfen(const string st)
 {
 	reset();
 
@@ -204,7 +205,7 @@ bool Position::parseZfen(string st)
 	return true;
 }
 
-string Position::printFen()
+string Position::printFen() const
 {
 	ostringstream buf;
 	string fen;
@@ -259,7 +260,7 @@ string Position::printFen()
 	return fen;
 }
 
-string Position::printZfen()
+string Position::printZfen() const
 {
 	stringstream buf;
 	string fen;

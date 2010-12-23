@@ -1,10 +1,6 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
-#include <cstring>
-#include <iostream>
-#include "Move.h"
-#include "Defines.h"
 #include "Position.h"
 
 //#define DEBUG_MAKE_MOVE
@@ -15,11 +11,11 @@ extern const int locValue[7][64];
 
 class Board {
 private:
-	uint64 key;
-
 	char square[64];
 
 	char piece[32];
+
+	uint64 key;
 
 	int ply;
 
@@ -32,19 +28,9 @@ private:
 public:
 	Board();
 
-	char currPlayer() const
-	{
-		return curr;
-	}
-
 	uint64 hash() const
 	{
 		return key;
-	}
-
-	bool vply() const
-	{
-		return (curr == WHITE)? !(ply % 2) : (ply % 2);
 	}
 
 	int getPly() const
@@ -52,15 +38,18 @@ public:
 		return ply;
 	}
 
+	char currPlayer() const
+	{
+		return curr;
+	}
+
+	void reset();
+
 	void rebuildHash();
 
 	void setBoard(Position pos);
 
-	void reset();
-
-	int isMate();
-
-	bool incheck(const char color);
+	Position getPosition() const;
 
 	void make(const Move move);
 
@@ -70,21 +59,23 @@ public:
 
 	void unmakeP(const Move move);
 
+	bool incheck(const char color);
+
+	int isMate();
+
 	bool validMove(const Move moveIn, Move &move);
 
-	int validMove(string smove, const char color, Move &move);
+	int validMove(const string smove, const char color, Move &move);
 
 	int eval() const;
 
-	Position getPosition() const;
-
 	int getNumMoves(const char color);
 
-	MoveList* getMovesList(const char color);
+	MoveList* getMoveList(const char color);
 
-	MoveList* getMovesList(const char color, const int movetype);
+	MoveList* getMoveList(const char color, const int movetype);
 
-	MoveList* getPerftMovesList(const char color, const int movetype);
+	MoveList* getPerftMoveList(const char color, const int movetype);
 
 	string printSquare(const int index) const;
 

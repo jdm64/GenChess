@@ -15,12 +15,18 @@ struct Move {
 	char xindex;
 
 	bool operator==(const Move &rhs) const;
+
 	void setNull();
-	bool isNull();
-	int type();
-	string dump() const;
+
+	bool isNull() const;
+
+	int type() const;
+
 	string toString() const;
-	bool parse(string s);
+
+	bool parse(const string s);
+
+	string dump() const;
 };
 
 // forward declations

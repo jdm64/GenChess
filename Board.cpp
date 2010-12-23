@@ -1,5 +1,6 @@
+#include <iostream>
+#include <cstring>
 #include "Board.h"
-#include "MoveLookup.h"
 #include "TransTable.h"
 
 const int pieceValue[16] = {224, 224, 224, 224, 224, 224, 224, 224, 336, 336, 560, 560, 896, 896, 1456, 0};
@@ -124,6 +125,17 @@ void Board::setBoard(Position pos)
 	rebuildHash();
 }
 
+Position Board::getPosition() const
+{
+	Position pos;
+
+	memcpy(pos.square, square, 64);
+	memcpy(pos.piece, piece, 32);
+	pos.ply = ply;
+
+	return pos;
+}
+
 int Board::pieceIndex(const int loc) const
 {
 	for (int i = 0; i < 32; i++)
@@ -142,24 +154,6 @@ int Board::pieceIndex(const int loc, const int type) const
 		if (piece[i] == loc)
 			return i;
 	return NONE;
-}
-
-bool Board::incheck(const char color)
-{
-	MoveLookup ml(square);
-	int king = (color == WHITE)? 31:15;
-
-	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
-}
-
-int Board::isMate()
-{
-	if (getNumMoves(curr))
-		return NOT_MATE;
-	if (incheck(curr))
-		return CHECK_MATE;
-	else
-		return STALE_MATE;
 }
 
 void Board::make(const Move move)
@@ -287,6 +281,24 @@ void Board::unmakeP(const Move move)
 	ply--;
 }
 
+bool Board::incheck(const char color)
+{
+	MoveLookup ml(square);
+	int king = (color == WHITE)? 31:15;
+
+	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
+}
+
+int Board::isMate()
+{
+	if (getNumMoves(curr))
+		return NOT_MATE;
+	if (incheck(curr))
+		return CHECK_MATE;
+	else
+		return STALE_MATE;
+}
+
 bool Board::validMove(const Move moveIn, Move &move)
 {
 	move = moveIn;
@@ -322,7 +334,7 @@ bool Board::validMove(const Move moveIn, Move &move)
 	return ret;
 }
 
-int Board::validMove(string smove, const char color, Move &move)
+int Board::validMove(const string smove, const char color, Move &move)
 {
 	// pre-setup move
 	if (!move.parse(smove))
@@ -396,17 +408,6 @@ int Board::eval() const
 	return (curr == WHITE)? -white : white;
 }
 
-Position Board::getPosition() const
-{
-	Position pos;
-
-	memcpy(pos.square, square, 64);
-	memcpy(pos.piece, piece, 32);
-	pos.ply = ply;
-
-	return pos;
-}
-
 int Board::getNumMoves(const char color)
 {
 	MoveLookup movelookup(square);
@@ -478,7 +479,7 @@ int Board::getNumMoves(const char color)
 	return num;
 }
 
-MoveList* Board::getMovesList(const char color)
+MoveList* Board::getMoveList(const char color)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
@@ -559,7 +560,7 @@ MoveList* Board::getMovesList(const char color)
 	return data;
 }
 
-MoveList* Board::getMovesList(const char color, const int movetype)
+MoveList* Board::getMoveList(const char color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
@@ -739,7 +740,7 @@ MoveList* Board::getMovesList(const char color, const int movetype)
 	return data;
 }
 
-MoveList* Board::getPerftMovesList(const char color, const int movetype)
+MoveList* Board::getPerftMoveList(const char color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
@@ -924,13 +925,6 @@ void Board::printBoard() const
 		<< "    a   b   c   d   e   f   g   h\n";
 }
 
-void Board::dumpDebug() const
-{
-	cout << "hash:" << key << " curr:" << (int)curr << " ply:" << ply << endl;
-	printBoard();
-	printPieceList();
-}
-
 void Board::printPieceList() const
 {
 	string tmp;
@@ -959,4 +953,11 @@ void Board::printPieceList() const
 			cout << tmp;
 		cout << ") ";
 	}																																															cout << endl;
+}
+
+void Board::dumpDebug() const
+{
+	cout << "hash:" << key << " curr:" << (int)curr << " ply:" << ply << endl;
+	printBoard();
+	printPieceList();
 }

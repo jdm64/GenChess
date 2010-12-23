@@ -47,15 +47,15 @@ struct EngineResults {
 	}
 };
 
-EngineResults eng1res, eng2res;
-
-IOptr engine1, engine2;
+char buff[256];
 
 int numGames, testType;
 
 string eng1Bin, eng2Bin;
 
-char buff[256];
+IOptr engine1, engine2;
+
+EngineResults eng1res, eng2res;
 
 timespec operator-(const timespec l, const timespec r)
 {
@@ -82,45 +82,7 @@ void sum(timespec &l, const timespec r)
 	l.tv_sec += r.tv_sec;
 }
 
-IOptr connectIO(string program)
-{
-	enum {IN, OUT};
-
-	int pipe1[2], pipe2[2];
-
-	pipe(pipe1);
-	pipe(pipe2);
-
-	if (!fork()) {
-		close(IN);
-		dup(pipe1[IN]);
-		close(OUT);
-		dup(pipe2[OUT]);
-		close(pipe1[OUT]);
-		close(pipe2[IN]);
-		execlp(program.c_str(), program.c_str(), NULL);
-		// program ends here
-	}
-	IOptr ret;
-
-	close(pipe1[IN]);
-	close(pipe2[OUT]);
-	ret.in = fdopen(pipe1[OUT], "w");
-	ret.out = fdopen(pipe2[IN], "r");
-
-	// set unbuffered I/O
-	setbuf(ret.in, NULL);
-
-	return ret;
-}
-
-void initEngines()
-{
-	engine1 = connectIO(eng1Bin);
-	engine2 = connectIO(eng2Bin);
-}
-
-double LOS(AsColor a)
+double LOS(const AsColor a)
 {
 	int num = a.win - a.lose, den = a.win + a.lose;
 	double ratio = double(num) / double(den);
@@ -184,7 +146,7 @@ void printStats()
 	printf("Color: %+4.2f\tEngine: %+4.2f\n", color, engine);
 }
 
-GameResults runGame(IOptr white, IOptr black)
+GameResults runGame(const IOptr white, const IOptr black)
 {
 	istringstream line;
 	string move, word;
@@ -301,6 +263,44 @@ void runMatch()
 	}
 	fputs("quit\n", engine1.in);
 	fputs("quit\n", engine2.in);
+}
+
+IOptr connectIO(const string program)
+{
+	enum {IN, OUT};
+
+	int pipe1[2], pipe2[2];
+
+	pipe(pipe1);
+	pipe(pipe2);
+
+	if (!fork()) {
+		close(IN);
+		dup(pipe1[IN]);
+		close(OUT);
+		dup(pipe2[OUT]);
+		close(pipe1[OUT]);
+		close(pipe2[IN]);
+		execlp(program.c_str(), program.c_str(), NULL);
+		// program ends here
+	}
+	IOptr ret;
+
+	close(pipe1[IN]);
+	close(pipe2[OUT]);
+	ret.in = fdopen(pipe1[OUT], "w");
+	ret.out = fdopen(pipe2[IN], "r");
+
+	// set unbuffered I/O
+	setbuf(ret.in, NULL);
+
+	return ret;
+}
+
+void initEngines()
+{
+	engine1 = connectIO(eng1Bin);
+	engine2 = connectIO(eng2Bin);
 }
 
 int main(int argc, char **argv)

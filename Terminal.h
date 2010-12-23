@@ -16,11 +16,11 @@ private:
 public:
 	Terminal(const int white, const int black);
 
-	bool mainMenu();
+	void displayHelp();
 
 	bool playerCmd();
 
-	void displayHelp();
+	bool mainMenu();
 
 	void run();
 };
