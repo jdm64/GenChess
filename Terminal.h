@@ -1,19 +1,10 @@
 #ifndef __TERMINAL_H__
 #define __TERMINAL_H__
 
-#include "ComputerPlayer.h"
-#include "Game.h"
+#include "UI.h"
 
-class Terminal {
+class Terminal : public UI {
 private:
-	static const string moveError[NUM_MOVE_ERRORS];
-
-	Board board;
-	
-	ComputerPlayer *engine;
-
-	Game *game;
-
 	static const string PS[3];
 	
 	const string *playerString;
@@ -22,12 +13,8 @@ private:
 	
 	char *playerType;
 
-	bool again;
-
 public:
 	Terminal(const int white, const int black);
-
-	~Terminal();
 
 	bool mainMenu();
 

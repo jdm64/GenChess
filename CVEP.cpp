@@ -1,32 +1,5 @@
 #include "CVEP.h"
 
-const string CVEP::moveError[NUM_MOVE_ERRORS] = {
-	"", "That's an invalid move format",
-	"That move doesn't reference a valid piece",
-	"That is not your piece", "You must place your king first",
-	"Can't place piece on another piece", "Can't capture your own piece",
-	"That piece can't move like that", "That move places you in check",
-	"Can't check by placing a piece"
-};
-
-
-CVEP::CVEP()
-{
-	quit_engine = false;
-	game = new Game(&board);
-	engine = new ComputerPlayer(&board);
-	tt = new TransTable(32);
-
-	board.rebuildHash();
-}
-
-CVEP::~CVEP()
-{
-	delete game;
-	delete engine;
-	delete tt;
-}
-
 bool CVEP::moveResults()
 {
 	switch (board.isMate()) {
@@ -58,7 +31,7 @@ bool CVEP::mainCmd()
 	if (cmd == "newgame") {
 		game->newGame();
 	} else if (cmd == "quit") {
-		quit_engine = true;
+		again = false;
 	} else if (cmd == "undo") {
 		game->undoMove();
 	} else if (cmd == "retract") {
@@ -91,7 +64,7 @@ bool CVEP::gameCmd()
 	} else if (cmd == "newgame") {
 		game->newGame();
 	} else if (cmd == "quit") {
-		quit_engine = true;
+		again = false;
 		return false;
 	} else if (cmd == "undo") {
 		game->undoMove();
@@ -138,12 +111,12 @@ void CVEP::run()
 	while (true) {
 		while (mainCmd());
 
-		if (quit_engine)
+		if (!again)
 			break;
 
 		while (gameCmd());
 
-		if (quit_engine)
+		if (!again)
 			break;
 	}
 }

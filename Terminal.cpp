@@ -1,15 +1,5 @@
 #include "Terminal.h"
 
-const string Terminal::moveError[NUM_MOVE_ERRORS] = {
-	"", "That's an invalid move format",
-	"That move doesn't reference a valid piece",
-	"That is not your piece", "You must place your king first",
-	"Can't place piece on another piece", "Can't capture your own piece",
-	"That piece can't move like that", "That move places you in check",
-	"Can't check by placing a piece"
-};
-
-
 const string Terminal::PS[3] = {"black", "", "white"};
 
 Terminal::Terminal(const int white, const int black)
@@ -18,20 +8,6 @@ Terminal::Terminal(const int white, const int black)
 	PT[2] = white;
 	playerType = PT + 1;
 	playerString = PS + 1;
-
-	again = true;
-	game = new Game(&board);
-	engine = new ComputerPlayer(&board);
-	tt = new TransTable(32);
-
-	board.rebuildHash();
-}
-
-Terminal::~Terminal()
-{
-	delete game;
-	delete engine;
-	delete tt;
 }
 
 bool Terminal::mainMenu()
