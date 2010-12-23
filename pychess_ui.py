@@ -6,7 +6,7 @@ from PyQt4 import QtCore, QtGui
 class Ui_MainWindow(object):
 	def setupUi(self, MainWindow):
 		MainWindow.setObjectName("MainWindow")
-		MainWindow.resize(700, 500)
+		MainWindow.resize(800, 600)
 
 		self.mainContainer = QtGui.QWidget(MainWindow)
 		self.mainContainer.setObjectName("mainContainer")
@@ -118,7 +118,7 @@ class Ui_MainWindow(object):
 		QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
 	def retranslateUi(self, MainWindow):
-		MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "GenChess GUI", None, QtGui.QApplication.UnicodeUTF8))
+		MainWindow.setWindowTitle(QtGui.QApplication.translate("MainWindow", "qtGenChess", None, QtGui.QApplication.UnicodeUTF8))
 		self.label.setText(QtGui.QApplication.translate("MainWindow", "WHITE", None, QtGui.QApplication.UnicodeUTF8))
 		self.label2.setText(QtGui.QApplication.translate("MainWindow", "BLACK", None, QtGui.QApplication.UnicodeUTF8))
 		self.menuFile.setTitle(QtGui.QApplication.translate("MainWindow", "File", None, QtGui.QApplication.UnicodeUTF8))

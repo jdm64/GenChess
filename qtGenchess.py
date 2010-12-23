@@ -11,6 +11,22 @@ from os import listdir
 # Edit this to change who plays white/black
 # First item is white, second is black
 player = ["human", "computer"]
+color = ["White", "Black"]
+
+def boardIndex(alg):
+	ret = ord(alg[0]) - ord('a')
+	ret += 8 * (8 - (ord(alg[1]) - ord('0')))
+	return ret
+
+def boardCord(index):
+	files = ["a", "b", "c", "d", "e", "f", "g", "h"]
+
+	one = files[index % 8]
+	two = 8 - (index / 8)
+	return one + str(two)
+
+def dropWord(string, num=1):
+	return ' '.join(string.split()[num:])
 
 class MainWindow(QMainWindow, Ui_MainWindow):
 	def __init__(self, parent=None):
@@ -18,26 +34,25 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		self.setupUi(self)
 
 		self.piece = ["P", "N", "B", "R", "Q", "K"]
-		self.files = ["a", "b", "c", "d", "e", "f", "g", "h"]
-		self.board = [''] * 64
 		self.callList = []
-		self.buff = ''
-		self.curr = False
 		self.timer = QTimer()
 
 		self.initGui()
 
-		cmdline = ["./genchess", "-X", "-w" + player[0], "-b" + player[1]]
-		self.genchessExe = Process(cmdline)
-		self.nextPlayer()
+		cmdline = ["./genchess", ""]
+		self.engine = Process(cmdline)
+		self.newGame()
+
+	def __del__(self):
+		pass
 
 	def initGui(self):
 		self.connect(self, SIGNAL('triggered()'), self.closeEvent)
 		self.connect(self.actionNew_Game_F2, SIGNAL("triggered()"), self.newGame)
-		for i in range(0, 6):
+		for i in range(6):
 			self.connect(self.whiteButtons[i], SIGNAL("clicked()"), lambda n="w" + str(i): self.runButton(n))
 			self.connect(self.blackButtons[i], SIGNAL("clicked()"), lambda n="b" + str(i): self.runButton(n))
-		for i in range(0, 64):
+		for i in range(64):
 			self.connect(self.boardButtons[i], SIGNAL("clicked()"), lambda n="n" + str(i): self.runButton(n))
 		self.iconMap = {}
 		list = listdir("./Images/")
@@ -50,49 +65,78 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.blackButtons[i].setIcon(self.iconMap["B"+self.piece[i]])
 
 	def closeEvent(self, event):
-		self.genchessExe.write("quit\n")
+		self.engine.write("quit\n")
 		sleep(0.2)
-		self.genchessExe.terminate()
+		self.engine.terminate()
 
-	def __del__(self):
-		pass
+	def comExe(self, data, lines):
+		self.engine.write(data)
+		output = self.engine.read()
+		while len(output.splitlines()) < lines:
+			sleep(0.05)
+			output += self.engine.read()
+		return output
+
+	def displayMessage(self, msg):
+		self.statusbar.showMessage(msg)
+
+	def updateBoard(self, move):
+		color = ["W", "B"]
+		color = color[self.curr]
+		if move[0] in self.piece:
+			to = boardIndex(move[1:])
+			self.board[to] = color + move[0]
+			self.boardButtons[to].setIcon(self.iconMap[self.board[to]])
+			return
+		fr = boardIndex(move[0:2])
+		to = boardIndex(move[2:4])
+
+		self.board[to] = self.board[fr]
+		self.boardButtons[fr].setIcon(self.iconMap["EE"])
+		self.boardButtons[to].setIcon(self.iconMap[self.board[to]])
+
+	def runComputer(self):
+		data = self.comExe("go\n", 2).splitlines()
+		move = data[0].split()[1]
+		results = data[1].split()[0]
+
+		self.updateBoard(move)
+
+		msg = color[self.curr] + "'s move: " + move
+		if results == 'ok':
+			self.displayMessage(msg)
+		elif results == 'special':
+			self.displayMessage(msg + ' (' + dropWord(data[1]) + ')')
+		elif results == 'result':
+			self.displayMessage(msg + ' ' + dropWord(data[1], 2))
+			return
+		self.curr ^= True
+		self.callList = []
+		self.timer.singleShot(300, self.nextPlayer)
+
+	def nextPlayer(self):
+		if player[self.curr] == 'computer':
+			self.runComputer()
 
 	def newGame(self):
-		self.genchessExe.write("new\n")
+		self.engine.write("newgame\n")
 		for i in range(64):
 			self.boardButtons[i].setIcon(self.iconMap["EE"])
 		self.curr = False
 		self.board = [''] * 64
 		self.nextPlayer()
 
-	def nextPlayer(self):
-		data = self.commExe(wait=False)
-		if data == '':
-			data = None
-		elif data[0] in ['!', '$']:
-			self.displayMessage(data)
-			data = None
-		if player[self.curr] == 'computer':
-			self.runComputer(data)
-		self.callList = []
-
-	def runComputer(self, move=None):
-		if move == None:
-			move = self.commExe()
-		self.updateBoard(move)
-		self.curr ^= True
-		self.timer.singleShot(300, self.nextPlayer)
-
 	def runButton(self, n):
 		if n[0] == "w" or n[0] == "b":
+			if len(self.callList) == 1 and self.callList[0] in self.piece:
+				self.callList = [ self.piece[int(n[1:])] ]
+				self.displayMessage("active button: " + self.callList[0])
+				return
 			self.callList.append(self.piece[int(n[1:])])
 		else:
-			index = int(n[1:])
-			one = self.files[index % 8]
-			two = 8 - (index / 8)
-			self.callList.append(one + str(two))
+			self.callList.append(boardCord(int(n[1:])))
 		if len(self.callList) == 1:
-			self.statusbar.showMessage("active button: " + self.callList[0])
+			self.displayMessage("active button: " + self.callList[0])
 			return
 		elif self.callList[1][0] in self.piece:
 			self.statusbar.clearMessage()
@@ -103,63 +147,26 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 			self.callList = []
 			return
 		act = ''.join(self.callList)
-		self.statusbar.showMessage("doing move: " + act)
 		self.callList = []
 
-		out = self.commExe(act + '\n')
-		if out[0] == '.':
+		data = self.comExe("move " + act + '\n', 1)
+		results = data.split()[0]
+
+		if results == 'ok':
+			self.displayMessage(color[self.curr] + "'s move: " + act)
 			self.updateBoard(act)
 			self.curr ^= True
-			self.timer.singleShot(300, self.nextPlayer)
-		else:
-			self.displayMessage(out)
-
-	def commExe(self, data=None, wait=True):
-		if data != None:
-			self.genchessExe.write(data)
-		sleep(0.03)
-		num = len(self.buff.splitlines(1))
-		if num == 0:
-			self.buff = self.genchessExe.read()
-			if wait:
-				while self.buff == '':
-					sleep(0.03)
-					self.buff = self.genchessExe.read()
-		elif num == 1:
-			out = self.buff
-			self.buff = ''
-			return out
-		num = len(self.buff.splitlines(1))
-		if num < 2:
-			out = self.buff
-			self.buff = ''
-			return out
-		out, self.buff = self.buff.splitlines(1)[0], self.buff.splitlines(1)[1:]
-		self.buff = ''.join(self.buff)
-		return out
-
-	def updateBoard(self, act):
-		color = ["W", "B"]
-		color = color[self.curr]
-		if act[0] in self.piece:
-			to = self.getBoardIndex(act[1:])
-			self.board[to] = color + act[0]
-			self.boardButtons[to].setIcon(self.iconMap[self.board[to]])
+		elif results == 'special':
+			self.displayMessage(color[self.curr] + "'s move: " + act + " (" + dropWord(data) + ")")
+			self.updateBoard(act)
+			self.curr ^= True
+		elif results == 'illegal':
+			self.displayMessage(data)
+		elif results == 'result':
+			self.displayMessage(color[self.curr] + "'s move: " + act + " " + dropWord(data, 2))
+			self.updateBoard(act)
 			return
-		fr = self.getBoardIndex(act[0:2])
-		to = self.getBoardIndex(act[2:4])
-
-		self.board[to] = self.board[fr]
-		self.boardButtons[fr].setIcon(self.iconMap["EE"])
-		self.boardButtons[to].setIcon(self.iconMap[self.board[to]])
-
-	def getBoardIndex(self, alg):
-		ret = ord(alg[0]) - ord('a')
-		ret += 8 * (8 - (ord(alg[1]) - ord('0')))
-		return ret
-
-	def displayMessage(self, msg):
-		self.statusbar.showMessage(msg[2:])
+		self.timer.singleShot(300, self.nextPlayer)
 
 
 if __name__ == "__main__":
