@@ -3,11 +3,11 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -pedantic -O3 -ggdb -std=gnu++0x
 TARGET = genchess
 
-VERSION = $(shell grep "define VERSION" main.cpp | cut -d'"' -f2)
+VERSION = $(shell grep "define VERSION" Defines.h | cut -d'"' -f2)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
-objs = main.o Terminal.o Game.o ComputerPlayer.o CVEP.o \
-	TransTable.o Board.o Position.o Move.o MoveLookup.o UI.o
+objs = Move.o MoveLookup.o Position.o Board.o TransTable.o \
+	ComputerPlayer.o Game.o UI.o CVEP.o Terminal.o main.o
 
 all : genchess enginetester
 
