@@ -28,19 +28,19 @@ extern const int locValue[7][64];
 
 class Board {
 private:
-	char square[64];
+	int8 square[64];
 
-	char piece[32];
+	int8 piece[32];
 
 	uint64 key;
 
 	int ply;
 
-	char curr;
+	int8 curr;
 
-	int pieceIndex(const int loc, const int type) const;
+	int pieceIndex(const int8 loc, const int8 type) const;
 
-	int pieceIndex(const int loc) const;
+	int pieceIndex(const int8 loc) const;
 
 public:
 	Board();
@@ -55,7 +55,7 @@ public:
 		return ply;
 	}
 
-	char currPlayer() const
+	int8 currPlayer() const
 	{
 		return curr;
 	}
@@ -76,23 +76,23 @@ public:
 
 	void unmakeP(const Move move);
 
-	bool incheck(const char color);
+	bool incheck(const int8 color);
 
 	int isMate();
 
 	bool validMove(const Move moveIn, Move &move);
 
-	int validMove(const string smove, const char color, Move &move);
+	int validMove(const string smove, const int8 color, Move &move);
 
 	int eval() const;
 
-	int getNumMoves(const char color);
+	int getNumMoves(const int8 color);
 
-	MoveList* getMoveList(const char color);
+	MoveList* getMoveList(const int8 color);
 
-	MoveList* getMoveList(const char color, const int movetype);
+	MoveList* getMoveList(const int8 color, const int movetype);
 
-	MoveList* getPerftMoveList(const char color, const int movetype);
+	MoveList* getPerftMoveList(const int8 color, const int movetype);
 
 	string printSquare(const int index) const;
 

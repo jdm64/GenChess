@@ -67,7 +67,7 @@ bool TransTable::getItem(const uint64 hash, TransItem *&item)
 	}
 }
 
-void TransTable::setItem(const uint64 hash, const int score, const Move move, const char depth, const char type)
+void TransTable::setItem(const uint64 hash, const int score, const Move move, const int8 depth, const int8 type)
 {
 	TransItem *item = &table[hash % size];
 

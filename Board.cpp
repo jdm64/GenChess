@@ -153,7 +153,7 @@ Position Board::getPosition() const
 	return pos;
 }
 
-int Board::pieceIndex(const int loc) const
+int Board::pieceIndex(const int8 loc) const
 {
 	for (int i = 0; i < 32; i++)
 		if (piece[i] == loc)
@@ -161,7 +161,7 @@ int Board::pieceIndex(const int loc) const
 	return NONE;
 }
 
-int Board::pieceIndex(const int loc, const int type) const
+int Board::pieceIndex(const int8 loc, const int8 type) const
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	int start = ((type < 0)? 0 : 16) + offset[abs(type)],
@@ -298,7 +298,7 @@ void Board::unmakeP(const Move move)
 	ply--;
 }
 
-bool Board::incheck(const char color)
+bool Board::incheck(const int8 color)
 {
 	MoveLookup ml(square);
 	int king = (color == WHITE)? 31:15;
@@ -351,7 +351,7 @@ bool Board::validMove(const Move moveIn, Move &move)
 	return ret;
 }
 
-int Board::validMove(const string smove, const char color, Move &move)
+int Board::validMove(const string smove, const int8 color, Move &move)
 {
 	// pre-setup move
 	if (!move.parse(smove))
@@ -425,7 +425,7 @@ int Board::eval() const
 	return (curr == WHITE)? -white : white;
 }
 
-int Board::getNumMoves(const char color)
+int Board::getNumMoves(const int8 color)
 {
 	MoveLookup movelookup(square);
 	int num = 0;
@@ -457,7 +457,7 @@ int Board::getNumMoves(const char color)
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
 		int n = 0;
-		char *loc = movelookup.genAll(piece[idx]);
+		int8 *loc = movelookup.genAll(piece[idx]);
 		while (loc[n] != -1) {
 			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			move.to = loc[n];
@@ -496,7 +496,7 @@ int Board::getNumMoves(const char color)
 	return num;
 }
 
-MoveList* Board::getMoveList(const char color)
+MoveList* Board::getMoveList(const int8 color)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
@@ -532,7 +532,7 @@ MoveList* Board::getMoveList(const char color)
 	for (int idx = start; idx >= end; idx--) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
-		char *loc = movelookup.genAll(piece[idx]);
+		int8 *loc = movelookup.genAll(piece[idx]);
 		int n = 0;
 		while (loc[n] != -1) {
 			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
@@ -577,7 +577,7 @@ MoveList* Board::getMoveList(const char color)
 	return data;
 }
 
-MoveList* Board::getMoveList(const char color, const int movetype)
+MoveList* Board::getMoveList(const int8 color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
@@ -636,7 +636,7 @@ MoveList* Board::getMoveList(const char color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			char *loc = movelookup.genAll(piece[idx]);
+			int8 *loc = movelookup.genAll(piece[idx]);
 			int n = 0;
 			while (loc[n] != -1) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
@@ -662,7 +662,7 @@ MoveList* Board::getMoveList(const char color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			char *loc = movelookup.genCapture(piece[idx]);
+			int8 *loc = movelookup.genCapture(piece[idx]);
 			int n = 0;
 			while (loc[n] != -1) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
@@ -688,7 +688,7 @@ MoveList* Board::getMoveList(const char color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			char *loc = movelookup.genMove(piece[idx]);
+			int8 *loc = movelookup.genMove(piece[idx]);
 			int n = 0;
 			while (loc[n] != -1) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
@@ -757,7 +757,7 @@ MoveList* Board::getMoveList(const char color, const int movetype)
 	return data;
 }
 
-MoveList* Board::getPerftMoveList(const char color, const int movetype)
+MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
 	MoveList *data = new MoveList;
@@ -810,7 +810,7 @@ MoveList* Board::getPerftMoveList(const char color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			char *loc = movelookup.genAll(piece[idx]);
+			int8 *loc = movelookup.genAll(piece[idx]);
 			int n = 0;
 			while (loc[n] != -1) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
@@ -833,7 +833,7 @@ MoveList* Board::getPerftMoveList(const char color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			char *loc = movelookup.genCapture(piece[idx]);
+			int8 *loc = movelookup.genCapture(piece[idx]);
 			int n = 0;
 			while (loc[n] != -1) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
@@ -856,7 +856,7 @@ MoveList* Board::getPerftMoveList(const char color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			char *loc = movelookup.genMove(piece[idx]);
+			int8 *loc = movelookup.genMove(piece[idx]);
 			int n = 0;
 			while (loc[n] != -1) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);

@@ -17,9 +17,8 @@
 
 #include <iostream>
 #include "Move.h"
-#include "Defines.h"
 
-const char pieceType[32] = {
+const int8 pieceType[32] = {
 	BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,
 	BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,
 	BLACK_KNIGHT, BLACK_KNIGHT, BLACK_BISHOP, BLACK_BISHOP,
@@ -32,13 +31,13 @@ const char pieceType[32] = {
 
 const char pieceSymbol[7] = {' ', 'P', 'N', 'B', 'R', 'Q', 'K'};
 
-string printLoc(const char loc)
+string printLoc(const int8 loc)
 {
 	string s;
 
 	if (loc > PLACEABLE) {
-		s += (char)('a' + (loc % 8));
-		s += (char)('8' - (loc / 8));
+		s += ('a' + (loc % 8));
+		s += ('8' - (loc / 8));
 		return s;
 	} else if (loc == PLACEABLE) {
 		return "aval";
@@ -93,7 +92,7 @@ string Move::toString() const
 
 bool Move::parse(const string s)
 {
-	char piece;
+	int8 piece;
 	bool place = true;
 
 	switch (s[0]) {

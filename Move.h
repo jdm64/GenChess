@@ -19,17 +19,18 @@
 #define __MOVE_H__
 
 #include <boost/array.hpp>
+#include "Defines.h"
 
 using namespace std;
 
-extern const char pieceType[32];
+extern const int8 pieceType[32];
 extern const char pieceSymbol[7];
 
 struct Move {
-	char index;
-	char to;
-	char from;
-	char xindex;
+	int8 index;
+	int8 to;
+	int8 from;
+	int8 xindex;
 
 	bool operator==(const Move &rhs) const;
 
@@ -72,6 +73,6 @@ struct ScoreSort {
 	}
 };
 
-string printLoc(const char loc);
+string printLoc(const int8 loc);
 
 #endif

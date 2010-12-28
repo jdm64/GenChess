@@ -18,6 +18,8 @@
 #ifndef __MOVE_LOOKUP_H__
 #define __MOVE_LOOKUP_H__
 
+#include "Defines.h"
+
 #define ATCK_CMP(A, B)		((A^B) >> 3) - ((A^(-B)) >> 3)
 #define CAPTURE_MOVE(A, B)	(A * B <  0)
 #define ANY_MOVE(A, B)		(A * B <= 0)
@@ -28,26 +30,26 @@
 
 class MoveLookup {
 private:
-	static char mailbox[120];
+	static int8 mailbox[120];
 
-	static char mailbox64[64];
+	static int8 mailbox64[64];
 
-	static char offsets[7][8];
+	static int8 offsets[7][8];
 
-	char *square;
+	int8 *square;
 
 public:
-	MoveLookup(char *Square) : square(Square) {}
+	MoveLookup(int8 *Square) : square(Square) {}
 
-	char* genAll(const char &from) const;
+	int8* genAll(const int8 &from) const;
 
-	char* genCapture(const char &from) const;
+	int8* genCapture(const int8 &from) const;
 
-	char* genMove(const char &from) const;
+	int8* genMove(const int8 &from) const;
 
-	bool fromto(const char &From, const char &To) const;
+	bool fromto(const int8 &From, const int8 &To) const;
 
-	bool isAttacked(const char &from) const;
+	bool isAttacked(const int8 &from) const;
 };
 
 #endif

@@ -18,21 +18,20 @@
 #ifndef __POSITION_H__
 #define __POSITION_H__
 
-#include "Defines.h"
 #include "Move.h"
 #include "MoveLookup.h"
 
 class Position {
 public:
-	char square[64];
-	char piece[32];
+	int8 square[64];
+	int8 piece[32];
 	int ply;
 
 	void reset();
 
-	bool setPiece(const char loc, const char type);
+	bool setPiece(const int8 loc, const int8 type);
 
-	bool incheck(const char color);
+	bool incheck(const int8 color);
 
 	bool parseFen(const string st);
 

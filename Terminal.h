@@ -26,9 +26,9 @@ private:
 	
 	const string *playerString;
 
-	char PT[3];
+	int PT[3];
 	
-	char *playerType;
+	int *playerType;
 
 public:
 	Terminal(const int white, const int black);

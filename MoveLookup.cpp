@@ -18,9 +18,8 @@
 #include <cstdlib>
 #include <cassert>
 #include "MoveLookup.h"
-#include "Defines.h"
 
-char MoveLookup::mailbox[120] = {
+int8 MoveLookup::mailbox[120] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	-1,  0,  1,  2,  3,  4,  5,  6,  7, -1,
@@ -34,7 +33,7 @@ char MoveLookup::mailbox[120] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 
-char MoveLookup::mailbox64[64] = {
+int8 MoveLookup::mailbox64[64] = {
 	21, 22, 23, 24, 25, 26, 27, 28,
 	31, 32, 33, 34, 35, 36, 37, 38,
 	41, 42, 43, 44, 45, 46, 47, 48,
@@ -44,7 +43,7 @@ char MoveLookup::mailbox64[64] = {
 	81, 82, 83, 84, 85, 86, 87, 88,
 	91, 92, 93, 94, 95, 96, 97, 98};
 
-char MoveLookup::offsets[7][8] = {
+int8 MoveLookup::offsets[7][8] = {
 	{  0,   0,   0,  0,   0,  0,  0,  0},
 	{-11,  -9,   9, 11, -10, -1,  1, 10},
 	{-21, -19, -12, -8,   8, 12, 19, 21},
@@ -53,10 +52,10 @@ char MoveLookup::offsets[7][8] = {
 	{-11, -10,  -9, -1,   1,  9, 10, 11},
 	{-11, -10,  -9, -1,   1,  9, 10, 11} };
 
-char* MoveLookup::genAll(const char &from) const
+int8* MoveLookup::genAll(const int8 &from) const
 {
 	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
-	char to, *list = new char[28], *offset = offsets[type];
+	int8 to, *list = new int8[28], *offset = offsets[type];
 
 	switch (type) {
 	case PAWN:
@@ -127,10 +126,10 @@ char* MoveLookup::genAll(const char &from) const
 	return list;
 }
 
-char* MoveLookup::genCapture(const char &from) const
+int8* MoveLookup::genCapture(const int8 &from) const
 {
 	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
-	char to, *list = new char[28], *offset = offsets[type];
+	int8 to, *list = new int8[28], *offset = offsets[type];
 
 	switch (type) {
 	case PAWN:
@@ -189,10 +188,10 @@ char* MoveLookup::genCapture(const char &from) const
 	return list;
 }
 
-char* MoveLookup::genMove(const char &from) const
+int8* MoveLookup::genMove(const int8 &from) const
 {
 	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
-	char to, *list = new char[28], *offset = offsets[type];
+	int8 to, *list = new int8[28], *offset = offsets[type];
 
 	switch (type) {
 	case PAWN:
@@ -251,10 +250,10 @@ char* MoveLookup::genMove(const char &from) const
 	return list;
 }
 
-bool MoveLookup::fromto(const char &From, const char &To) const
+bool MoveLookup::fromto(const int8 &From, const int8 &To) const
 {
 	int type = abs(square[From]), mfrom = mailbox64[From];
-	char to, *offset = offsets[type];
+	int8 to, *offset = offsets[type];
 
 	switch (type) {
 	case PAWN:
@@ -328,10 +327,10 @@ bool MoveLookup::fromto(const char &From, const char &To) const
 	return false;
 }
 
-bool MoveLookup::isAttacked(const char &from) const
+bool MoveLookup::isAttacked(const int8 &from) const
 {
 	int mfrom = mailbox64[from];
-	char to, *offset;
+	int8 to, *offset;
 
 	offset = offsets[ROOK];
 	for (int dir = 0; dir < 4; dir++) {

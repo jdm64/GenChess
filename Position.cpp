@@ -19,7 +19,7 @@
 #include <sstream>
 #include "Position.h"
 
-const char type[] = {
+const int8 type[] = {
 	EMPTY,		EMPTY,		BLACK_KING,	WHITE_BISHOP,	EMPTY,
 	BLACK_KNIGHT,	EMPTY,		BLACK_PAWN,	BLACK_QUEEN,	BLACK_ROOK,
 	EMPTY,		EMPTY,		WHITE_KING,	EMPTY,		BLACK_BISHOP,
@@ -31,7 +31,7 @@ void Position::reset()
 	memset(piece, DEAD, 32);
 }
 
-bool Position::setPiece(const char loc, const char type)
+bool Position::setPiece(const int8 loc, const int8 type)
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	int start = ((type < 0)? 0 : 16) + offset[abs(type)],
@@ -48,7 +48,7 @@ bool Position::setPiece(const char loc, const char type)
 	return false;
 }
 
-bool Position::incheck(const char color)
+bool Position::incheck(const int8 color)
 {
 	MoveLookup ml(square);
 	int king = (color == WHITE)? 31:15;
@@ -91,7 +91,7 @@ bool Position::parseFen(const string st)
 		}
 	}
 	// pick up color-to-move
-	char ctm = (st[i] == 'w')? WHITE : BLACK;
+	int8 ctm = (st[i] == 'w')? WHITE : BLACK;
 	i += 2;
 
 	// parse placeable pieces
@@ -216,7 +216,7 @@ bool Position::parseZfen(const string st)
 		return false;
 
 	// check if color not on move is in check
-	char ctm = (ply % 2)? BLACK : WHITE;
+	int8 ctm = (ply % 2)? BLACK : WHITE;
 	if (incheck(ctm ^ -2))
 		return false;
 	return true;

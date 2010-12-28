@@ -20,9 +20,10 @@
 
 #include <cstdint>
 
-typedef uint64_t uint64;
-
 #define VERSION		"2.0.75"
+
+typedef uint64_t uint64;
+typedef int8_t int8;
 
 enum {NONE = -1, PLACEABLE = -2, DEAD = -4, NULL_MOVE = -8};
 
