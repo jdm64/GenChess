@@ -34,8 +34,8 @@ void Position::reset()
 bool Position::setPiece(const int8 loc, const int8 type)
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
-	int start = ((type < 0)? 0 : 16) + offset[abs(type)],
-		end = ((type < 0)? 0 : 16) + offset[abs(type) + 1];
+	int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
+		end = ((type < 0)? 0 : 16) + offset[ABS(type) + 1];
 
 	for (int i = start; i < end; i++) {
 		if (piece[i] == DEAD) {

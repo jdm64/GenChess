@@ -164,8 +164,8 @@ int Board::pieceIndex(const int8 loc) const
 int Board::pieceIndex(const int8 loc, const int8 type) const
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
-	int start = ((type < 0)? 0 : 16) + offset[abs(type)],
-		end = ((type < 0)? 0 : 16) + offset[abs(type) + 1];
+	int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
+		end = ((type < 0)? 0 : 16) + offset[ABS(type) + 1];
 
 	for (int i = start; i < end; i++)
 		if (piece[i] == loc)
@@ -336,7 +336,7 @@ bool Board::validMove(const Move moveIn, Move &move)
 		if (!ml.fromto(move.from, move.to))
 			return false;
 	}
-	if (ply < 2 && abs(pieceType[move.index]) != KING)
+	if (ply < 2 && ABS(pieceType[move.index]) != KING)
 		return false;
 
 	bool ret = true;
@@ -376,7 +376,7 @@ int Board::validMove(const string smove, const int8 color, Move &move)
 			return CAPTURE_OWN;
 	}
 	// must place king first
-	if (ply < 2 && abs(pieceType[move.index]) != KING)
+	if (ply < 2 && ABS(pieceType[move.index]) != KING)
 		return KING_FIRST;
 	if (move.from != PLACEABLE) {
 		MoveLookup ml(square);
@@ -922,7 +922,7 @@ string Board::printSquare(const int index) const
 
 	if (!square[index])
 		return "  ";
-	tmp = { pieceSymbol[abs(square[index])],
+	tmp = { pieceSymbol[ABS(square[index])],
 		(square[index] > 0)? ' ':'*' };
 	return tmp;
 }

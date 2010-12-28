@@ -54,7 +54,7 @@ int8 MoveLookup::offsets[7][8] = {
 
 int8* MoveLookup::genAll(const int8 &from) const
 {
-	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
+	int type = ABS(square[from]), next = 0, mfrom = mailbox64[from];
 	int8 to, *list = new int8[28], *offset = offsets[type];
 
 	switch (type) {
@@ -128,7 +128,7 @@ int8* MoveLookup::genAll(const int8 &from) const
 
 int8* MoveLookup::genCapture(const int8 &from) const
 {
-	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
+	int type = ABS(square[from]), next = 0, mfrom = mailbox64[from];
 	int8 to, *list = new int8[28], *offset = offsets[type];
 
 	switch (type) {
@@ -190,7 +190,7 @@ int8* MoveLookup::genCapture(const int8 &from) const
 
 int8* MoveLookup::genMove(const int8 &from) const
 {
-	int type = abs(square[from]), next = 0, mfrom = mailbox64[from];
+	int type = ABS(square[from]), next = 0, mfrom = mailbox64[from];
 	int8 to, *list = new int8[28], *offset = offsets[type];
 
 	switch (type) {
@@ -252,7 +252,7 @@ int8* MoveLookup::genMove(const int8 &from) const
 
 bool MoveLookup::fromto(const int8 &From, const int8 &To) const
 {
-	int type = abs(square[From]), mfrom = mailbox64[From];
+	int type = ABS(square[From]), mfrom = mailbox64[From];
 	int8 to, *offset = offsets[type];
 
 	switch (type) {
@@ -342,9 +342,9 @@ bool MoveLookup::isAttacked(const int8 &from) const
 				continue;
 			else if (OWN_PIECE(square[from], square[to]))
 				break;
-			else if (abs(square[to]) == ROOK || abs(square[to]) == QUEEN)
+			else if (ABS(square[to]) == ROOK || ABS(square[to]) == QUEEN)
 				return true;
-			else if (k == 1 && abs(square[to]) == KING)
+			else if (k == 1 && ABS(square[to]) == KING)
 				return true;
 			break;
 		}
@@ -360,9 +360,9 @@ bool MoveLookup::isAttacked(const int8 &from) const
 				continue;
 			else if (OWN_PIECE(square[from], square[to]))
 				break;
-			else if (abs(square[to]) == BISHOP || abs(square[to]) == QUEEN)
+			else if (ABS(square[to]) == BISHOP || ABS(square[to]) == QUEEN)
 				return true;
-			else if (k == 1 && (abs(square[to]) == PAWN || abs(square[to]) == KING))
+			else if (k == 1 && (ABS(square[to]) == PAWN || ABS(square[to]) == KING))
 				return true;
 			break;
 		}
@@ -375,7 +375,7 @@ bool MoveLookup::isAttacked(const int8 &from) const
 			continue;
 		else if (NOT_CAPTURE(square[from], square[to]))
 			continue;
-		else if (abs(square[to]) == KNIGHT)
+		else if (ABS(square[to]) == KNIGHT)
 			return true;
 	}
 	return false;

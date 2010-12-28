@@ -83,7 +83,7 @@ string Move::toString() const
 	string out;
 
 	if (from == PLACEABLE)
-		out += pieceSymbol[abs(pieceType[index])];
+		out += pieceSymbol[ABS(pieceType[index])];
 	else
 		out = printLoc(from);
 	out += printLoc(to);
