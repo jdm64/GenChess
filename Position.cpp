@@ -115,7 +115,7 @@ bool Position::parseFen(const string st)
 		tmp += st[i];
 		i++;
 	}
-	int hply = atoi(tmp.c_str());
+	ply = atoi(tmp.c_str());
 	i++;
 
 	// pick up full ply count (starts at 1)

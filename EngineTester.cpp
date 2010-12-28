@@ -24,8 +24,6 @@ using namespace std;
 
 #define NSEC_PER_SEC 1000000000L
 
-enum {SINGLE, DUAL};
-
 struct IOptr {
 	FILE *in;
 	FILE *out;
@@ -178,12 +176,18 @@ GameResults runGame(const IOptr white, const IOptr black)
 		res.ply++;
 		fputs("go\n", white.in);
 		clock_gettime(CLOCK_REALTIME, &tm1);
-		fgets(buff, 256, white.out);
+		if (!fgets(buff, 256, white.out)) {
+			cout << "Error: broken pipe\n";
+			exit(EXIT_FAILURE);
+		}
 		clock_gettime(CLOCK_REALTIME, &tm2);
 		sum(res.whiteTime, tm2 - tm1);
 
 		move = string(buff);
-		fgets(buff, 256, white.out);
+		if (!fgets(buff, 256, white.out)) {
+			cout << "Error: broken pipe\n";
+			exit(EXIT_FAILURE);
+		}
 
 		line.str(string(buff));
 		line >> word;
@@ -194,18 +198,27 @@ GameResults runGame(const IOptr white, const IOptr black)
 
 		// send white's move to black
 		fputs(move.c_str(), black.in);
-		fgets(buff, 256, black.out);
+		if (!fgets(buff, 256, black.out)) {
+			cout << "Error: broken pipe\n";
+			exit(EXIT_FAILURE);
+		}
 
 		// get black's move
 		res.ply++;
 		fputs("go\n", black.in);
 		clock_gettime(CLOCK_REALTIME, &tm1);
-		fgets(buff, 256, black.out);
+		if (!fgets(buff, 256, black.out)) {
+			cout << "Error: broken pipe\n";
+			exit(EXIT_FAILURE);
+		}
 		clock_gettime(CLOCK_REALTIME, &tm2);
 		sum(res.blackTime, tm2 - tm1);
 
 		move = string(buff);
-		fgets(buff, 256, black.out);
+		if (!fgets(buff, 256, black.out)) {
+			cout << "Error: broken pipe\n";
+			exit(EXIT_FAILURE);
+		}
 
 		line.str(string(buff));
 		line >> word;
@@ -216,7 +229,10 @@ GameResults runGame(const IOptr white, const IOptr black)
 
 		// send black's move to white
 		fputs(move.c_str(), white.in);
-		fgets(buff, 256, white.out);
+		if (!fgets(buff, 256, white.out)) {
+			cout << "Error: broken pipe\n";
+			exit(EXIT_FAILURE);
+		}
 	}
 	// results of game
 	line >> word;
@@ -288,14 +304,26 @@ IOptr connectIO(const string program)
 
 	int pipe1[2], pipe2[2];
 
-	pipe(pipe1);
-	pipe(pipe2);
+	if (pipe(pipe1)) {
+		cout << "Error: can't create pipe to: " << program << endl;
+		exit(EXIT_FAILURE);
+	}
+	if (pipe(pipe2)) {
+		cout << "Error: can't create pipe to: " << program << endl;
+		exit(EXIT_FAILURE);
+	}
 
 	if (!fork()) {
 		close(IN);
-		dup(pipe1[IN]);
+		if (dup(pipe1[IN]) == -1) {
+			cout << "Error: can't duplicate file descriptor\n";
+			exit(EXIT_FAILURE);
+		}
 		close(OUT);
-		dup(pipe2[OUT]);
+		if (dup(pipe2[OUT]) == -1) {
+			cout << "Error: can't duplicate file descriptor\n";
+			exit(EXIT_FAILURE);
+		}
 		close(pipe1[OUT]);
 		close(pipe2[IN]);
 		execlp(program.c_str(), program.c_str(), NULL);
