@@ -519,7 +519,7 @@ MoveList* Board::getMoveList(const int8 color)
 			make(item.move);
 			// place moves are only valid if neither side is inCheck
 			if (!incheck(color) && !incheck(color ^ -2)) {
-				item.check = false;
+				// item.check initialized to false
 				item.score = eval();
 				data->list[data->size++] = item;
 			}
@@ -567,7 +567,7 @@ MoveList* Board::getMoveList(const int8 color)
 			make(item.move);
 			// place moves are only valid if neither side is inCheck
 			if (!incheck(color) && !incheck(color ^ -2)) {
-				item.check = false;
+				// item.check initialized to false
 				item.score = eval();
 				data->list[data->size++] = item;
 			}
@@ -601,7 +601,7 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 				make(item.move);
 				// place moves are only valid if neither side is inCheck
 				if (!incheck(color) && !incheck(color ^ -2)) {
-					item.check = false;
+					// item.check initialized to false
 					item.score = eval();
 					data->list[data->size++] = item;
 				}
@@ -624,7 +624,7 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 				make(item.move);
 				// place moves are only valid if neither side is inCheck
 				if (!incheck(color) && !incheck(color ^ -2)) {
-					item.check = false;
+					// item.check initialized to false
 					item.score = eval();
 					data->list[data->size++] = item;
 				}
@@ -722,7 +722,7 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 				make(item.move);
 				// place moves are only valid if neither side is inCheck
 				if (!incheck(color) && !incheck(color ^ -2)) {
-					item.check = false;
+					// item.check initialized to false
 					item.score = eval();
 					data->list[data->size++] = item;
 				}
@@ -745,7 +745,7 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 				make(item.move);
 				// place moves are only valid if neither side is inCheck
 				if (!incheck(color) && !incheck(color ^ -2)) {
-					item.check = false;
+					// item.check initialized to false
 					item.score = eval();
 					data->list[data->size++] = item;
 				}

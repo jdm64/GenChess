@@ -46,6 +46,7 @@ struct TransItem {
 	{
 		hash = 0;
 		type = NONE_NODE;
+		depth = 0;
 	}
 
 	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const

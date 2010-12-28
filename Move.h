@@ -55,6 +55,8 @@ struct MoveNode {
 	Move move;
 	int score;
 	bool check;
+
+	MoveNode() : score(0), check(false) {}
 };
 
 struct MoveList {
