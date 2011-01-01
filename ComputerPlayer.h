@@ -56,6 +56,8 @@ public:
 	{
 	}
 
+	void pickRandomMove();
+
 	int Quiescence(int alpha, int beta, int depth);
 
 	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<Move> &killer, const int type);

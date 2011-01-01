@@ -20,7 +20,19 @@
 #include "ComputerPlayer.h"
 
 //#define DEBUG_SCORES
-//#define RANDOM_MOVE_ORDER
+
+void ComputerPlayer::pickRandomMove()
+{
+	int score = curr->list[0].score, end = 1;
+
+	for (int i = 1; i < curr->size; i++) {
+		if (curr->list[i].score != score) {
+			end = i + 1;
+			break;
+		}
+	}
+	pvMove[0] = curr->list[rand() % end].move;
+}
 
 int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
@@ -218,6 +230,9 @@ Move ComputerPlayer::think()
 	for (int depth = 0; depth <= maxNg; depth++)
 		search(MIN_SCORE, MAX_SCORE, 0, depth);
 
+	// Randomize opening
+	if (board->getPly() < 7)
+		pickRandomMove();
 #ifdef DEBUG_SCORES
 	debugTree();
 #endif
