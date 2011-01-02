@@ -24,6 +24,8 @@ using namespace std;
 
 #define NSEC_PER_SEC 1000000000L
 
+enum {ENG1WIN, ENG2WIN, ENGDRAW};
+
 struct IOptr {
 	FILE *in;
 	FILE *out;
@@ -49,6 +51,19 @@ struct AsColor {
 	int lose;
 	int draw;
 	int ply;
+
+	AsColor operator+(const AsColor &b)
+	{
+		AsColor r;
+
+		// r.time = time + b.time;
+		r.win = win + b.win;
+		r.lose = lose + b.lose;
+		r.draw = draw + b.draw;
+		r.ply = ply + b.ply;
+
+		return r;
+	}
 };
 
 struct EngineResults {
@@ -64,7 +79,7 @@ struct EngineResults {
 
 char buff[256];
 
-int numGames, testType;
+int numGames, elo1 = 0, elo2 = 0;
 
 string eng1Bin, eng2Bin;
 
@@ -97,31 +112,46 @@ void sum(timespec &l, const timespec r)
 	l.tv_sec += r.tv_sec;
 }
 
-double LOS(const AsColor a)
+double WinRatio(const AsColor a)
 {
-	int num = a.win - a.lose, den = a.win + a.lose;
-	double ratio = double(num) / double(den);
+	// (win + draw / 2) / (win + lose + draw)
+	double win = a.win, draw = a.draw, lose = a.lose;
 
-	return 100.0 * erf(ratio / sqrt(2.0)) / 2.0;
+	return 100.0 * ((win + draw / 2) / (win + draw + lose));
+}
+
+void UpdateElo(const int results)
+{
+	double score1 = 0, score2 = 0, exp;
+
+	switch (results) {
+	case ENG1WIN:
+		score1 = 1;
+		break;
+	case ENG2WIN:
+		score2 = 1;
+		break;
+	case ENGDRAW:
+		score1 = 0.5;
+		score2 = 0.5;
+		break;
+	}
+	// Engine 1 Elo
+	exp = 1.0 / (pow(2.0, (elo2 - elo1) / 128.0) + 1.0);
+	elo1 += ceil(32.0 * (score1 - exp));
+	// Engine 2 Elo
+	exp = 1.0 / (pow(2.0, (elo1 - elo2) / 128.0) + 1.0);
+	elo2 += ceil(32.0 * (score2 - exp));
 }
 
 void printStats()
 {
-	AsColor w, x, y, z;
-
-	w.win = eng1res.aswhite.win + eng1res.asblack.win;
-	w.lose = eng1res.aswhite.lose + eng1res.asblack.lose;
-	x.win = eng2res.aswhite.win + eng2res.asblack.win;
-	x.lose = eng2res.aswhite.lose + eng2res.asblack.lose;
-	y.win = eng1res.aswhite.win + eng2res.aswhite.win;
-	y.lose = eng1res.aswhite.lose + eng2res.aswhite.lose;
-	z.win = eng1res.asblack.win + eng2res.asblack.win;
-	z.lose = eng1res.asblack.lose + eng2res.asblack.lose;
-
-	double w1 = LOS(eng1res.aswhite), b1 = LOS(eng1res.asblack),
-		w2 = LOS(eng2res.aswhite), b2 = LOS(eng2res.asblack),
-		wb1 = LOS(w), wb2 = LOS(x), w12 = LOS(y), b12 = LOS(z),
-		color = (w1 + w12 + w2) / 3.0, engine = (w1 + wb1 + b1) / 3.0;
+	double w1 = WinRatio(eng1res.aswhite), b1 = WinRatio(eng1res.asblack),
+		w2 = WinRatio(eng2res.aswhite), b2 = WinRatio(eng2res.asblack),
+		w = WinRatio(eng1res.aswhite + eng2res.aswhite),
+		b = WinRatio(eng1res.asblack + eng2res.asblack),
+		e1 = WinRatio(eng1res.aswhite + eng1res.asblack),
+		e2 = WinRatio(eng2res.aswhite + eng2res.asblack);
 
 	cout.setf(ios::showpoint);
 
@@ -155,10 +185,12 @@ void printStats()
 
 	printf("Stats:\n");
 	printf("\twhite\t\tblack\n");
-	printf("one\t%+4.2f\t%+4.2f\t%+4.2f\n", w1, wb1, b1);
-	printf("\t%+4.2f\t\t%+4.2f\n", w12, b12);
-	printf("two\t%+4.2f\t%+4.2f\t%+4.2f\n\n", w2, wb2, b2);
-	printf("Color: %+4.2f\tEngine: %+4.2f\n", color, engine);
+	printf("one\t%4.2f\t%4.2f\t%4.2f\n", w1, e1, b1);
+	printf("\t%4.2f\t\t%4.2f\n", w, b);
+	printf("two\t%4.2f\t%4.2f\t%4.2f\n\n", w2, e2, b2);
+	printf("Engine 1 Elo:\t%i\n", elo1);
+	printf("Engine 2 Elo:\t%i\n", elo2);
+	printf("Elo Diff:\t%i\n", abs(elo1 - elo2));
 }
 
 GameResults runGame(const IOptr white, const IOptr black)
@@ -260,14 +292,17 @@ void runMatch()
 		case 'W':
 			eng1res.aswhite.win++;
 			eng2res.asblack.lose++;
+			UpdateElo(ENG1WIN);
 			break;
 		case 'B':
 			eng2res.asblack.win++;
 			eng1res.aswhite.lose++;
+			UpdateElo(ENG2WIN);
 			break;
 		case 'D':
 			eng1res.aswhite.draw++;
 			eng2res.asblack.draw++;
+			UpdateElo(ENGDRAW);
 			break;
 		}
 		// One=black; Two=white
@@ -283,14 +318,17 @@ void runMatch()
 		case 'W':
 			eng2res.aswhite.win++;
 			eng1res.asblack.lose++;
+			UpdateElo(ENG2WIN);
 			break;
 		case 'B':
 			eng1res.asblack.win++;
 			eng2res.aswhite.lose++;
+			UpdateElo(ENG1WIN);
 			break;
 		case 'D':
 			eng2res.aswhite.draw++;
 			eng1res.asblack.draw++;
+			UpdateElo(ENGDRAW);
 			break;
 		}
 	}
