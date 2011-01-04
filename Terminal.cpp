@@ -63,24 +63,39 @@ bool Terminal::playerCmd()
 	} else if (cmd == "list") {
 		board.printPieceList();
 		return true;
+	} else if (cmd == "print") {
+		cin >> cmd;
+
+		if (cmd == "board")
+			board.printBoard();
+		else if (cmd == "fen")
+			cout << board.getPosition().printFen() << endl;
+		else if (cmd == "zfen")
+			cout << board.getPosition().printZfen() << endl;
+		else
+			cout << "error: required argument (board, fen, zfen)\n";
+		return true;
 	} else if (cmd == "set") {
 		cin >> cmd;
 
 		Position pos;
 		if (cmd == "fen") {
 			getline(cin, cmd);
-			if (!pos.parseFen(cmd))
-				cout << "error in setting board\n";
-			else
-				board.setBoard(pos);
+			if (!pos.parseFen(cmd)) {
+				cout << "error: not valid fen string\n";
+				return true;
+			}
+			board.setBoard(pos);
 		} else if (cmd == "zfen") {
 			cin >> cmd;
-			if (!pos.parseZfen(cmd))
-				cout << "error in setting board\n";
-			else
-				board.setBoard(pos);
+			if (!pos.parseZfen(cmd)) {
+				cout << "error: not valid zfen string\n";
+				return true;
+			}
+			board.setBoard(pos);
 		} else {
-			cout << "error in setting board\n";
+			cout << "error: required argument (fen, zfen)\n";
+			return true;
 		}
 	} else if (cmd == "help") {
 		displayHelp();
