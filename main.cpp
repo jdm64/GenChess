@@ -79,12 +79,15 @@ done:
 void show_help()
 {
 	cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
-		<< "Copyright (C) 2010 Justin Madru under the GPLv3\n\n"
+		<< "Copyright (C) 2011 Justin Madru under the GPLv3\n\n"
 		<< "Usage: genchess [options]\n\n"
 		<< "The following options are recognized:\n"
-		<< "-X\t\tputs the engine in GUI mode, the board and prompt are not printed\n"
+		<< "-i\t\tputs the engine in terminal interactive mode; board and prompt are printed\n"
+		<< "\t\tif not supplied, engine is started in GUI mode; no prompts are displayed\n\n"
 		<< "-w[c|h]\t\tselects type of white player: c=computer, h=human\n"
 		<< "-b[c|h]\t\tselects type of black player\n"
+		<< "-p #\t\truns the perft test to depth #\n"
+		<< "-v\t\tdisplays version and copyright information\n"
 		<< "-h\t\tprints the help screen for program and argument info\n\n";
 }
 
@@ -97,9 +100,9 @@ int main(int argc, char **argv)
 	// set I/O to unbuffered
 	cout.setf(ios::unitbuf);
 
-	while ((c = getopt(argc, argv, "Xw:b:hp:v")) != -1) {
+	while ((c = getopt(argc, argv, "iw:b:hp:v")) != -1) {
 		switch (c) {
-		case 'X':
+		case 'i':
 			xMode = true;
 			break;
 		case 'w':
@@ -126,7 +129,7 @@ int main(int argc, char **argv)
 			return EXIT_SUCCESS;
 		case 'v':
 			cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
-				<< "Copyright (C) 2010 Justin Madru under the GPLv3\n\n";
+				<< "Copyright (C) 2011 Justin Madru under the GPLv3\n\n";
 			return EXIT_SUCCESS;
 		}
 	}

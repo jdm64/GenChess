@@ -30,7 +30,12 @@ Terminal::Terminal(const int white, const int black)
 
 void Terminal::displayHelp()
 {
-	cout << "help messages comming soon...";
+	cout << "Command\t\t\tDescription\n\n"
+		<< "new\t\t\tstarts a new game\n"
+		<< "quit\t\t\texits the program\n"
+		<< "set [fen|zfen]\t\tsets the board using (Z)FEN notation\n"
+		<< "print board\t\tredisplays the board\n"
+		<< "print [fen|zfen]\tprints the current board's (Z)FEN notation\n\n";
 }
 
 bool Terminal::playerCmd()
