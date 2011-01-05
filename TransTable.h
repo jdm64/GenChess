@@ -35,55 +35,22 @@ extern uint64 hashBox[ZBOX_SIZE];
 
 extern const int typeLookup[32];
 
-struct TransItem {
+class TransTable;
+extern TransTable *tt;
+
+class TransItem {
+public:
 	uint64 hash;
 	int score;
 	Move move;
 	int8 depth;
 	int8 type;
 
-	TransItem()
-	{
-		hash = 0;
-		type = NONE_NODE;
-		depth = 0;
-	}
+	TransItem();
 
-	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
-	{
-		if ((type & HAS_SCORE) && depth >= inDepth) {
-			switch (type) {
-			case PV_NODE:
-				outScore = score;
-				return true;
-			case CUT_NODE:
-				if (score >= beta) {
-					outScore = score;
-					return true;
-				}
-				break;
-			case ALL_NODE:
-				if (score <= alpha) {
-					outScore = score;
-					return true;
-				}
-				break;
-			case NONE_NODE:
-				assert(0);
-			}
-		}
-		return false;
-	}
+	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const;
 
-	bool getMove(Move &inMove) const
-	{
-		if (type & HAS_MOVE) {
-			inMove = move;
-			return true;
-		} else {
-			return false;
-		}
-	}
+	bool getMove(Move &inMove) const;
 };
 
 class TransTable {
@@ -103,7 +70,5 @@ public:
 
 	void setItem(const uint64 hash, const int score, const Move move, const int8 depth, const int8 type);
 };
-
-extern TransTable *tt;
 
 #endif

@@ -29,6 +29,49 @@ const int typeLookup[32] = {0, 0, 0, 0, 0, 0,  0,  0,
 			    6, 6, 6, 6, 6, 6,  6,  6,
 			    7, 7, 8, 8, 9, 9, 10, 11};
 
+TransItem::TransItem()
+{
+	hash = 0;
+	type = NONE_NODE;
+	depth = 0;
+}
+
+bool TransItem::getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
+{
+	if ((type & HAS_SCORE) && depth >= inDepth) {
+		switch (type) {
+		case PV_NODE:
+			outScore = score;
+			return true;
+		case CUT_NODE:
+			if (score >= beta) {
+				outScore = score;
+				return true;
+			}
+			break;
+		case ALL_NODE:
+			if (score <= alpha) {
+				outScore = score;
+				return true;
+			}
+			break;
+		case NONE_NODE:
+			assert(0);
+		}
+	}
+	return false;
+}
+
+bool TransItem::getMove(Move &inMove) const
+{
+	if (type & HAS_MOVE) {
+		inMove = move;
+		return true;
+	} else {
+		return false;
+	}
+}
+
 TransTable::TransTable(const int num_MB)
 {
 	Rand64 rad;
