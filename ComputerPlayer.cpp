@@ -20,6 +20,7 @@
 #include "ComputerPlayer.h"
 
 //#define DEBUG_SCORES
+#define PRINT_HASH_STATS
 
 void ComputerPlayer::pickRandomMove()
 {
@@ -229,6 +230,14 @@ Move ComputerPlayer::think()
 	curr = NULL;
 	for (int depth = 0; depth <= maxNg; depth++)
 		search(MIN_SCORE, MAX_SCORE, 0, depth);
+
+#ifdef PRINT_HASH_STATS
+	sixInt st = tt->stats();
+	cout << "stats total=" << st.one + st.two << " hits=" << 100 * st.one / double(st.one + st.two)
+		<< "% scorehits=" << 100 * st.three / double(st.three + st.four)
+		<< "% movehits=" << 100 * st.five / double(st.five + st.six) << "%" << endl;
+	tt->clearStats();
+#endif
 
 	// Randomize opening
 	if (board->getPly() < 7)

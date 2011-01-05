@@ -46,9 +46,13 @@ enum {NOT_MATE, CHECK_MATE, STALE_MATE};
 
 enum {HUMAN, COMPUTER};
 
-struct intPair {
+struct sixInt {
 	uint64 one;
 	uint64 two;
+	uint64 three;
+	uint64 four;
+	uint64 five;
+	uint64 six;
 };
 
 #endif

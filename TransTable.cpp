@@ -42,16 +42,19 @@ bool TransItem::getScore(const int alpha, const int beta, const int inDepth, int
 		switch (type) {
 		case PV_NODE:
 			outScore = score;
+			tt->scorehit++;
 			return true;
 		case CUT_NODE:
 			if (score >= beta) {
 				outScore = score;
+				tt->scorehit++;
 				return true;
 			}
 			break;
 		case ALL_NODE:
 			if (score <= alpha) {
 				outScore = score;
+				tt->scorehit++;
 				return true;
 			}
 			break;
@@ -59,6 +62,7 @@ bool TransItem::getScore(const int alpha, const int beta, const int inDepth, int
 			assert(0);
 		}
 	}
+	tt->scoremiss++;
 	return false;
 }
 
@@ -66,8 +70,10 @@ bool TransItem::getMove(Move &inMove) const
 {
 	if (type & HAS_MOVE) {
 		inMove = move;
+		tt->movehit++;
 		return true;
 	} else {
+		tt->movemiss++;
 		return false;
 	}
 }
@@ -84,7 +90,7 @@ TransTable::TransTable(const int num_MB)
 	startHash = rad.next();
 	for (int i = HOLD_START; i < ZBOX_SIZE; i++)
 		startHash += hashBox[i];
-	hit = miss = 0;
+	hit = miss = scorehit = scoremiss = movehit = movemiss = 0;
 }
 
 TransTable::~TransTable()
@@ -92,9 +98,14 @@ TransTable::~TransTable()
 	delete[] table;
 }
 
-intPair TransTable::hitStats() const
+sixInt TransTable::stats() const
 {
-	return {hit, miss};
+	return {hit, miss, scorehit, scoremiss, movehit, movemiss};
+}
+
+void TransTable::clearStats()
+{
+	hit = miss = scorehit = scoremiss = movehit = movemiss = 0;
 }
 
 bool TransTable::getItem(const uint64 hash, TransItem *&item)

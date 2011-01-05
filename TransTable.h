@@ -56,15 +56,18 @@ public:
 class TransTable {
 private:
 	TransItem *table;
-	uint64 hit, miss;
 	int size;
 
 public:
+	uint64 hit, miss, scorehit, scoremiss, movehit, movemiss;
+
 	TransTable(const int num_MB);
 
 	~TransTable();
 	
-	intPair hitStats() const;
+	sixInt stats() const;
+
+	void clearStats();
 
 	bool getItem(const uint64 hash, TransItem *&item);
 

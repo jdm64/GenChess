@@ -208,23 +208,34 @@ GameResults runGame(const IOptr white, const IOptr black)
 		res.ply++;
 		fputs("go\n", white.in);
 		clock_gettime(CLOCK_REALTIME, &tm1);
-		if (!fgets(buff, 256, white.out)) {
-			cout << "Error: broken pipe\n";
-			exit(EXIT_FAILURE);
+
+		// loop over stat output
+		while (true) {
+			if (!fgets(buff, 256, white.out)) {
+				cout << "Error: broken pipe\n";
+				exit(EXIT_FAILURE);
+			}
+			line.str(string(buff));
+			line >> word;
+
+			if (word == "stats")
+				continue;
+			if (word == "move")
+				break;
 		}
 		clock_gettime(CLOCK_REALTIME, &tm2);
 		sum(res.whiteTime, tm2 - tm1);
 
-		move = string(buff);
+		move = line.str();
+
 		if (!fgets(buff, 256, white.out)) {
 			cout << "Error: broken pipe\n";
 			exit(EXIT_FAILURE);
 		}
-
 		line.str(string(buff));
 		line >> word;
 
-		// ok|special are discarded
+		// game is over on result
 		if (word == "result")
 			break;
 
@@ -239,23 +250,34 @@ GameResults runGame(const IOptr white, const IOptr black)
 		res.ply++;
 		fputs("go\n", black.in);
 		clock_gettime(CLOCK_REALTIME, &tm1);
-		if (!fgets(buff, 256, black.out)) {
-			cout << "Error: broken pipe\n";
-			exit(EXIT_FAILURE);
+
+		// loop over stat output
+		while (true) {
+			if (!fgets(buff, 256, black.out)) {
+				cout << "Error: broken pipe\n";
+				exit(EXIT_FAILURE);
+			}
+			line.str(string(buff));
+			line >> word;
+
+			if (word == "stats")
+				continue;
+			if (word == "move")
+				break;
 		}
 		clock_gettime(CLOCK_REALTIME, &tm2);
 		sum(res.blackTime, tm2 - tm1);
 
-		move = string(buff);
+		move = line.str();
+
 		if (!fgets(buff, 256, black.out)) {
 			cout << "Error: broken pipe\n";
 			exit(EXIT_FAILURE);
 		}
-
 		line.str(string(buff));
 		line >> word;
 
-		// ok|special are discarded
+		// game is over on result
 		if (word == "result")
 			break;
 
