@@ -42,14 +42,14 @@ bool Terminal::playerCmd()
 {
 	string cmd;
 
-	cout << playerString[board.currPlayer()] << "> ";
+	cout << playerString[board.getStm()] << "> ";
 	cin >> cmd;
 	if (cmd == "move") {
 		string mv;
 		Move move;
 
 		cin >> mv;
-		int status = board.validMove(mv, board.currPlayer(), move);
+		int status = board.validMove(mv, board.getStm(), move);
 		if (status != VALID_MOVE) {
 			cout << moveError[status] << endl;
 			return true;
@@ -146,7 +146,7 @@ void Terminal::run()
 	board.printBoard();
 
 	while (again) {
-		if (playerType[board.currPlayer()] == HUMAN) {
+		if (playerType[board.getStm()] == HUMAN) {
 			while (playerCmd());
 		} else {
 			Move move = engine->think();
@@ -161,7 +161,7 @@ void Terminal::run()
 		default:
 			break;
 		case CHECK_MATE:
-			cout << playerString[board.currPlayer() ^ -2] << " got checkmate\n";
+			cout << playerString[board.getStm() ^ -2] << " got checkmate\n";
 			while (mainMenu());
 			break;
 		case STALE_MATE:

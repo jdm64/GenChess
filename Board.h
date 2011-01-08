@@ -36,7 +36,7 @@ private:
 
 	int ply;
 
-	int8 curr;
+	int8 stm;
 
 	int pieceIndex(const int8 loc, const int8 type) const;
 
@@ -55,9 +55,9 @@ public:
 		return ply;
 	}
 
-	int8 currPlayer() const
+	int8 getStm() const
 	{
-		return curr;
+		return stm;
 	}
 
 	void reset();

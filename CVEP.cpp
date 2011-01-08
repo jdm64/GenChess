@@ -26,14 +26,14 @@ bool CVEP::moveResults()
 		if (board.getPly() > 600) {
 			cout << "result N-N (too many moves)" << endl;
 			return false;
-		} else if (board.incheck(board.currPlayer())) {
+		} else if (board.incheck(board.getStm())) {
 			cout << "special check" << endl;
 		} else {
 			cout << "ok" << endl;
 		}
 		return true;
 	case CHECK_MATE:
-		cout << "result " << (((board.currPlayer() ^ -2) == WHITE)? "1-0" : "0-1") << " (checkmate)" << endl;
+		cout << "result " << (((board.getStm() ^ -2) == WHITE)? "1-0" : "0-1") << " (checkmate)" << endl;
 		return false;
 	case STALE_MATE:
 		cout << "result N-N (stalemate)" << endl;
@@ -51,7 +51,7 @@ bool CVEP::gameCmd()
 		Move move;
 
 		cin >> mv;
-		int status = board.validMove(mv, board.currPlayer(), move);
+		int status = board.validMove(mv, board.getStm(), move);
 		if (status != VALID_MOVE) {
 			cout << "illegal (" << moveError[status] << "): " << mv << endl;
 		} else {

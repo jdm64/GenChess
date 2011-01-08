@@ -98,7 +98,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 	def updateBoard(self, move):
 		color = ["W", "B"]
-		color = color[self.curr]
+		color = color[self.stm]
 		if move[0] in self.piece:
 			to = boardIndex(move[1:])
 			self.board[to] = color + move[0]
@@ -118,7 +118,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
 		self.updateBoard(move)
 
-		msg = color[self.curr] + "'s move: " + move
+		msg = color[self.stm] + "'s move: " + move
 		if results == 'ok':
 			self.displayMessage(msg)
 		elif results == 'special':
@@ -126,19 +126,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		elif results == 'result':
 			self.displayMessage(msg + ' ' + dropWord(data[1], 2))
 			return
-		self.curr ^= True
+		self.stm ^= True
 		self.callList = []
 		self.timer.singleShot(300, self.nextPlayer)
 
 	def nextPlayer(self):
-		if player[self.curr] == 'computer':
+		if player[self.stm] == 'computer':
 			self.runComputer()
 
 	def newGame(self):
 		self.engine.write("newgame\n")
 		for i in range(64):
 			self.boardButtons[i].setIcon(self.iconMap["EE"])
-		self.curr = False
+		self.stm = False
 		self.board = [''] * 64
 		self.nextPlayer()
 
@@ -169,17 +169,17 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 		results = data.split()[0]
 
 		if results == 'ok':
-			self.displayMessage(color[self.curr] + "'s move: " + act)
+			self.displayMessage(color[self.stm] + "'s move: " + act)
 			self.updateBoard(act)
-			self.curr ^= True
+			self.stm ^= True
 		elif results == 'special':
-			self.displayMessage(color[self.curr] + "'s move: " + act + " (" + dropWord(data) + ")")
+			self.displayMessage(color[self.stm] + "'s move: " + act + " (" + dropWord(data) + ")")
 			self.updateBoard(act)
-			self.curr ^= True
+			self.stm ^= True
 		elif results == 'illegal':
 			self.displayMessage(data)
 		elif results == 'result':
-			self.displayMessage(color[self.curr] + "'s move: " + act + " " + dropWord(data, 2))
+			self.displayMessage(color[self.stm] + "'s move: " + act + " " + dropWord(data, 2))
 			self.updateBoard(act)
 			return
 		self.timer.singleShot(300, self.nextPlayer)

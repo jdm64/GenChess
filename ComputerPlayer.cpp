@@ -37,7 +37,7 @@ void ComputerPlayer::pickRandomMove()
 
 int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
-	MoveList *ptr = board->getMoveList(board->currPlayer(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
+	MoveList *ptr = board->getMoveList(board->getStm(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -87,7 +87,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		board->make(move);
 
 		// set check for opponent
-		tactical[depth + 1] = board->incheck(board->currPlayer());
+		tactical[depth + 1] = board->incheck(board->getStm());
 
 		best = -NegaScout(-beta, -alpha, depth + 1, limit);
 		board->unmake(move);
@@ -101,7 +101,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		}
 	}
 	// Try all of moveType Moves
-	MoveList *ptr = board->getMoveList(board->currPlayer(), type);
+	MoveList *ptr = board->getMoveList(board->getStm(), type);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -168,7 +168,7 @@ int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
 			board->make(move);
 
 			// set check for opponent
-			tactical[depth + 1] = board->incheck(board->currPlayer());
+			tactical[depth + 1] = board->incheck(board->getStm());
 
 			best = -NegaScout(-beta, -alpha, depth + 1, limit);
 			board->unmake(move);
@@ -202,7 +202,7 @@ hashMiss:
 
 void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 {
-	curr = curr? curr : board->getMoveList(board->currPlayer());
+	curr = curr? curr : board->getMoveList(board->getStm());
 
 	int b = beta;
 	for (int n = 0; n < curr->size; n++) {
@@ -275,7 +275,7 @@ void ComputerPlayer::debugTree()
 			NegaScout(-INT_MAX, INT_MAX, 0, mDepth);
 		} else if (cmd == "down") {
 			cin >> cmd;
-			if (board->validMove(cmd, board->currPlayer(), move) != VALID_MOVE) {
+			if (board->validMove(cmd, board->getStm(), move) != VALID_MOVE) {
 				cout << "error\n";
 			} else {
 				mstack.push_back(move);

@@ -109,14 +109,14 @@ void Board::reset()
 		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 	};
 	key = startHash;
-	curr = WHITE;
+	stm = WHITE;
 	ply = 0;
 }
 
 void Board::rebuildHash()
 {
 	key = startHash;
-	key += (curr == WHITE)? 0 : -hashBox[WTM_HASH];
+	key += (stm == WHITE)? 0 : -hashBox[WTM_HASH];
 
 	for (int i = 0; i < 32; i++) {
 		switch (piece[i]) {
@@ -138,7 +138,7 @@ void Board::setBoard(Position pos)
 	memcpy(square, pos.square, 64);
 	memcpy(piece, pos.piece, 32);
 	ply = pos.ply;
-	curr = (pos.ply % 2)? BLACK : WHITE;
+	stm = (pos.ply % 2)? BLACK : WHITE;
 	rebuildHash();
 }
 
@@ -176,7 +176,7 @@ int Board::pieceIndex(const int8 loc, const int8 type) const
 void Board::make(const Move move)
 {
 #ifdef DEBUG_MAKE_MOVE
-	assert(pieceType[move.index] * curr > 0);
+	assert(pieceType[move.index] * stm > 0);
 	assert(piece[move.index] == move.from);
 	if (move.from != PLACEABLE)
 		assert(square[move.from] == pieceType[move.index]);
@@ -197,7 +197,7 @@ void Board::make(const Move move)
 	if (move.xindex != NONE)
 		piece[move.xindex] = DEAD;
 
-	key += (curr == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
+	key += (stm == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
 	key += hashBox[12 * move.to + typeLookup[move.index]];
 	if (move.from != PLACEABLE)
 		key -= hashBox[12 * move.from + typeLookup[move.index]];
@@ -206,11 +206,11 @@ void Board::make(const Move move)
 	if (move.xindex != NONE)
 		key -= hashBox[12 * move.to + typeLookup[move.xindex]];
 
-	curr ^= -2;
+	stm ^= -2;
 	ply++;
 
 #ifdef DEBUG_MAKE_MOVE
-	assert(pieceType[move.index] * curr < 0);
+	assert(pieceType[move.index] * stm < 0);
 	assert(piece[move.index] == move.to);
 	assert(square[move.to] == pieceType[move.index]);
 	if (move.from != PLACEABLE)
@@ -230,14 +230,14 @@ void Board::makeP(const Move move)
 	piece[move.index] = move.to;
 	if (move.xindex != NONE)
 		piece[move.xindex] = DEAD;
-	curr ^= -2;
+	stm ^= -2;
 	ply++;
 }
 
 void Board::unmake(const Move move)
 {
 #ifdef DEBUG_MAKE_MOVE
-	assert(pieceType[move.index] * curr < 0);
+	assert(pieceType[move.index] * stm < 0);
 	assert(piece[move.index] == move.to);
 	assert(square[move.to] == pieceType[move.index]);
 	if (move.from != PLACEABLE)
@@ -257,7 +257,7 @@ void Board::unmake(const Move move)
 	if (move.from != PLACEABLE)
 		square[move.from] = pieceType[move.index];
 
-	key += (curr == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
+	key += (stm == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
 	key -= hashBox[12 * move.to + typeLookup[move.index]];
 	if (move.from != PLACEABLE)
 		key += hashBox[12 * move.from + typeLookup[move.index]];
@@ -266,11 +266,11 @@ void Board::unmake(const Move move)
 	if (move.xindex != NONE)
 		key += hashBox[12 * move.to + typeLookup[move.xindex]];
 
-	curr ^= -2;
+	stm ^= -2;
 	ply--;
 
 #ifdef DEBUG_MAKE_MOVE
-	assert(pieceType[move.index] * curr > 0);
+	assert(pieceType[move.index] * stm > 0);
 	assert(piece[move.index] == move.from);
 	if (move.from != PLACEABLE)
 		assert(square[move.from] == pieceType[move.index]);
@@ -294,7 +294,7 @@ void Board::unmakeP(const Move move)
 	}
 	if (move.from != PLACEABLE)
 		square[move.from] = pieceType[move.index];
-	curr ^= -2;
+	stm ^= -2;
 	ply--;
 }
 
@@ -308,9 +308,9 @@ bool Board::incheck(const int8 color)
 
 int Board::isMate()
 {
-	if (getNumMoves(curr))
+	if (getNumMoves(stm))
 		return NOT_MATE;
-	if (incheck(curr))
+	if (incheck(stm))
 		return CHECK_MATE;
 	else
 		return STALE_MATE;
@@ -322,7 +322,7 @@ bool Board::validMove(const Move moveIn, Move &move)
 
 	if ((move.index = pieceIndex(move.from, pieceType[move.index])) == NONE)
 		return false;
-	if (pieceType[move.index] * curr <= 0)
+	if (pieceType[move.index] * stm <= 0)
 		return false;
 	if (move.xindex != NONE) {
 		if ((move.xindex = pieceIndex(move.to, pieceType[move.xindex])) == NONE)
@@ -342,9 +342,9 @@ bool Board::validMove(const Move moveIn, Move &move)
 	bool ret = true;
 
 	make(move);
-	if (incheck(curr ^ -2))
+	if (incheck(stm ^ -2))
 		ret = false;
-	if (move.from == PLACEABLE && incheck(curr))
+	if (move.from == PLACEABLE && incheck(stm))
 		ret = false;
 	unmake(move);
 
@@ -386,10 +386,10 @@ int Board::validMove(const string smove, const int8 color, Move &move)
 	int ret = VALID_MOVE;
 
 	make(move);
-	// curr is opponent after make
-	if (incheck(curr ^ -2))
+	// stm is opponent after make
+	if (incheck(stm ^ -2))
 		ret = IN_CHECK;
-	if (move.from == PLACEABLE && incheck(curr))
+	if (move.from == PLACEABLE && incheck(stm))
 		ret = IN_CHECK_PLACE;
 	unmake(move);
 
@@ -422,7 +422,7 @@ int Board::eval() const
 		}
 	}
 	white -= black;
-	return (curr == WHITE)? -white : white;
+	return (stm == WHITE)? -white : white;
 }
 
 int Board::getNumMoves(const int8 color)
@@ -974,7 +974,7 @@ void Board::printPieceList() const
 
 void Board::dumpDebug() const
 {
-	cout << "hash:" << key << " curr:" << (int)curr << " ply:" << ply << endl;
+	cout << "hash:" << key << " stm:" << (int)stm << " ply:" << ply << endl;
 	printBoard();
 	printPieceList();
 }
