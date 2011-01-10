@@ -6,7 +6,7 @@ TARGET = genchess
 VERSION = $(shell grep "define VERSION" Defines.h | cut -d'"' -f2)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
-objs = Move.o MoveLookup.o Position.o Board.o TransTable.o \
+objs = Util.o Move.o MoveLookup.o Position.o Board.o TransTable.o \
 	ComputerPlayer.o Game.o UI.o CVEP.o Terminal.o main.o
 
 all : genchess enginetester
@@ -16,7 +16,7 @@ genchess : $(objs)
 #	strip -s $(TARGET)
 
 enginetester : EngineTester.o
-	$(CXX) -lrt EngineTester.o -o enginetester
+	$(CXX) EngineTester.o Util.o -o enginetester
 
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

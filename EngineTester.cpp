@@ -19,10 +19,9 @@
 #include <iostream>
 #include <sstream>
 #include "Defines.h"
+#include "Util.h"
 
 using namespace std;
-
-#define NSEC_PER_SEC 1000000000L
 
 enum {ENG1WIN, ENG2WIN, ENGDRAW};
 
@@ -32,8 +31,8 @@ struct IOptr {
 };
 
 struct GameResults {
-	timespec whiteTime;
-	timespec blackTime;
+	timeval whiteTime;
+	timeval blackTime;
 	int ply;
 	char winner;
 
@@ -46,7 +45,7 @@ struct GameResults {
 };
 
 struct AsColor {
-	timespec time;
+	timeval time;
 	int win;
 	int lose;
 	int draw;
@@ -86,31 +85,6 @@ string eng1Bin, eng2Bin;
 IOptr engine1, engine2;
 
 EngineResults eng1res, eng2res;
-
-timespec operator-(const timespec l, const timespec r)
-{
-	timespec ret = l;
-
-	if (l.tv_nsec < r.tv_nsec) {
-		ret.tv_sec--;
-		ret.tv_nsec += NSEC_PER_SEC;
-	}
-	ret.tv_sec = l.tv_sec - r.tv_sec;
-	ret.tv_nsec = l.tv_nsec - r.tv_nsec;
-
-	return ret;
-}
-
-void sum(timespec &l, const timespec r)
-{
-	l.tv_nsec += r.tv_nsec;
-
-	while (l.tv_nsec >= NSEC_PER_SEC) {
-		l.tv_sec++;
-		l.tv_nsec -= NSEC_PER_SEC;
-	}
-	l.tv_sec += r.tv_sec;
-}
 
 double WinRatio(const AsColor a)
 {
@@ -198,7 +172,7 @@ GameResults runGame(const IOptr white, const IOptr black)
 	istringstream line;
 	string move, word;
 	GameResults res;
-	timespec tm1, tm2;
+	timeval tm1, tm2;
 
 	fputs("newgame\n", white.in);
 	fputs("newgame\n", black.in);
@@ -207,7 +181,7 @@ GameResults runGame(const IOptr white, const IOptr black)
 		// get white's move
 		res.ply++;
 		fputs("go\n", white.in);
-		clock_gettime(CLOCK_REALTIME, &tm1);
+		gettimeofday(&tm1, NULL);
 
 		// loop over stat output
 		while (true) {
@@ -223,7 +197,7 @@ GameResults runGame(const IOptr white, const IOptr black)
 			if (word == "move")
 				break;
 		}
-		clock_gettime(CLOCK_REALTIME, &tm2);
+		gettimeofday(&tm2, NULL);
 		sum(res.whiteTime, tm2 - tm1);
 
 		move = line.str();
@@ -249,7 +223,7 @@ GameResults runGame(const IOptr white, const IOptr black)
 		// get black's move
 		res.ply++;
 		fputs("go\n", black.in);
-		clock_gettime(CLOCK_REALTIME, &tm1);
+		gettimeofday(&tm1, NULL);
 
 		// loop over stat output
 		while (true) {
@@ -265,7 +239,7 @@ GameResults runGame(const IOptr white, const IOptr black)
 			if (word == "move")
 				break;
 		}
-		clock_gettime(CLOCK_REALTIME, &tm2);
+		gettimeofday(&tm2, NULL);
 		sum(res.blackTime, tm2 - tm1);
 
 		move = line.str();
@@ -304,11 +278,11 @@ void runMatch()
 		// One=white; Two=black
 		results = runGame(engine1, engine2);
 
-		sum(eng1res.aswhite.time, results.whiteTime);
 		eng1res.aswhite.ply += results.ply;
-
-		sum(eng2res.asblack.time, results.blackTime);
 		eng2res.asblack.ply += results.ply;
+
+		sum(eng1res.aswhite.time, results.whiteTime);
+		sum(eng2res.asblack.time, results.blackTime);
 
 		switch (results.winner) {
 		case 'W':
@@ -330,11 +304,11 @@ void runMatch()
 		// One=black; Two=white
 		results = runGame(engine2, engine1);
 
-		sum(eng2res.aswhite.time, results.whiteTime);
 		eng2res.aswhite.ply += results.ply;
-
-		sum(eng1res.asblack.time, results.blackTime);
 		eng1res.asblack.ply += results.ply;
+
+		sum(eng2res.aswhite.time, results.whiteTime);
+		sum(eng1res.asblack.time, results.blackTime);
 
 		switch (results.winner) {
 		case 'W':
