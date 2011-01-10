@@ -228,7 +228,7 @@ Move ComputerPlayer::think()
 {
 	srand(time(NULL));
 	curr = NULL;
-	for (int depth = 0; depth <= maxNg; depth++)
+	for (int depth = 1; depth <= maxNg; depth++)
 		search(MIN_SCORE, MAX_SCORE, 0, depth);
 
 #ifdef PRINT_HASH_STATS
