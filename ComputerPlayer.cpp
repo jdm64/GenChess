@@ -18,6 +18,7 @@
 #include <iostream>
 #include <climits>
 #include "ComputerPlayer.h"
+#include "Util.h"
 
 //#define DEBUG_SCORES
 #define PRINT_HASH_STATS
@@ -226,10 +227,17 @@ void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 
 Move ComputerPlayer::think()
 {
+	timeval t1, t2;
+
 	srand(time(NULL));
 	curr = NULL;
-	for (int depth = 1; depth <= maxNg; depth++)
+
+	gettimeofday(&t1, NULL);
+	for (int depth = 1; depth <= maxNg; depth++) {
 		search(MIN_SCORE, MAX_SCORE, 0, depth);
+		gettimeofday(&t2, NULL);
+		cout << "stats depth " << depth << " time " << time_in_msec(t2 - t1) << endl;
+	}
 
 #ifdef PRINT_HASH_STATS
 	sixInt st = tt->stats();

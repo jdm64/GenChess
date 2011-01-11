@@ -40,3 +40,8 @@ void sum(timeval &l, const timeval r)
 	}
 	l.tv_sec += r.tv_sec;
 }
+
+int time_in_msec(const timeval t)
+{
+	return t.tv_sec * 1000 + t.tv_usec / 1000;
+}

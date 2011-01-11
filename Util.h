@@ -26,4 +26,6 @@ timeval operator-(const timeval l, const timeval r);
 
 void sum(timeval &l, const timeval r);
 
+int time_in_msec(const timeval t);
+
 #endif
