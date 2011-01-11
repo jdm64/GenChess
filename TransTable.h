@@ -67,6 +67,8 @@ public:
 	
 	sixInt stats() const;
 
+	void clear();
+
 	void clearStats();
 
 	bool getItem(const uint64 hash, TransItem *&item);

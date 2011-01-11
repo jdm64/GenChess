@@ -103,6 +103,12 @@ sixInt TransTable::stats() const
 	return {hit, miss, scorehit, scoremiss, movehit, movemiss};
 }
 
+void TransTable::clear()
+{
+	for (int i = 0; i < size; i++)
+		table[i].hash = 0;
+}
+
 void TransTable::clearStats()
 {
 	hit = miss = scorehit = scoremiss = movehit = movemiss = 0;

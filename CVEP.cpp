@@ -74,6 +74,8 @@ bool CVEP::gameCmd()
 		game->doMove(move);
 		cout << "move " << move.toString() << endl;
 		return moveResults();
+	} else if (cmd == "clearhash") {
+		tt->clear();
 	} else if (cmd == "setboard") {
 		cin >> cmd;
 
