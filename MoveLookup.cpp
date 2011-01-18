@@ -262,7 +262,7 @@ bool MoveLookup::fromto(const int8 &From, const int8 &To) const
 			to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (ANY_MOVE(square[From], square[to]) && to == To)
+			else if (CAPTURE_MOVE(square[From], square[to]) && to == To)
 				return true;
 		}
 		// moves
