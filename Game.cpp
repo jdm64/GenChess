@@ -23,7 +23,7 @@ void Game::newGame()
 	history.clear();
 }
 
-void Game::doMove(const Move move)
+void Game::doMove(const Move &move)
 {
 	board->make(move);
 	history.push_back(move);

@@ -32,7 +32,7 @@ public:
 
 	void newGame();
 
-	void doMove(const Move move);
+	void doMove(const Move &move);
 
 	bool undoMove();
 };

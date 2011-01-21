@@ -173,7 +173,7 @@ int Board::pieceIndex(const int8 loc, const int8 type) const
 	return NONE;
 }
 
-void Board::make(const Move move)
+void Board::make(const Move &move)
 {
 #ifdef DEBUG_MAKE_MOVE
 	assert(pieceType[move.index] * stm > 0);
@@ -220,7 +220,7 @@ void Board::make(const Move move)
 #endif
 }
 
-void Board::makeP(const Move move)
+void Board::makeP(const Move &move)
 {
 	// update board information
 	square[move.to] = pieceType[move.index];
@@ -234,7 +234,7 @@ void Board::makeP(const Move move)
 	ply++;
 }
 
-void Board::unmake(const Move move)
+void Board::unmake(const Move &move)
 {
 #ifdef DEBUG_MAKE_MOVE
 	assert(pieceType[move.index] * stm < 0);
@@ -283,7 +283,7 @@ void Board::unmake(const Move move)
 #endif
 }
 
-void Board::unmakeP(const Move move)
+void Board::unmakeP(const Move &move)
 {
 	piece[move.index] = move.from;
 	if (move.xindex == NONE) {
@@ -316,7 +316,7 @@ int Board::isMate()
 		return STALE_MATE;
 }
 
-bool Board::validMove(const Move moveIn, Move &move)
+bool Board::validMove(const Move &moveIn, Move &move)
 {
 	move = moveIn;
 

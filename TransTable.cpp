@@ -32,8 +32,9 @@ const int typeLookup[32] = {0, 0, 0, 0, 0, 0,  0,  0,
 TransItem::TransItem()
 {
 	hash = 0;
-	type = NONE_NODE;
+	score = 0;
 	depth = 0;
+	type = NONE_NODE;
 }
 
 bool TransItem::getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
@@ -127,7 +128,7 @@ bool TransTable::getItem(const uint64 hash, TransItem *&item)
 	}
 }
 
-void TransTable::setItem(const uint64 hash, const int score, const Move move, const int8 depth, const int8 type)
+void TransTable::setItem(const uint64 hash, const int score, const Move &move, const int8 depth, const int8 type)
 {
 	TransItem *item = &table[hash % size];
 

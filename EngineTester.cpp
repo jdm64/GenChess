@@ -51,7 +51,7 @@ struct AsColor {
 	int draw;
 	int ply;
 
-	AsColor operator+(const AsColor &b)
+	AsColor operator+(const AsColor &b) const
 	{
 		AsColor r;
 
@@ -86,7 +86,7 @@ IOptr engine1, engine2;
 
 EngineResults eng1res, eng2res;
 
-double WinRatio(const AsColor a)
+double WinRatio(const AsColor &a)
 {
 	// (win + draw / 2) / (win + lose + draw)
 	double win = a.win, draw = a.draw, lose = a.lose;
@@ -167,7 +167,7 @@ void printStats()
 	printf("Elo Diff:\t%i\n", abs(elo1 - elo2));
 }
 
-GameResults runGame(const IOptr white, const IOptr black)
+GameResults runGame(const IOptr &white, const IOptr &black)
 {
 	istringstream line;
 	string move, word;

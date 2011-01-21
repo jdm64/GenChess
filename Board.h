@@ -68,19 +68,19 @@ public:
 
 	Position getPosition() const;
 
-	void make(const Move move);
+	void make(const Move &move);
 
-	void unmake(const Move move);
+	void unmake(const Move &move);
 
-	void makeP(const Move move);
+	void makeP(const Move &move);
 
-	void unmakeP(const Move move);
+	void unmakeP(const Move &move);
 
 	bool incheck(const int8 color);
 
 	int isMate();
 
-	bool validMove(const Move moveIn, Move &move);
+	bool validMove(const Move &moveIn, Move &move);
 
 	int validMove(const string smove, const int8 color, Move &move);
 

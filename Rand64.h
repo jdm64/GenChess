@@ -23,8 +23,6 @@
 #include <algorithm>
 #include <ctime>
 
-typedef uint64_t uint64;
-
 #define BLOCK 8192
 
 class Rand64 {
