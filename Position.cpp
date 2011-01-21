@@ -61,25 +61,25 @@ bool Position::parseFen(const string st)
 	reset();
 
 	// index counter for st
-	int i = 0;
-	while (isspace(st[i]))
-		i++;
+	int n = 0;
+	while (isspace(st[n]))
+		n++;
 
 	// parse board
-	for (int loc = 0, cont = true; cont; i++) {
-		switch (st[i]) {
+	for (int loc = 0, cont = true; cont; n++) {
+		switch (st[n]) {
 		case 'p':	case 'b':	case 'r':
 		case 'n':	case 'q':	case 'k':
 		case 'P':	case 'B':	case 'R':
 		case 'N':	case 'Q':	case 'K':
-			if (!setPiece(loc, type[st[i] % 21]))
+			if (!setPiece(loc, type[st[n] % 21]))
 				return false;
 			loc++;
 			break;
 		case '1':	case '2':	case '3':
 		case '4':	case '5':	case '6':
 		case '7':	case '8':
-			loc += st[i] - '0';
+			loc += st[n] - '0';
 			break;
 		case '/':
 			break;
@@ -91,38 +91,38 @@ bool Position::parseFen(const string st)
 		}
 	}
 	// pick up color-to-move
-	int8 ctm = (st[i] == 'w')? WHITE : BLACK;
-	i += 2;
+	int8 ctm = (st[n] == 'w')? WHITE : BLACK;
+	n += 2;
 
 	// parse placeable pieces
-	for (;; i++) {
-		if (st[i] == ' ') {
-			i++;
+	for (;; n++) {
+		if (st[n] == ' ') {
+			n++;
 			break;
-		} else if (st[i] == '-') {
-			i += 2;
+		} else if (st[n] == '-') {
+			n += 2;
 			break;
-		} else if (!isalpha(st[i])) {
+		} else if (!isalpha(st[n])) {
 			return false;
-		} else if (!setPiece(PLACEABLE, type[st[i] % 21])) {
+		} else if (!setPiece(PLACEABLE, type[st[n] % 21])) {
 			return false;
 		}
 	}
 
 	// pick up half-ply count
 	string tmp;
-	while (isdigit(st[i])) {
-		tmp += st[i];
-		i++;
+	while (isdigit(st[n])) {
+		tmp += st[n];
+		n++;
 	}
 	ply = atoi(tmp.c_str());
-	i++;
+	n++;
 
 	// pick up full ply count (starts at 1)
 	tmp = "";
-	while (isdigit(st[i])) {
-		tmp += st[i];
-		i++;
+	while (isdigit(st[n])) {
+		tmp += st[n];
+		n++;
 	}
 	ply = 2 * atoi(tmp.c_str()) - 2 + ((ctm == BLACK)? 1:0);
 
@@ -154,25 +154,25 @@ bool Position::parseZfen(const string st)
 	reset();
 
 	// index counter for st
-	int i = 0;
+	int n = 0;
 
 	// parse board
 	string num = "";
-	for (int loc = 0, act = false; true; i++) {
-		if (isdigit(st[i])) {
-			num += st[i];
+	for (int loc = 0, act = false; true; n++) {
+		if (isdigit(st[n])) {
+			num += st[n];
 			act = true;
-		} else if (isalpha(st[i])) {
+		} else if (isalpha(st[n])) {
 			if (act) {
 				loc += atoi(num.c_str());
 				num = "";
 				act = false;
 			}
-			if (!setPiece(loc, type[st[i] % 21]))
+			if (!setPiece(loc, type[st[n] % 21]))
 				return false;
 			loc++;
-		} else if (st[i] == ':') {
-			i++;
+		} else if (st[n] == ':') {
+			n++;
 			break;
 		} else {
 			return false;
@@ -180,22 +180,22 @@ bool Position::parseZfen(const string st)
 	}
 
 	// parse placeable pieces
-	for (;; i++) {
-		if (st[i] == ':') {
-			i++;
+	for (;; n++) {
+		if (st[n] == ':') {
+			n++;
 			break;
-		} else if (!isalpha(st[i])) {
+		} else if (!isalpha(st[n])) {
 			return false;
-		} else if (!setPiece(PLACEABLE, type[st[i] % 21])) {
+		} else if (!setPiece(PLACEABLE, type[st[n] % 21])) {
 			return false;
 		}
 	}
 
 	// parse half-ply
 	num = "";
-	while (isdigit(st[i])) {
-		num += st[i];
-		i++;
+	while (isdigit(st[n])) {
+		num += st[n];
+		n++;
 	}
 	ply = atoi(num.c_str());
 
