@@ -125,7 +125,7 @@ bool Move::parse(const string s)
 	}
 	if (place) {
 		// parse placement move
-		if (s[1] < 'a' || s[1] > 'h' || s[2] < '0' || s[2] > '9')
+		if (s[1] < 'a' || s[1] > 'h' || s[2] < '1' || s[2] > '8')
 			return false;
 		to = s[1] - 'a';
 		to += 8 * (8 - (s[2] - '0'));
@@ -133,8 +133,8 @@ bool Move::parse(const string s)
 		index = piece;
 	} else {
 		// parse movement move
-		if (s[0] < 'a' || s[0] > 'h' || s[1] < '0' || s[1] > '9' ||
-				s[2] < 'a' || s[2] > 'h' || s[3] < '0' || s[3] > '9')
+		if (s[0] < 'a' || s[0] > 'h' || s[1] < '1' || s[1] > '8' ||
+				s[2] < 'a' || s[2] > 'h' || s[3] < '1' || s[3] > '8')
 			return false;
 		from = s[0] - 'a';
 		from += 8 * (8 - (s[1] - '0'));
