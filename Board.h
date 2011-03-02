@@ -21,6 +21,7 @@
 #include "Position.h"
 
 //#define DEBUG_MAKE_MOVE
+#define TT_ENABLED
 
 extern const int pieceValue[16];
 

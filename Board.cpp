@@ -108,13 +108,16 @@ void Board::reset()
 		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 	};
+#ifdef TT_ENABLED
 	key = startHash;
+#endif
 	stm = WHITE;
 	ply = 0;
 }
 
 void Board::rebuildHash()
 {
+#ifdef TT_ENABLED
 	key = startHash;
 	key += (stm == WHITE)? 0 : -hashBox[WTM_HASH];
 
@@ -131,6 +134,7 @@ void Board::rebuildHash()
 			break;
 		}
 	}
+#endif
 }
 
 void Board::setBoard(Position pos)
@@ -197,6 +201,7 @@ void Board::make(const Move &move)
 	if (move.xindex != NONE)
 		piece[move.xindex] = DEAD;
 
+#ifdef TT_ENABLED
 	key += (stm == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
 	key += hashBox[12 * move.to + typeLookup[move.index]];
 	if (move.from != PLACEABLE)
@@ -205,7 +210,7 @@ void Board::make(const Move &move)
 		key -= hashBox[HOLD_START + typeLookup[move.index]];
 	if (move.xindex != NONE)
 		key -= hashBox[12 * move.to + typeLookup[move.xindex]];
-
+#endif
 	stm ^= -2;
 	ply++;
 
@@ -257,6 +262,7 @@ void Board::unmake(const Move &move)
 	if (move.from != PLACEABLE)
 		square[move.from] = pieceType[move.index];
 
+#ifdef TT_ENABLED
 	key += (stm == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
 	key -= hashBox[12 * move.to + typeLookup[move.index]];
 	if (move.from != PLACEABLE)
@@ -265,7 +271,7 @@ void Board::unmake(const Move &move)
 		key += hashBox[HOLD_START + typeLookup[move.index]];
 	if (move.xindex != NONE)
 		key += hashBox[12 * move.to + typeLookup[move.xindex]];
-
+#endif
 	stm ^= -2;
 	ply--;
 
