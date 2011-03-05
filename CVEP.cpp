@@ -21,7 +21,7 @@
 bool CVEP::moveResults()
 {
 	switch (board.isMate()) {
-	case NOT_MATE:
+	case NOTMATE:
 	default:
 		if (board.getPly() > 600) {
 			cout << "result N-N (too many moves)" << endl;
@@ -32,10 +32,11 @@ bool CVEP::moveResults()
 			cout << "ok" << endl;
 		}
 		return true;
-	case CHECK_MATE:
-		cout << "result " << (((board.getStm() ^ -2) == WHITE)? "1-0" : "0-1") << " (checkmate)" << endl;
+	case WHITE_CHECKMATE:
+	case BLACK_CHECKMATE:
+		cout << "result " << ((board.getStm() == BLACK)? "1-0" : "0-1") << " (checkmate)" << endl;
 		return false;
-	case STALE_MATE:
+	case STALEMATE:
 		cout << "result N-N (stalemate)" << endl;
 		return false;
 	}

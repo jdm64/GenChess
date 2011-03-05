@@ -315,11 +315,11 @@ bool Board::incheck(const int8 color)
 int Board::isMate()
 {
 	if (getNumMoves(stm))
-		return NOT_MATE;
-	if (incheck(stm))
-		return CHECK_MATE;
+		return NOTMATE;
+	else if (incheck(stm))
+		return (stm == WHITE)? BLACK_CHECKMATE : WHITE_CHECKMATE;
 	else
-		return STALE_MATE;
+		return STALEMATE;
 }
 
 bool Board::validMove(const Move &moveIn, Move &move)

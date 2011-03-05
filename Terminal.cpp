@@ -157,14 +157,15 @@ void Terminal::run()
 			board.printBoard();
 
 		switch (board.isMate()) {
-		case NOT_MATE:
+		case NOTMATE:
 		default:
 			break;
-		case CHECK_MATE:
+		case WHITE_CHECKMATE:
+		case BLACK_CHECKMATE:
 			cout << playerString[board.getStm() ^ -2] << " got checkmate\n";
 			while (mainMenu());
 			break;
-		case STALE_MATE:
+		case STALEMATE:
 			cout << "game is stalemate\n";
 			while (mainMenu());
 			break;
