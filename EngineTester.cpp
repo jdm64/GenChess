@@ -38,9 +38,10 @@ struct GameResults {
 
 	GameResults()
 	{
-		ply = 0;
 		whiteTime = {0, 0};
 		blackTime = {0, 0};
+		ply = 0;
+		winner = 'D';
 	}
 };
 

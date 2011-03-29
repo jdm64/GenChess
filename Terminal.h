@@ -33,7 +33,7 @@ private:
 public:
 	Terminal(const int white, const int black);
 
-	void displayHelp();
+	void displayHelp() const;
 
 	bool playerCmd();
 

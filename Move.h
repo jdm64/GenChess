@@ -69,7 +69,7 @@ struct MoveList {
 };
 
 struct ScoreSort {
-	bool operator()(const MoveNode &a, const MoveNode &b)
+	bool operator()(const MoveNode &a, const MoveNode &b) const
 	{
 		return a.score > b.score;
 	}

@@ -28,7 +28,7 @@ Terminal::Terminal(const int white, const int black)
 	playerString = PS + 1;
 }
 
-void Terminal::displayHelp()
+void Terminal::displayHelp() const
 {
 	cout << "Command\t\t\tDescription\n\n"
 		<< "new\t\t\tstarts a new game\n"
