@@ -113,10 +113,10 @@ void UpdateElo(const int results)
 	}
 	// Engine 1 Elo
 	exp = 1.0 / (pow(2.0, (elo2 - elo1) / 128.0) + 1.0);
-	elo1 += ceil(32.0 * (score1 - exp));
+	elo1 += round(32.0 * (score1 - exp));
 	// Engine 2 Elo
 	exp = 1.0 / (pow(2.0, (elo1 - elo2) / 128.0) + 1.0);
-	elo2 += ceil(32.0 * (score2 - exp));
+	elo2 += round(32.0 * (score2 - exp));
 }
 
 void printStats()
