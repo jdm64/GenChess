@@ -132,9 +132,6 @@ void TransTable::setItem(const uint64 hash, const int score, const Move &move, c
 {
 	TransItem *item = &table[hash % size];
 
-	if (depth < item->depth)
-		return;
-
 	item->hash = hash;
 	item->score = score;
 	item->move = move;
