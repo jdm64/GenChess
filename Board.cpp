@@ -157,14 +157,6 @@ Position Board::getPosition() const
 	return pos;
 }
 
-int Board::pieceIndex(const int8 loc) const
-{
-	for (int i = 0; i < 32; i++)
-		if (piece[i] == loc)
-			return i;
-	return NONE;
-}
-
 int Board::pieceIndex(const int8 loc, const int8 type) const
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
@@ -368,16 +360,16 @@ int Board::validMove(const string smove, const int8 color, Move &move)
 		move.index = pieceIndex(PLACEABLE, move.index * color);
 		if (move.index == NONE)
 			return NOPIECE_ERROR;
-		move.xindex = pieceIndex(move.to);
+		move.xindex = pieceIndex(move.to, square[move.to]);
 		if (move.xindex != NONE)
 			return NON_EMPTY_PLACE;
 	} else {
-		move.index = pieceIndex(move.from);
+		move.index = pieceIndex(move.from, square[move.from]);
 		if (move.index == NONE)
 			return NOPIECE_ERROR;
 		else if (square[move.from] * color < 0)
 			return DONT_OWN;
-		move.xindex = pieceIndex(move.to);
+		move.xindex = pieceIndex(move.to, square[move.to]);
 		if (move.xindex != NONE && square[move.to] * color > 0)
 			return CAPTURE_OWN;
 	}

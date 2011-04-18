@@ -41,8 +41,6 @@ private:
 
 	int pieceIndex(const int8 loc, const int8 type) const;
 
-	int pieceIndex(const int8 loc) const;
-
 public:
 	Board();
 
