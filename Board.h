@@ -85,7 +85,7 @@ public:
 
 	int eval() const;
 
-	int getNumMoves(const int8 color);
+	bool anyMoves(const int8 color);
 
 	MoveList* getMoveList(const int8 color);
 

@@ -306,7 +306,7 @@ bool Board::incheck(const int8 color)
 
 int Board::isMate()
 {
-	if (getNumMoves(stm))
+	if (anyMoves(stm))
 		return NOTMATE;
 	else if (incheck(stm))
 		return (stm == WHITE)? BLACK_CHECKMATE : WHITE_CHECKMATE;
@@ -423,10 +423,9 @@ int Board::eval() const
 	return (stm == WHITE)? -white : white;
 }
 
-int Board::getNumMoves(const int8 color)
+bool Board::anyMoves(const int8 color)
 {
 	MoveLookup movelookup(square);
-	int num = 0;
 	Move move;
 
 	// we must place king first
@@ -443,11 +442,14 @@ int Board::getNumMoves(const int8 color)
 
 			make(move);
 			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2))
-				num++;
+			if (!incheck(color) && !incheck(color ^ -2)) {
+				unmake(move);
+				return true;
+			}
 			unmake(move);
 		}
-		return num;
+		// shouldn't ever happen
+		return false;
 	}
 	// generate piece moves
 	int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
@@ -463,8 +465,11 @@ int Board::getNumMoves(const int8 color)
 			move.index = idx;
 
 			make(move);
-			if (!incheck(color))
-				num++;
+			if (!incheck(color)) {
+				delete[] loc;
+				unmake(move);
+				return true;
+			}
 			unmake(move);
 
 			n++;
@@ -486,12 +491,14 @@ int Board::getNumMoves(const int8 color)
 
 			make(move);
 			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2))
-				num++;
+			if (!incheck(color) && !incheck(color ^ -2)) {
+				unmake(move);
+				return true;
+			}
 			unmake(move);
 		}
 	}
-	return num;
+	return false;
 }
 
 MoveList* Board::getMoveList(const int8 color)
