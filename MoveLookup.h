@@ -30,11 +30,11 @@
 
 class MoveLookup {
 private:
-	static int8 mailbox[120];
+	static const int8 mailbox[120];
 
-	static int8 mailbox64[64];
+	static const int8 mailbox64[64];
 
-	static int8 offsets[7][8];
+	static const int8 offsets[7][8];
 
 	int8 *square;
 
