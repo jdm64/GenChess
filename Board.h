@@ -63,7 +63,7 @@ public:
 
 	void rebuildHash();
 
-	void setBoard(Position pos);
+	void setBoard(const Position &pos);
 
 	Position getPosition() const;
 

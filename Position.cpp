@@ -34,7 +34,7 @@ void Position::reset()
 bool Position::setPiece(const int8 loc, const int8 type)
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
-	int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
+	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
 		end = ((type < 0)? 0 : 16) + offset[ABS(type) + 1];
 
 	for (int i = start; i < end; i++) {
@@ -50,8 +50,8 @@ bool Position::setPiece(const int8 loc, const int8 type)
 
 bool Position::incheck(const int8 color)
 {
-	MoveLookup ml(square);
-	int king = (color == WHITE)? 31:15;
+	const MoveLookup ml(square);
+	const int king = (color == WHITE)? 31:15;
 
 	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
 }

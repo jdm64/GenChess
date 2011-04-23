@@ -90,7 +90,7 @@ EngineResults eng1res, eng2res;
 double WinRatio(const AsColor &a)
 {
 	// (win + draw / 2) / (win + lose + draw)
-	double win = a.win, draw = a.draw, lose = a.lose;
+	const double win = a.win, draw = a.draw, lose = a.lose;
 
 	return 100.0 * ((win + draw / 2) / (win + draw + lose));
 }
@@ -121,7 +121,7 @@ void UpdateElo(const int results)
 
 void printStats()
 {
-	double w1 = WinRatio(eng1res.aswhite), b1 = WinRatio(eng1res.asblack),
+	const double w1 = WinRatio(eng1res.aswhite), b1 = WinRatio(eng1res.asblack),
 		w2 = WinRatio(eng2res.aswhite), b2 = WinRatio(eng2res.asblack),
 		w = WinRatio(eng1res.aswhite + eng2res.aswhite),
 		b = WinRatio(eng1res.asblack + eng2res.asblack),

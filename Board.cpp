@@ -106,7 +106,7 @@ void Board::reset()
 		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
-		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
+		PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE
 	};
 #ifdef TT_ENABLED
 	key = startHash;
@@ -137,7 +137,7 @@ void Board::rebuildHash()
 #endif
 }
 
-void Board::setBoard(Position pos)
+void Board::setBoard(const Position &pos)
 {
 	memcpy(square, pos.square, 64);
 	memcpy(piece, pos.piece, 32);
@@ -160,7 +160,7 @@ Position Board::getPosition() const
 int Board::pieceIndex(const int8 loc, const int8 type) const
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
-	int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
+	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
 		end = ((type < 0)? 0 : 16) + offset[ABS(type) + 1];
 
 	for (int i = start; i < end; i++)
@@ -298,8 +298,8 @@ void Board::unmakeP(const Move &move)
 
 bool Board::incheck(const int8 color)
 {
-	MoveLookup ml(square);
-	int king = (color == WHITE)? 31:15;
+	const MoveLookup ml(square);
+	const int king = (color == WHITE)? 31:15;
 
 	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
 }
@@ -330,7 +330,7 @@ bool Board::validMove(const Move &moveIn, Move &move)
 	}
 
 	if (move.from != PLACEABLE) {
-		MoveLookup ml(square);
+		const MoveLookup ml(square);
 		if (!ml.fromto(move.from, move.to))
 			return false;
 	}
@@ -377,7 +377,7 @@ int Board::validMove(const string smove, const int8 color, Move &move)
 	if (ply < 2 && ABS(pieceType[move.index]) != KING)
 		return KING_FIRST;
 	if (move.from != PLACEABLE) {
-		MoveLookup ml(square);
+		const MoveLookup ml(square);
 		if (!ml.fromto(move.from, move.to))
 			return INVALID_MOVEMENT;
 	}
@@ -425,12 +425,12 @@ int Board::eval() const
 
 bool Board::anyMoves(const int8 color)
 {
-	MoveLookup movelookup(square);
+	const MoveLookup movelookup(square);
 	Move move;
 
 	// we must place king first
 	if (ply < 2) {
-		int idx = pieceIndex(PLACEABLE, KING * color);
+		const int idx = pieceIndex(PLACEABLE, KING * color);
 
 		for (int loc = 0; loc < 64; loc++) {
 			if (square[loc] != EMPTY)
@@ -452,7 +452,7 @@ bool Board::anyMoves(const int8 color)
 		return false;
 	}
 	// generate piece moves
-	int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
+	const int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	for (int idx = start; idx < end; idx++) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
@@ -504,14 +504,14 @@ bool Board::anyMoves(const int8 color)
 MoveList* Board::getMoveList(const int8 color)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
+	const MoveLookup movelookup(square);
 	MoveList *data = new MoveList;
-	MoveLookup movelookup(square);
 	MoveNode item;
 
 	data->size = 0;
 	// we must place king first
 	if (ply < 2) {
-		int idx = pieceIndex(PLACEABLE, KING * color);
+		const int idx = pieceIndex(PLACEABLE, KING * color);
 
 		for (int loc = 0; loc < 64; loc++) {
 			if (square[loc] != EMPTY)
@@ -533,7 +533,7 @@ MoveList* Board::getMoveList(const int8 color)
 		return data;
 	}
 	// generate piece moves
-	int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
+	const int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
 	for (int idx = start; idx >= end; idx--) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
@@ -585,16 +585,16 @@ MoveList* Board::getMoveList(const int8 color)
 MoveList* Board::getMoveList(const int8 color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
+	const MoveLookup movelookup(square);
+	const int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
 	MoveList *data = new MoveList;
-	MoveLookup movelookup(square);
 	MoveNode item;
-	int start, end;
 
 	data->size = 0;
 	switch (movetype) {
 	case MOVE_ALL:
 		if (ply < 2) {
-			int idx = pieceIndex(PLACEABLE, KING * color);
+			const int idx = pieceIndex(PLACEABLE, KING * color);
 			for (int loc = 0; loc < 64; loc++) {
 				if (square[loc] != EMPTY)
 					continue;
@@ -636,8 +636,6 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 				unmake(item.move);
 			}
 		}
-		start = (color == BLACK)? 15:31;
-		end = (color == BLACK)? 0:16;
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
@@ -662,8 +660,6 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 		}
 		break;
 	case MOVE_CAPTURE:
-		start = (color == BLACK)? 15:31;
-		end = (color == BLACK)? 0:16;
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
@@ -688,8 +684,6 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 		}
 		break;
 	case MOVE_MOVE:
-		start = (color == BLACK)? 15:31;
-		end = (color == BLACK)? 0:16;
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
@@ -715,7 +709,7 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 		break;
 	case MOVE_PLACE:
 		if (ply < 2) {
-			int idx = pieceIndex(PLACEABLE, KING * color);
+			const int idx = pieceIndex(PLACEABLE, KING * color);
 			for (int loc = 0; loc < 64; loc++) {
 				if (square[loc] != EMPTY)
 					continue;
@@ -765,16 +759,16 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
+	const MoveLookup movelookup(square);
+	const int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
 	MoveList *data = new MoveList;
-	MoveLookup movelookup(square);
 	MoveNode item;
-	int start, end;
 
 	data->size = 0;
 	switch (movetype) {
 	case MOVE_ALL:
 		if (ply < 2) {
-			int idx = pieceIndex(PLACEABLE, KING * color);
+			const int idx = pieceIndex(PLACEABLE, KING * color);
 			for (int loc = 0; loc < 64; loc++) {
 				if (square[loc] != EMPTY)
 					continue;
@@ -810,8 +804,6 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 				unmakeP(item.move);
 			}
 		}
-		start = (color == BLACK)? 15:31;
-		end = (color == BLACK)? 0:16;
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
@@ -833,8 +825,6 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 		}
 		break;
 	case MOVE_CAPTURE:
-		start = (color == BLACK)? 15:31;
-		end = (color == BLACK)? 0:16;
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
@@ -856,8 +846,6 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 		}
 		break;
 	case MOVE_MOVE:
-		start = (color == BLACK)? 15:31;
-		end = (color == BLACK)? 0:16;
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
@@ -880,7 +868,7 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 		break;
 	case MOVE_PLACE:
 		if (ply < 2) {
-			int idx = pieceIndex(PLACEABLE, KING * color);
+			const int idx = pieceIndex(PLACEABLE, KING * color);
 			for (int loc = 0; loc < 64; loc++) {
 				if (square[loc] != EMPTY)
 					continue;

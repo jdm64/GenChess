@@ -25,7 +25,8 @@
 
 void ComputerPlayer::pickRandomMove()
 {
-	int score = curr->list[0].score, end = 1;
+	const int score = curr->list[0].score;
+	int end = 1;
 
 	for (int i = 1; i < curr->size; i++) {
 		if (curr->list[i].score != score) {
