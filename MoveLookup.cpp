@@ -92,8 +92,8 @@ int8* MoveLookup::genAll(const int8 &from) const
 	case BISHOP:
 	case ROOK:
 		for (int dir = 0; dir < 4; dir++) {
-			for (int to = mfrom ;;) {
-				to = mailbox[to + offset[dir]];
+			for (int to, k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (EMPTY_MOVE(square[from], square[to])) {
@@ -108,8 +108,8 @@ int8* MoveLookup::genAll(const int8 &from) const
 		break;
 	case QUEEN:
 		for (int dir = 0; dir < 8; dir++) {
-			for (int to = mfrom ;;) {
-				to = mailbox[to + offset[dir]];
+			for (int to, k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (EMPTY_MOVE(square[from], square[to])) {
@@ -159,8 +159,8 @@ int8* MoveLookup::genCapture(const int8 &from) const
 	case BISHOP:
 	case ROOK:
 		for (int dir = 0; dir < 4; dir++) {
-			for (int to = mfrom ;;) {
-				to = mailbox[to + offset[dir]];
+			for (int to, k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1)
 					break;
 				else if (EMPTY_MOVE(square[from], square[to]))
@@ -173,8 +173,8 @@ int8* MoveLookup::genCapture(const int8 &from) const
 		break;
 	case QUEEN:
 		for (int dir = 0; dir < 8; dir++) {
-			for (int to = mfrom ;;) {
-				to = mailbox[to + offset[dir]];
+			for (int to, k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1)
 					break;
 				else if (EMPTY_MOVE(square[from], square[to]))
@@ -222,8 +222,8 @@ int8* MoveLookup::genMove(const int8 &from) const
 	case BISHOP:
 	case ROOK:
 		for (int dir = 0; dir < 4; dir++) {
-			for (int to = mfrom ;;) {
-				to = mailbox[to + offset[dir]];
+			for (int to, k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (EMPTY_MOVE(square[from], square[to])) {
@@ -236,8 +236,8 @@ int8* MoveLookup::genMove(const int8 &from) const
 		break;
 	case QUEEN:
 		for (int dir = 0; dir < 8; dir++) {
-			for (int to = mfrom ;;) {
-				to = mailbox[to + offset[dir]];
+			for (int to, k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (EMPTY_MOVE(square[from], square[to])) {
@@ -290,8 +290,8 @@ bool MoveLookup::fromto(const int8 &From, const int8 &To) const
 	case BISHOP:
 	case ROOK:
 		for (int dir = 0; dir < 4; dir++) {
-			for (int to = mfrom ;;) {
-				to = mailbox[to + offset[dir]];
+			for (int to, k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (EMPTY_MOVE(square[From], square[to])) {
@@ -307,8 +307,8 @@ bool MoveLookup::fromto(const int8 &From, const int8 &To) const
 		break;
 	case QUEEN:
 		for (int dir = 0; dir < 8; dir++) {
-			for (int to = mfrom ;;) {
-				to = mailbox[to + offset[dir]];
+			for (int to, k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (EMPTY_MOVE(square[From], square[to])) {
