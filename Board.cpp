@@ -456,9 +456,9 @@ bool Board::anyMoves(const int8 color)
 	for (int idx = start; idx < end; idx++) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
-		int n = 0;
+
 		int8 *loc = movelookup.genAll(piece[idx]);
-		while (loc[n] != -1) {
+		for (int n = 0; loc[n] != -1; n++) {
 			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			move.to = loc[n];
 			move.from = piece[idx];
@@ -471,8 +471,6 @@ bool Board::anyMoves(const int8 color)
 				return true;
 			}
 			unmake(move);
-
-			n++;
 		}
 		delete[] loc;
 	}
@@ -501,45 +499,58 @@ bool Board::anyMoves(const int8 color)
 	return false;
 }
 
-MoveList* Board::getMoveList(const int8 color)
+void Board::getPlaceMoveList(MoveList *data, const int8 pieceType)
 {
-	// TODO list might work better as a stl::list, or initialize to prev size
-	const MoveLookup movelookup(square);
-	MoveList *data = new MoveList;
+	const int idx = pieceIndex(PLACEABLE, pieceType);
+	const int8 color = pieceType / ABS(pieceType);
 	MoveNode item;
 
-	data->size = 0;
-	// we must place king first
-	if (ply < 2) {
-		const int idx = pieceIndex(PLACEABLE, KING * color);
+	if (idx == NONE)
+		return;
+	for (int loc = 0; loc < 64; loc++) {
+		if (square[loc] != EMPTY)
+			continue;
+		item.move.index = idx;
+		item.move.to = loc;
+		item.move.xindex = NONE;
+		item.move.from = PLACEABLE;
 
-		for (int loc = 0; loc < 64; loc++) {
-			if (square[loc] != EMPTY)
-				continue;
-			item.move.to = loc;
-			item.move.index = idx;
-			item.move.xindex = NONE;
-			item.move.from = PLACEABLE;
-
-			make(item.move);
-			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2)) {
-				// item.check initialized to false
-				item.score = eval();
-				data->list[data->size++] = item;
-			}
-			unmake(item.move);
+		make(item.move);
+		// place moves are only valid if neither side is inCheck
+		if (!incheck(color) && !incheck(color ^ -2)) {
+			// item.check initialized to false
+			item.score = eval();
+			data->list[data->size++] = item;
 		}
-		return data;
+		unmake(item.move);
 	}
-	// generate piece moves
-	const int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
+}
+
+void Board::getMoveList(MoveList *data, const int8 color, const int movetype)
+{
+	const MoveLookup movelookup(square);
+	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
+	MoveNode item;
+
 	for (int idx = start; idx >= end; idx--) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
-		int8 *loc = movelookup.genAll(piece[idx]);
-		int n = 0;
-		while (loc[n] != -1) {
+
+		int8 *loc;
+		switch (movetype) {
+		case MOVE_ALL:
+		default:
+			loc = movelookup.genAll(piece[idx]);
+			break;
+		case MOVE_CAPTURE:
+			loc = movelookup.genCapture(piece[idx]);
+			break;
+		case MOVE_MOVE:
+			loc = movelookup.genMove(piece[idx]);
+			break;
+		}
+
+		for (int n = 0; loc[n] != -1; n++) {
 			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			item.move.to = loc[n];
 			item.move.from = piece[idx];
@@ -552,205 +563,37 @@ MoveList* Board::getMoveList(const int8 color)
 				data->list[data->size++] = item;
 			}
 			unmake(item.move);
-			n++;
 		}
 		delete[] loc;
 	}
-	// generate piece place moves
-	for (int type = QUEEN; type >= PAWN; type--) {
-		int idx = pieceIndex(PLACEABLE, type * color);
-		if (idx == NONE)
-			continue;
-		for (int loc = 0; loc < 64; loc++) {
-			if (square[loc] != EMPTY)
-				continue;
-			item.move.index = idx;
-			item.move.to = loc;
-			item.move.xindex = NONE;
-			item.move.from = PLACEABLE;
-
-			make(item.move);
-			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2)) {
-				// item.check initialized to false
-				item.score = eval();
-				data->list[data->size++] = item;
-			}
-			unmake(item.move);
-		}
-	}
-	return data;
 }
 
 MoveList* Board::getMoveList(const int8 color, const int movetype)
 {
-	// TODO list might work better as a stl::list, or initialize to prev size
-	const MoveLookup movelookup(square);
-	const int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
 	MoveList *data = new MoveList;
-	MoveNode item;
-
 	data->size = 0;
+
 	switch (movetype) {
 	case MOVE_ALL:
 		if (ply < 2) {
-			const int idx = pieceIndex(PLACEABLE, KING * color);
-			for (int loc = 0; loc < 64; loc++) {
-				if (square[loc] != EMPTY)
-					continue;
-				item.move.to = loc;
-				item.move.index = idx;
-				item.move.xindex = NONE;
-				item.move.from = PLACEABLE;
-
-				make(item.move);
-				// place moves are only valid if neither side is inCheck
-				if (!incheck(color) && !incheck(color ^ -2)) {
-					// item.check initialized to false
-					item.score = eval();
-					data->list[data->size++] = item;
-				}
-				unmake(item.move);
-			}
+			getPlaceMoveList(data, KING * color);
 			break;
 		}
-		for (int type = QUEEN; type >= PAWN; type--) {
-			int idx = pieceIndex(PLACEABLE, type * color);
-			if (idx == NONE)
-				continue;
-			for (int loc = 0; loc < 64; loc++) {
-				if (square[loc] != EMPTY)
-					continue;
-				item.move.index = idx;
-				item.move.to = loc;
-				item.move.xindex = NONE;
-				item.move.from = PLACEABLE;
-
-				make(item.move);
-				// place moves are only valid if neither side is inCheck
-				if (!incheck(color) && !incheck(color ^ -2)) {
-					// item.check initialized to false
-					item.score = eval();
-					data->list[data->size++] = item;
-				}
-				unmake(item.move);
-			}
-		}
-		for (int idx = start; idx >= end; idx--) {
-			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
-				continue;
-			int8 *loc = movelookup.genAll(piece[idx]);
-			int n = 0;
-			while (loc[n] != -1) {
-				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
-				item.move.to = loc[n];
-				item.move.from = piece[idx];
-				item.move.index = idx;
-
-				make(item.move);
-				if (!incheck(color)) {
-					item.check = incheck(color ^ -2);
-					item.score = eval();
-					data->list[data->size++] = item;
-				}
-				unmake(item.move);
-				n++;
-			}
-			delete[] loc;
-		}
-		break;
-	case MOVE_CAPTURE:
-		for (int idx = start; idx >= end; idx--) {
-			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
-				continue;
-			int8 *loc = movelookup.genCapture(piece[idx]);
-			int n = 0;
-			while (loc[n] != -1) {
-				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
-				item.move.to = loc[n];
-				item.move.from = piece[idx];
-				item.move.index = idx;
-
-				make(item.move);
-				if (!incheck(color)) {
-					item.check = incheck(color ^ -2);
-					item.score = eval();
-					data->list[data->size++] = item;
-				}
-				unmake(item.move);
-				n++;
-			}
-			delete[] loc;
-		}
-		break;
-	case MOVE_MOVE:
-		for (int idx = start; idx >= end; idx--) {
-			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
-				continue;
-			int8 *loc = movelookup.genMove(piece[idx]);
-			int n = 0;
-			while (loc[n] != -1) {
-				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
-				item.move.to = loc[n];
-				item.move.from = piece[idx];
-				item.move.index = idx;
-
-				make(item.move);
-				if (!incheck(color)) {
-					item.check = incheck(color ^ -2);
-					item.score = eval();
-					data->list[data->size++] = item;
-				}
-				unmake(item.move);
-				n++;
-			}
-			delete[] loc;
-		}
+		getMoveList(data, color, MOVE_ALL);
+		for (int type = QUEEN; type >= PAWN; type--)
+			getPlaceMoveList(data, type * color);
 		break;
 	case MOVE_PLACE:
 		if (ply < 2) {
-			const int idx = pieceIndex(PLACEABLE, KING * color);
-			for (int loc = 0; loc < 64; loc++) {
-				if (square[loc] != EMPTY)
-					continue;
-				item.move.to = loc;
-				item.move.index = idx;
-				item.move.xindex = NONE;
-				item.move.from = PLACEABLE;
-
-				make(item.move);
-				// place moves are only valid if neither side is inCheck
-				if (!incheck(color) && !incheck(color ^ -2)) {
-					// item.check initialized to false
-					item.score = eval();
-					data->list[data->size++] = item;
-				}
-				unmake(item.move);
-			}
+			getPlaceMoveList(data, KING * color);
 			break;
 		}
-		for (int type = QUEEN; type >= PAWN; type--) {
-			int idx = pieceIndex(PLACEABLE, type * color);
-			if (idx == NONE)
-				continue;
-			for (int loc = 0; loc < 64; loc++) {
-				if (square[loc] != EMPTY)
-					continue;
-				item.move.index = idx;
-				item.move.to = loc;
-				item.move.xindex = NONE;
-				item.move.from = PLACEABLE;
-
-				make(item.move);
-				// place moves are only valid if neither side is inCheck
-				if (!incheck(color) && !incheck(color ^ -2)) {
-					// item.check initialized to false
-					item.score = eval();
-					data->list[data->size++] = item;
-				}
-				unmake(item.move);
-			}
-		}
+		for (int type = QUEEN; type >= PAWN; type--)
+			getPlaceMoveList(data, type * color);
+		break;
+	case MOVE_CAPTURE:
+	case MOVE_MOVE:
+		getMoveList(data, color, movetype);
 		break;
 	}
 	return data;

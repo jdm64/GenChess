@@ -204,7 +204,7 @@ hashMiss:
 
 void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
 {
-	curr = curr? curr : board->getMoveList(board->getStm());
+	curr = curr? curr : board->getMoveList(board->getStm(), MOVE_ALL);
 
 	int b = beta;
 	for (int n = 0; n < curr->size; n++) {
