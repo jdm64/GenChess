@@ -428,29 +428,10 @@ bool Board::anyMoves(const int8 color)
 	const MoveLookup movelookup(square);
 	Move move;
 
-	// we must place king first
-	if (ply < 2) {
-		const int idx = pieceIndex(PLACEABLE, KING * color);
+	// shortest games takes 5 half-moves
+	if (ply < 4)
+		return true;
 
-		for (int loc = 0; loc < 64; loc++) {
-			if (square[loc] != EMPTY)
-				continue;
-			move.to = loc;
-			move.index = idx;
-			move.xindex = NONE;
-			move.from = PLACEABLE;
-
-			make(move);
-			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2)) {
-				unmake(move);
-				return true;
-			}
-			unmake(move);
-		}
-		// shouldn't ever happen
-		return false;
-	}
 	// generate piece moves
 	const int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	for (int idx = start; idx < end; idx++) {
