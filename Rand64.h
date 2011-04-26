@@ -22,8 +22,11 @@
 #include <cstdlib>
 #include <algorithm>
 #include <ctime>
+#include "Defines.h"
 
-#define BLOCK 8192
+#define BLOCK 256
+
+using namespace std;
 
 class Rand64 {
 private:
@@ -35,7 +38,7 @@ private:
 	{
 		int rn;
 
-		if (size < 6)
+		if (size < 16)
 			size = BLOCK - 1;
 		do {
 			rn = rand() % size;
@@ -50,17 +53,20 @@ public:
 	{
 		size = BLOCK - 1;
 		last = BLOCK;
+
+		srand(time(NULL));
 		for (int i = 0; i < BLOCK; i++)
 			box[i] = i;
-		srand(time(NULL));
+		for (int i = 0; i < BLOCK; i++)
+			block();
 	}
 
 	uint64 next()
 	{
 		uint64 val = 0;
 
-		for (int i = 0; i < 5; i++)
-			val |= block() << (13 * i);
+		for (int i = 0; i < 8; i++)
+			val |= block() << (8 * i);
 		return val;
 	}
 };
