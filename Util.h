@@ -19,6 +19,7 @@
 #define __UTIL_H__                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    #define __COMPUTER_PLAYER_H__ 
 
 #include <sys/time.h>
+#include "Defines.h"
 
 #define USEC_PER_SEC 1000000
 
@@ -26,6 +27,6 @@ timeval operator-(const timeval l, const timeval r);
 
 void sum(timeval &l, const timeval r);
 
-int time_in_msec(const timeval t);
+int64 time_in_msec(const timeval t);
 
 #endif

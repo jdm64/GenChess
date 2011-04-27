@@ -24,6 +24,7 @@
 #define ABS(X)		((X >= 0)? X : -X)
 
 typedef uint64_t uint64;
+typedef int64_t int64;
 typedef int8_t int8;
 
 enum {NONE = -1, PLACEABLE = -2, DEAD = -4, NULL_MOVE = -8};
