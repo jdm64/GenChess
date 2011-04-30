@@ -71,7 +71,7 @@ bool CVEP::gameCmd()
 		game->undoMove();
 		game->undoMove();
 	} else if (cmd == "go") {
-		Move move = engine->think();
+		const Move move = engine->think();
 		game->doMove(move);
 		cout << "move " << move.toString() << endl;
 		return moveResults();

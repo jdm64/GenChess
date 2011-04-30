@@ -36,7 +36,7 @@ private:
 
 	static const int8 offsets[7][8];
 
-	int8 *square;
+	const int8 *square;
 
 public:
 	MoveLookup(int8 *Square) : square(Square) {}

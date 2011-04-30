@@ -39,7 +39,7 @@ void ComputerPlayer::pickRandomMove()
 
 int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 {
-	MoveList *ptr = board->getMoveList(board->getStm(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
+	MoveList* const ptr = board->getMoveList(board->getStm(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -103,7 +103,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		}
 	}
 	// Try all of moveType Moves
-	MoveList *ptr = board->getMoveList(board->getStm(), type);
+	MoveList* const ptr = board->getMoveList(board->getStm(), type);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -140,7 +140,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 	return false;
 }
 
-int ComputerPlayer::NegaScout(int alpha, int beta, int depth, int limit)
+int ComputerPlayer::NegaScout(int alpha, const int beta, const int depth, int limit)
 {
 	if (depth >= limit) {
 		if (!tactical[depth])
@@ -202,7 +202,7 @@ hashMiss:
 	return best;
 }
 
-void ComputerPlayer::search(int alpha, int beta, int depth, int limit)
+void ComputerPlayer::search(int alpha, const int beta, const int depth, const int limit)
 {
 	curr = curr? curr : board->getMoveList(board->getStm(), MOVE_ALL);
 

@@ -438,7 +438,7 @@ bool Board::anyMoves(const int8 color)
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
 
-		int8 *loc = movelookup.genAll(piece[idx]);
+		const int8* const loc = movelookup.genAll(piece[idx]);
 		for (int n = 0; loc[n] != -1; n++) {
 			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			move.to = loc[n];
@@ -457,7 +457,7 @@ bool Board::anyMoves(const int8 color)
 	}
 	// generate piece place moves
 	for (int type = PAWN; type <= KING; type++) {
-		int idx = pieceIndex(PLACEABLE, type * color);
+		const int idx = pieceIndex(PLACEABLE, type * color);
 		if (idx == NONE)
 			continue;
 		for (int loc = 0; loc < 64; loc++) {
@@ -480,7 +480,7 @@ bool Board::anyMoves(const int8 color)
 	return false;
 }
 
-void Board::getPlaceMoveList(MoveList *data, const int8 pieceType)
+void Board::getPlaceMoveList(MoveList* const data, const int8 pieceType)
 {
 	const int idx = pieceIndex(PLACEABLE, pieceType);
 	const int8 color = pieceType / ABS(pieceType);
@@ -507,7 +507,7 @@ void Board::getPlaceMoveList(MoveList *data, const int8 pieceType)
 	}
 }
 
-void Board::getMoveList(MoveList *data, const int8 color, const int movetype)
+void Board::getMoveList(MoveList* const data, const int8 color, const int movetype)
 {
 	const MoveLookup movelookup(square);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
@@ -551,7 +551,7 @@ void Board::getMoveList(MoveList *data, const int8 color, const int movetype)
 
 MoveList* Board::getMoveList(const int8 color, const int movetype)
 {
-	MoveList *data = new MoveList;
+	MoveList* const data = new MoveList;
 	data->size = 0;
 
 	switch (movetype) {
@@ -585,7 +585,7 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 	// TODO list might work better as a stl::list, or initialize to prev size
 	const MoveLookup movelookup(square);
 	const int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
-	MoveList *data = new MoveList;
+	MoveList* const data = new MoveList;
 	MoveNode item;
 
 	data->size = 0;
@@ -610,7 +610,7 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 			break;
 		}
 		for (int type = QUEEN; type >= PAWN; type--) {
-			int idx = pieceIndex(PLACEABLE, type * color);
+			const int idx = pieceIndex(PLACEABLE, type * color);
 			if (idx == NONE)
 				continue;
 			for (int loc = 0; loc < 64; loc++) {
@@ -631,9 +631,8 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			int8 *loc = movelookup.genAll(piece[idx]);
-			int n = 0;
-			while (loc[n] != -1) {
+			const int8* const loc = movelookup.genAll(piece[idx]);
+			for (int n = 0; loc[n] != -1; n++) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 				item.move.to = loc[n];
 				item.move.from = piece[idx];
@@ -643,7 +642,6 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 				if (!incheck(color))
 					data->list[data->size++] = item;
 				unmakeP(item.move);
-				n++;
 			}
 			delete[] loc;
 		}
@@ -652,9 +650,8 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			int8 *loc = movelookup.genCapture(piece[idx]);
-			int n = 0;
-			while (loc[n] != -1) {
+			const int8* const loc = movelookup.genCapture(piece[idx]);
+			for (int n = 0; loc[n] != -1; n++) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 				item.move.to = loc[n];
 				item.move.from = piece[idx];
@@ -664,7 +661,6 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 				if (!incheck(color))
 					data->list[data->size++] = item;
 				unmakeP(item.move);
-				n++;
 			}
 			delete[] loc;
 		}
@@ -673,9 +669,8 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			int8 *loc = movelookup.genMove(piece[idx]);
-			int n = 0;
-			while (loc[n] != -1) {
+			const int8* const loc = movelookup.genMove(piece[idx]);
+			for (int n = 0; loc[n] != -1; n++) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 				item.move.to = loc[n];
 				item.move.from = piece[idx];
@@ -685,7 +680,6 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 				if (!incheck(color))
 					data->list[data->size++] = item;
 				unmakeP(item.move);
-				n++;
 			}
 			delete[] loc;
 		}
@@ -710,7 +704,7 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 			break;
 		}
 		for (int type = QUEEN; type >= PAWN; type--) {
-			int idx = pieceIndex(PLACEABLE, type * color);
+			const int idx = pieceIndex(PLACEABLE, type * color);
 			if (idx == NONE)
 				continue;
 			for (int loc = 0; loc < 64; loc++) {

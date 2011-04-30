@@ -87,9 +87,9 @@ public:
 
 	bool anyMoves(const int8 color);
 
-	void getPlaceMoveList(MoveList *data, const int8 pieceType);
+	void getPlaceMoveList(MoveList* const data, const int8 pieceType);
 
-	void getMoveList(MoveList *data, const int8 color, const int movetype);
+	void getMoveList(MoveList* const data, const int8 color, const int movetype);
 
 	MoveList* getMoveList(const int8 color, const int movetype);
 

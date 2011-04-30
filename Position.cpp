@@ -91,7 +91,7 @@ bool Position::parseFen(const string st)
 		}
 	}
 	// pick up color-to-move
-	int8 ctm = (st[n] == 'w')? WHITE : BLACK;
+	const int8 ctm = (st[n] == 'w')? WHITE : BLACK;
 	n += 2;
 
 	// parse placeable pieces
@@ -216,7 +216,7 @@ bool Position::parseZfen(const string st)
 		return false;
 
 	// check if color not on move is in check
-	int8 ctm = (ply % 2)? BLACK : WHITE;
+	const int8 ctm = (ply % 2)? BLACK : WHITE;
 	if (incheck(ctm ^ -2))
 		return false;
 	return true;

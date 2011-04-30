@@ -73,7 +73,7 @@ public:
 
 	bool getItem(const uint64 hash, TransItem *&item);
 
-	void setItem(const uint64 hash, const int score, const Move &move, const int8 depth, const int8 type);
+	void setItem(const uint64 hash, const int score, const Move &move, const int8 depth, const int8 type) const;
 };
 
 #endif

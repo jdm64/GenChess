@@ -49,7 +49,7 @@ bool Terminal::playerCmd()
 		Move move;
 
 		cin >> mv;
-		int status = board.validMove(mv, board.getStm(), move);
+		const int status = board.validMove(mv, board.getStm(), move);
 		if (status != VALID_MOVE) {
 			cout << moveError[status] << endl;
 			return true;
