@@ -21,7 +21,7 @@
 #include <cstdint>
 
 #define VERSION		"2.0.75"
-#define ABS(X)		((X >= 0)? X : -X)
+#define ABS(X)		((X >= 0)? X : -(X))
 
 typedef uint64_t uint64;
 typedef int64_t int64;
