@@ -23,8 +23,8 @@
 #define ATCK_CMP(A, B)		((A^B) >> 3) - ((A^(-B)) >> 3)
 #define CAPTURE_MOVE(A, B)	(A * B <  0)
 #define ANY_MOVE(A, B)		(A * B <= 0)
-#define NOT_EMPTY(A, B)		(A * B != 0)
-#define EMPTY_MOVE(A, B)	(A * B == 0)
+// #define NOT_EMPTY(A, B)	(A * B != 0)
+// #define EMPTY_MOVE(A, B)	(A * B == 0)
 #define NOT_CAPTURE(A, B)	(A * B >= 0)
 #define OWN_PIECE(A, B)		(A * B >  0)
 

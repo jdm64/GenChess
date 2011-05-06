@@ -75,7 +75,7 @@ int8* MoveLookup::genAll(const int8 &from) const
 			const int to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (EMPTY_MOVE(square[from], square[to]))
+			else if (square[to] == EMPTY)
 				list[next++] = to;
 		}
 		break;
@@ -96,7 +96,7 @@ int8* MoveLookup::genAll(const int8 &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(square[from], square[to])) {
+				} else if (square[to] == EMPTY) {
 					list[next++] = to;
 					continue;
 				} else if (CAPTURE_MOVE(square[from], square[to])) {
@@ -112,7 +112,7 @@ int8* MoveLookup::genAll(const int8 &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(square[from], square[to])) {
+				} else if (square[to] == EMPTY) {
 					list[next++] = to;
 					continue;
 				} else if (CAPTURE_MOVE(square[from], square[to])) {
@@ -163,7 +163,7 @@ int8* MoveLookup::genCapture(const int8 &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1)
 					break;
-				else if (EMPTY_MOVE(square[from], square[to]))
+				else if (square[to] == EMPTY)
 					continue;
 				else if (CAPTURE_MOVE(square[from], square[to]))
 					list[next++] = to;
@@ -177,7 +177,7 @@ int8* MoveLookup::genCapture(const int8 &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1)
 					break;
-				else if (EMPTY_MOVE(square[from], square[to]))
+				else if (square[to] == EMPTY)
 					continue;
 				else if (CAPTURE_MOVE(square[from], square[to]))
 					list[next++] = to;
@@ -205,7 +205,7 @@ int8* MoveLookup::genMove(const int8 &from) const
 			const int to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (EMPTY_MOVE(square[from], square[to]))
+			else if (square[to] == EMPTY)
 				list[next++] = to;
 		}
 		break;
@@ -215,7 +215,7 @@ int8* MoveLookup::genMove(const int8 &from) const
 			const int to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (EMPTY_MOVE(square[from], square[to]))
+			else if (square[to] == EMPTY)
 				list[next++] = to;
 		}
 		break;
@@ -226,7 +226,7 @@ int8* MoveLookup::genMove(const int8 &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(square[from], square[to])) {
+				} else if (square[to] == EMPTY) {
 					list[next++] = to;
 					continue;
 				}
@@ -240,7 +240,7 @@ int8* MoveLookup::genMove(const int8 &from) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(square[from], square[to])) {
+				} else if (square[to] == EMPTY) {
 					list[next++] = to;
 					continue;
 				}
@@ -273,7 +273,7 @@ bool MoveLookup::fromto(const int8 &From, const int8 &To) const
 			const int to = mailbox[mfrom + offset[dir]];
 			if (to == -1)
 				continue;
-			else if (EMPTY_MOVE(square[From], square[to]) && to == To)
+			else if (square[to] == EMPTY && to == To)
 				return true;
 		}
 		break;
@@ -294,7 +294,7 @@ bool MoveLookup::fromto(const int8 &From, const int8 &To) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(square[From], square[to])) {
+				} else if (square[to] == EMPTY) {
 					if (to == To)
 						return true;
 					continue;
@@ -311,7 +311,7 @@ bool MoveLookup::fromto(const int8 &From, const int8 &To) const
 				to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
-				} else if (EMPTY_MOVE(square[From], square[to])) {
+				} else if (square[to] == EMPTY) {
 					if (to == To)
 						return true;
 					continue;
@@ -336,7 +336,7 @@ bool MoveLookup::isAttacked(const int8 &from) const
 			const int to = mailbox[mfrom + k * offsets[ROOK][dir]];
 			if (to == -1)
 				break;
-			else if (EMPTY_MOVE(square[from], square[to]))
+			else if (square[to] == EMPTY)
 				continue;
 			else if (OWN_PIECE(square[from], square[to]))
 				break;
@@ -353,7 +353,7 @@ bool MoveLookup::isAttacked(const int8 &from) const
 			const int to = mailbox[mfrom + k * offsets[BISHOP][dir]];
 			if (to == -1)
 				break;
-			else if (EMPTY_MOVE(square[from], square[to]))
+			else if (square[to] == EMPTY)
 				continue;
 			else if (OWN_PIECE(square[from], square[to]))
 				break;
