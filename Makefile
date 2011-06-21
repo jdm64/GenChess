@@ -1,6 +1,6 @@
 CXX = g++
 #CXXFLAGS = -Wall -Wextra -pedantic -O3 -std=gnu++0x
-CXXFLAGS = -Wall -Wextra -pedantic -O3 -ggdb -std=gnu++0x -flto -fwhole-program
+CXXFLAGS = -Wall -Wextra -pedantic -O3 -ggdb -std=gnu++0x
 TARGET = genchess
 
 VERSION = $(shell grep "define VERSION" Defines.h | cut -d'"' -f2)
@@ -12,7 +12,7 @@ objs = Util.o Move.o MoveLookup.o Position.o Board.o TransTable.o \
 all : genchess enginetester
 
 genchess : $(objs)
-	$(CXX) $(objs) -flto -o $(TARGET)
+	$(CXX) $(objs) -o $(TARGET)
 #	strip -s $(TARGET)
 
 enginetester : EngineTester.o
