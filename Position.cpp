@@ -19,7 +19,7 @@
 #include <sstream>
 #include "Position.h"
 
-const int8 type[] = {
+const int8 stype[] = {
 	EMPTY,		EMPTY,		BLACK_KING,	WHITE_BISHOP,	EMPTY,
 	BLACK_KNIGHT,	EMPTY,		BLACK_PAWN,	BLACK_QUEEN,	BLACK_ROOK,
 	EMPTY,		EMPTY,		WHITE_KING,	EMPTY,		BLACK_BISHOP,
@@ -72,7 +72,7 @@ bool Position::parseFen(const string st)
 		case 'n':	case 'q':	case 'k':
 		case 'P':	case 'B':	case 'R':
 		case 'N':	case 'Q':	case 'K':
-			if (!setPiece(loc, type[st[n] % 21]))
+			if (!setPiece(loc, stype[st[n] % 21]))
 				return false;
 			loc++;
 			break;
@@ -104,27 +104,27 @@ bool Position::parseFen(const string st)
 			break;
 		} else if (!isalpha(st[n])) {
 			return false;
-		} else if (!setPiece(PLACEABLE, type[st[n] % 21])) {
+		} else if (!setPiece(PLACEABLE, stype[st[n] % 21])) {
 			return false;
 		}
 	}
 
 	// pick up half-ply count
-	string tmp;
+	string num;
 	while (isdigit(st[n])) {
-		tmp += st[n];
+		num += st[n];
 		n++;
 	}
-	ply = atoi(tmp.c_str());
+	ply = atoi(num.c_str());
 	n++;
 
 	// pick up full ply count (starts at 1)
-	tmp = "";
+	num = "";
 	while (isdigit(st[n])) {
-		tmp += st[n];
+		num += st[n];
 		n++;
 	}
-	ply = 2 * atoi(tmp.c_str()) - 2 + ((ctm == BLACK)? 1:0);
+	ply = 2 * atoi(num.c_str()) - 2 + ((ctm == BLACK)? 1:0);
 
 	// verify if ply is reasonable
 	int mply = 0;
@@ -168,7 +168,7 @@ bool Position::parseZfen(const string st)
 				num = "";
 				act = false;
 			}
-			if (!setPiece(loc, type[st[n] % 21]))
+			if (!setPiece(loc, stype[st[n] % 21]))
 				return false;
 			loc++;
 		} else if (st[n] == ':') {
@@ -186,7 +186,7 @@ bool Position::parseZfen(const string st)
 			break;
 		} else if (!isalpha(st[n])) {
 			return false;
-		} else if (!setPiece(PLACEABLE, type[st[n] % 21])) {
+		} else if (!setPiece(PLACEABLE, stype[st[n] % 21])) {
 			return false;
 		}
 	}
@@ -312,7 +312,7 @@ string Position::printZfen() const
 
 	buf.str(string());
 	buf << ply;
-	fen += buf.str();;
+	fen += buf.str();
 
 	return fen;
 }
