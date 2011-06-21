@@ -110,6 +110,9 @@ void Board::reset()
 	};
 #ifdef TT_ENABLED
 	key = startHash;
+	key += hashBox[WTM_HASH];
+	for (int i = HOLD_START; i < ZBOX_SIZE; i++)
+		key += hashBox[i];
 #endif
 	stm = WHITE;
 	ply = 0;
@@ -119,7 +122,7 @@ void Board::rebuildHash()
 {
 #ifdef TT_ENABLED
 	key = startHash;
-	key += (stm == WHITE)? 0 : -hashBox[WTM_HASH];
+	key += (stm == WHITE)? hashBox[WTM_HASH] : 0;
 
 	for (int i = 0; i < 32; i++) {
 		switch (piece[i]) {

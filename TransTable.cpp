@@ -89,8 +89,6 @@ TransTable::TransTable(const int num_MB)
 	table = new TransItem[size];
 
 	startHash = rad.next();
-	for (int i = HOLD_START; i < ZBOX_SIZE; i++)
-		startHash += hashBox[i];
 	hit = miss = scorehit = scoremiss = movehit = movemiss = 0;
 }
 
