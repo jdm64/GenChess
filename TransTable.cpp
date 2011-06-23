@@ -22,14 +22,14 @@ uint64 startHash;
 
 uint64 hashBox[ZBOX_SIZE];
 
-TransTable *tt;
+GenTransTable *gtt;
 
 const int typeLookup[32] = {0, 0, 0, 0, 0, 0,  0,  0,
 			    1, 1, 2, 2, 3, 3,  4,  5,
 			    6, 6, 6, 6, 6, 6,  6,  6,
 			    7, 7, 8, 8, 9, 9, 10, 11};
 
-TransItem::TransItem()
+GenTransItem::GenTransItem()
 {
 	hash = 0;
 	score = 0;
@@ -37,25 +37,25 @@ TransItem::TransItem()
 	type = NONE_NODE;
 }
 
-bool TransItem::getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
+bool GenTransItem::getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
 {
 	if ((type & HAS_SCORE) && depth >= inDepth) {
 		switch (type) {
 		case PV_NODE:
 			outScore = score;
-			tt->scorehit++;
+			gtt->scorehit++;
 			return true;
 		case CUT_NODE:
 			if (score >= beta) {
 				outScore = score;
-				tt->scorehit++;
+				gtt->scorehit++;
 				return true;
 			}
 			break;
 		case ALL_NODE:
 			if (score <= alpha) {
 				outScore = score;
-				tt->scorehit++;
+				gtt->scorehit++;
 				return true;
 			}
 			break;
@@ -63,57 +63,57 @@ bool TransItem::getScore(const int alpha, const int beta, const int inDepth, int
 			assert(0);
 		}
 	}
-	tt->scoremiss++;
+	gtt->scoremiss++;
 	return false;
 }
 
-bool TransItem::getMove(Move &inMove) const
+bool GenTransItem::getMove(GenMove &inMove) const
 {
 	if (type & HAS_MOVE) {
 		inMove = move;
-		tt->movehit++;
+		gtt->movehit++;
 		return true;
 	} else {
-		tt->movemiss++;
+		gtt->movemiss++;
 		return false;
 	}
 }
 
-TransTable::TransTable(const int num_MB)
+GenTransTable::GenTransTable(const int num_MB)
 {
 	Rand64 rad;
 
 	for (int i = 0; i < ZBOX_SIZE; i++)
 		hashBox[i] = rad.next();
-	size = (num_MB * 1048576) / sizeof(TransItem);
-	table = new TransItem[size];
+	size = (num_MB * 1048576) / sizeof(GenTransItem);
+	table = new GenTransItem[size];
 
 	startHash = rad.next();
 	hit = miss = scorehit = scoremiss = movehit = movemiss = 0;
 }
 
-TransTable::~TransTable()
+GenTransTable::~GenTransTable()
 {
 	delete[] table;
 }
 
-sixInt TransTable::stats() const
+sixInt GenTransTable::stats() const
 {
 	return {hit, miss, scorehit, scoremiss, movehit, movemiss};
 }
 
-void TransTable::clear()
+void GenTransTable::clear()
 {
 	for (int i = 0; i < size; i++)
 		table[i].hash = 0;
 }
 
-void TransTable::clearStats()
+void GenTransTable::clearStats()
 {
 	hit = miss = scorehit = scoremiss = movehit = movemiss = 0;
 }
 
-bool TransTable::getItem(const uint64 hash, TransItem *&item)
+bool GenTransTable::getItem(const uint64 hash, GenTransItem *&item)
 {
 	item = &table[hash % size];
 
@@ -126,9 +126,9 @@ bool TransTable::getItem(const uint64 hash, TransItem *&item)
 	}
 }
 
-void TransTable::setItem(const uint64 hash, const int score, const Move &move, const int8 depth, const int8 type) const
+void GenTransTable::setItem(const uint64 hash, const int score, const GenMove &move, const int8 depth, const int8 type) const
 {
-	TransItem* const item = &table[hash % size];
+	GenTransItem* const item = &table[hash % size];
 
 	item->hash = hash;
 	item->score = score;

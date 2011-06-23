@@ -21,18 +21,18 @@
 #include <vector>
 #include "Board.h"
 
-class Game {
+class GenGame {
 private:
-	Board *board;
+	GenBoard *board;
 
-	vector<Move> history;
+	vector<GenMove> history;
 
 public:
-	Game(Board *Board) : board(Board) {}
+	GenGame(GenBoard *Board) : board(Board) {}
 
 	void newGame();
 
-	void doMove(const Move &move);
+	void doMove(const GenMove &move);
 
 	bool undoMove();
 };

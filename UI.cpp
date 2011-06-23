@@ -17,7 +17,7 @@
 
 #include "UI.h"
 
-const string UI::moveError[NUM_MOVE_ERRORS] = {
+const string GenUI::moveError[NUM_MOVE_ERRORS] = {
 	"", "That's an invalid move format",
 	"That move doesn't reference a valid piece",
 	"That is not your piece", "You must place your king first",
@@ -26,20 +26,20 @@ const string UI::moveError[NUM_MOVE_ERRORS] = {
 	"Can't check by placing a piece"
 };
 
-UI::UI()
+GenUI::GenUI()
 {
 	again = true;
 
-	game = new Game(&board);
-	engine = new ComputerPlayer(&board);
-	tt = new TransTable(32);
+	game = new GenGame(&board);
+	engine = new GenEngine(&board);
+	gtt = new GenTransTable(32);
 
 	board.rebuildHash();
 }
 
-UI::~UI()
+GenUI::~GenUI()
 {
 	delete game;
 	delete engine;
-	delete tt;
+	delete gtt;
 }

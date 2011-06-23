@@ -17,19 +17,19 @@
 
 #include "Game.h"
 
-void Game::newGame()
+void GenGame::newGame()
 {
 	board->reset();
 	history.clear();
 }
 
-void Game::doMove(const Move &move)
+void GenGame::doMove(const GenMove &move)
 {
 	board->make(move);
 	history.push_back(move);
 }
 
-bool Game::undoMove()
+bool GenGame::undoMove()
 {
 	if (!history.size())
 		return false;

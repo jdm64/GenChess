@@ -20,7 +20,7 @@
 
 #include "UI.h"
 
-class CVEP : public UI {
+class GenCVEP : public GenUI {
 public:
 	bool moveResults();
 

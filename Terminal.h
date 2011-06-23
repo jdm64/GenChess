@@ -20,7 +20,7 @@
 
 #include "UI.h"
 
-class Terminal : public UI {
+class GenTerminal : public GenUI {
 private:
 	static const string PS[3];
 	
@@ -31,7 +31,7 @@ private:
 	int *playerType;
 
 public:
-	Terminal(const int white, const int black);
+	GenTerminal(const int white, const int black);
 
 	void displayHelp() const;
 

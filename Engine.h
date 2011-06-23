@@ -15,8 +15,8 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __COMPUTER_PLAYER_H__
-#define __COMPUTER_PLAYER_H__
+#ifndef __ENGINE_H__
+#define __ENGINE_H__
 
 #include <vector>
 #include "Array.h"
@@ -28,31 +28,31 @@
 #define CHECKMATE_SCORE		-(INT_MAX - 4)
 #define STALEMATE_SCORE		0
 
-class ComputerPlayer {
+class GenEngine {
 private:
-	MoveList *curr;
+	GenMoveList *curr;
 
-	Board *board;
+	GenBoard *board;
 
-	Array<Move> captureKiller;
-	Array<Move> moveKiller;
-	Array<Move> placeKiller;
-	Array<Move> pvMove;
+	Array<GenMove> captureKiller;
+	Array<GenMove> moveKiller;
+	Array<GenMove> placeKiller;
+	Array<GenMove> pvMove;
 
 	int maxNg;
 
 	Array<bool> tactical;
 	Array<bool> ismate;
 
-	ScoreSort cmpScore;
+	GenScoreSort cmpScore;
 
 public:
-	ComputerPlayer(Board* Board) : curr(NULL), board(Board)
+	GenEngine(GenBoard* GenBoard) : curr(NULL), board(GenBoard)
 	{
 		maxNg = 5;
 	}
 
-	~ComputerPlayer()
+	~GenEngine()
 	{
 	}
 
@@ -60,13 +60,13 @@ public:
 
 	int Quiescence(int alpha, int beta, int depth);
 
-	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<Move> &killer, const int type);
+	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<GenMove> &killer, const int type);
 
 	int NegaScout(int alpha, int beta, int depth, int limit);
 
 	void search(int alpha, int beta, int depth, int limit);
 
-	Move think();
+	GenMove think();
 
 	void debugTree();
 };

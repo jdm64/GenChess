@@ -25,13 +25,13 @@ const int8 stype[] = {
 	EMPTY,		EMPTY,		WHITE_KING,	EMPTY,		BLACK_BISHOP,
 	WHITE_KNIGHT,	EMPTY,		WHITE_PAWN,	WHITE_QUEEN,	WHITE_ROOK};
 
-void Position::reset()
+void GenPosition::reset()
 {
 	memset(square, EMPTY, 64);
 	memset(piece, DEAD, 32);
 }
 
-bool Position::setPiece(const int8 loc, const int8 type)
+bool GenPosition::setPiece(const int8 loc, const int8 type)
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
@@ -48,15 +48,15 @@ bool Position::setPiece(const int8 loc, const int8 type)
 	return false;
 }
 
-bool Position::incheck(const int8 color)
+bool GenPosition::incheck(const int8 color)
 {
-	const MoveLookup ml(square);
+	const GenMoveLookup ml(square);
 	const int king = (color == WHITE)? 31:15;
 
 	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
 }
 
-bool Position::parseFen(const string st)
+bool GenPosition::parseFen(const string st)
 {
 	reset();
 
@@ -149,7 +149,7 @@ bool Position::parseFen(const string st)
 	return true;
 }
 
-bool Position::parseZfen(const string st)
+bool GenPosition::parseZfen(const string st)
 {
 	reset();
 
@@ -222,7 +222,7 @@ bool Position::parseZfen(const string st)
 	return true;
 }
 
-string Position::printFen() const
+string GenPosition::printFen() const
 {
 	ostringstream buf;
 	string fen;
@@ -277,7 +277,7 @@ string Position::printFen() const
 	return fen;
 }
 
-string Position::printZfen() const
+string GenPosition::printZfen() const
 {
 	stringstream buf;
 	string fen;

@@ -20,9 +20,9 @@
 #include "Board.h"
 #include "TransTable.h"
 
-const int pieceValue[16] = {224, 224, 224, 224, 224, 224, 224, 224, 336, 336, 560, 560, 896, 896, 1456, 0};
+const int genPieceValue[16] = {224, 224, 224, 224, 224, 224, 224, 224, 336, 336, 560, 560, 896, 896, 1456, 0};
 
-const int8 InitBoard[64] = {
+const int8 InitGenBoard[64] = {
 	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
@@ -32,7 +32,7 @@ const int8 InitBoard[64] = {
 	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
 	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY };
 
-const int8 InitPiece[32] = {
+const int8 InitGenPiece[32] = {
 	PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 	PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 	PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
@@ -42,7 +42,7 @@ const int8 InitPiece[32] = {
 	PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE,
 	PLACEABLE, PLACEABLE, PLACEABLE, PLACEABLE };
 
-const int locValue[7][64] = {
+const int genLocValue[7][64] = {
 	{	0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,
@@ -101,26 +101,26 @@ const int locValue[7][64] = {
 		-10,  0,  0,  0,  0,  0,  0, -10}
 	};
 
-Board::Board()
+GenBoard::GenBoard()
 {
 	reset();
 }
 
-void Board::reset()
+void GenBoard::reset()
 {
-	copy(InitBoard, InitBoard + 64, square);
-	copy(InitPiece, InitPiece + 64, piece);
+	copy(InitGenBoard, InitGenBoard + 64, square);
+	copy(InitGenPiece, InitGenPiece + 64, piece);
 #ifdef TT_ENABLED
 	key = startHash;
 	key += hashBox[WTM_HASH];
-	for (int i = HOLD_START; i < ZBOX_SIZE; i++)
+	for (int i = HOLD_START; i < HOLD_END; i++)
 		key += hashBox[i];
 #endif
 	stm = WHITE;
 	ply = 0;
 }
 
-void Board::rebuildHash()
+void GenBoard::rebuildHash()
 {
 #ifdef TT_ENABLED
 	key = startHash;
@@ -142,7 +142,7 @@ void Board::rebuildHash()
 #endif
 }
 
-void Board::setBoard(const Position &pos)
+void GenBoard::setBoard(const GenPosition &pos)
 {
 	memcpy(square, pos.square, 64);
 	memcpy(piece, pos.piece, 32);
@@ -151,9 +151,9 @@ void Board::setBoard(const Position &pos)
 	rebuildHash();
 }
 
-Position Board::getPosition() const
+GenPosition GenBoard::getPosition() const
 {
-	Position pos;
+	GenPosition pos;
 
 	memcpy(pos.square, square, 64);
 	memcpy(pos.piece, piece, 32);
@@ -162,7 +162,7 @@ Position Board::getPosition() const
 	return pos;
 }
 
-int Board::pieceIndex(const int8 loc, const int8 type) const
+int GenBoard::pieceIndex(const int8 loc, const int8 type) const
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
@@ -174,7 +174,7 @@ int Board::pieceIndex(const int8 loc, const int8 type) const
 	return NONE;
 }
 
-void Board::make(const Move &move)
+void GenBoard::make(const GenMove &move)
 {
 #ifdef DEBUG_MAKE_MOVE
 	assert(pieceType[move.index] * stm > 0);
@@ -222,7 +222,7 @@ void Board::make(const Move &move)
 #endif
 }
 
-void Board::makeP(const Move &move)
+void GenBoard::makeP(const GenMove &move)
 {
 	// update board information
 	square[move.to] = pieceType[move.index];
@@ -236,7 +236,7 @@ void Board::makeP(const Move &move)
 	ply++;
 }
 
-void Board::unmake(const Move &move)
+void GenBoard::unmake(const GenMove &move)
 {
 #ifdef DEBUG_MAKE_MOVE
 	assert(pieceType[move.index] * stm < 0);
@@ -286,7 +286,7 @@ void Board::unmake(const Move &move)
 #endif
 }
 
-void Board::unmakeP(const Move &move)
+void GenBoard::unmakeP(const GenMove &move)
 {
 	piece[move.index] = move.from;
 	if (move.xindex == NONE) {
@@ -301,15 +301,15 @@ void Board::unmakeP(const Move &move)
 	ply--;
 }
 
-bool Board::incheck(const int8 color)
+bool GenBoard::incheck(const int8 color)
 {
-	const MoveLookup ml(square);
+	const GenMoveLookup ml(square);
 	const int king = (color == WHITE)? 31:15;
 
 	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
 }
 
-int Board::isMate()
+int GenBoard::isMate()
 {
 	if (anyMoves(stm))
 		return NOTMATE;
@@ -319,7 +319,7 @@ int Board::isMate()
 		return STALEMATE;
 }
 
-bool Board::validMove(const Move &moveIn, Move &move)
+bool GenBoard::validMove(const GenMove &moveIn, GenMove &move)
 {
 	move = moveIn;
 
@@ -335,7 +335,7 @@ bool Board::validMove(const Move &moveIn, Move &move)
 	}
 
 	if (move.from != PLACEABLE) {
-		const MoveLookup ml(square);
+		const GenMoveLookup ml(square);
 		if (!ml.fromto(move.from, move.to))
 			return false;
 	}
@@ -354,7 +354,7 @@ bool Board::validMove(const Move &moveIn, Move &move)
 	return ret;
 }
 
-int Board::validMove(const string smove, const int8 color, Move &move)
+int GenBoard::validMove(const string smove, const int8 color, GenMove &move)
 {
 	// pre-setup move
 	if (!move.parse(smove))
@@ -382,7 +382,7 @@ int Board::validMove(const string smove, const int8 color, Move &move)
 	if (ply < 2 && ABS(pieceType[move.index]) != KING)
 		return KING_FIRST;
 	if (move.from != PLACEABLE) {
-		const MoveLookup ml(square);
+		const GenMoveLookup ml(square);
 		if (!ml.fromto(move.from, move.to))
 			return INVALID_MOVEMENT;
 	}
@@ -399,28 +399,28 @@ int Board::validMove(const string smove, const int8 color, Move &move)
 	return ret;
 }
 
-int Board::eval() const
+int GenBoard::eval() const
 {
 	int white = 0, black = 0;
 	for (int b = 0, w = 16; b < 16; b++, w++) {
 		switch (piece[b]) {
 		default:
-			black += locValue[pieceType[w]][piece[b]];
+			black += regLocValue[pieceType[w]][piece[b]];
 		case PLACEABLE:
-			black += pieceValue[b];
+			black += regPieceValue[b];
 			break;
 		case DEAD:
-			black -= pieceValue[b];
+			black -= regPieceValue[b];
 			break;
 		}
 		switch (piece[w]) {
 		default:
-			white += locValue[pieceType[w]][piece[w]];
+			white += regLocValue[pieceType[w]][piece[w]];
 		case PLACEABLE:
-			white += pieceValue[b];
+			white += regPieceValue[b];
 			break;
 		case DEAD:
-			white -= pieceValue[b];
+			white -= regPieceValue[b];
 			break;
 		}
 	}
@@ -428,10 +428,10 @@ int Board::eval() const
 	return (stm == WHITE)? -white : white;
 }
 
-bool Board::anyMoves(const int8 color)
+bool GenBoard::anyMoves(const int8 color)
 {
-	const MoveLookup movelookup(square);
-	Move move;
+	const GenMoveLookup movelookup(square);
+	GenMove move;
 
 	// shortest games takes 5 half-moves
 	if (ply < 4)
@@ -485,11 +485,11 @@ bool Board::anyMoves(const int8 color)
 	return false;
 }
 
-void Board::getPlaceMoveList(MoveList* const data, const int8 pieceType)
+void GenBoard::getPlaceMoveList(GenMoveList* const data, const int8 pieceType)
 {
 	const int idx = pieceIndex(PLACEABLE, pieceType);
 	const int8 color = pieceType / ABS(pieceType);
-	MoveNode item;
+	GenMoveNode item;
 
 	if (idx == NONE)
 		return;
@@ -512,11 +512,11 @@ void Board::getPlaceMoveList(MoveList* const data, const int8 pieceType)
 	}
 }
 
-void Board::getMoveList(MoveList* const data, const int8 color, const int movetype)
+void GenBoard::getMoveList(GenMoveList* const data, const int8 color, const int movetype)
 {
-	const MoveLookup movelookup(square);
+	const GenMoveLookup movelookup(square);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
-	MoveNode item;
+	GenMoveNode item;
 
 	for (int idx = start; idx >= end; idx--) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
@@ -554,9 +554,9 @@ void Board::getMoveList(MoveList* const data, const int8 color, const int movety
 	}
 }
 
-MoveList* Board::getMoveList(const int8 color, const int movetype)
+GenMoveList* GenBoard::getMoveList(const int8 color, const int movetype)
 {
-	MoveList* const data = new MoveList;
+	GenMoveList* const data = new GenMoveList;
 	data->size = 0;
 
 	switch (movetype) {
@@ -585,13 +585,13 @@ MoveList* Board::getMoveList(const int8 color, const int movetype)
 	return data;
 }
 
-MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
+GenMoveList* GenBoard::getPerftMoveList(const int8 color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
-	const MoveLookup movelookup(square);
+	const GenMoveLookup movelookup(square);
 	const int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
-	MoveList* const data = new MoveList;
-	MoveNode item;
+	GenMoveList* const data = new GenMoveList;
+	GenMoveNode item;
 
 	data->size = 0;
 	switch (movetype) {
@@ -732,7 +732,7 @@ MoveList* Board::getPerftMoveList(const int8 color, const int movetype)
 	return data;
 }
 
-string Board::printSquare(const int index) const
+string GenBoard::printSquare(const int index) const
 {
 	string tmp;
 
@@ -743,7 +743,7 @@ string Board::printSquare(const int index) const
 	return tmp;
 }
 
-void Board::printBoard() const
+void GenBoard::printBoard() const
 {
 	cout << "  / - + - + - + - + - + - + - + - \\\n";
 	for (int i = 0, rank = 8; ;) {
@@ -758,7 +758,7 @@ void Board::printBoard() const
 		<< "    a   b   c   d   e   f   g   h\n";
 }
 
-void Board::printPieceList() const
+void GenBoard::printPieceList() const
 {
 	string tmp;
 
@@ -788,7 +788,7 @@ void Board::printPieceList() const
 	}																																															cout << endl;
 }
 
-void Board::dumpDebug() const
+void GenBoard::dumpDebug() const
 {
 	cout << "hash:" << key << " stm:" << (int)stm << " ply:" << ply << endl;
 	printBoard();

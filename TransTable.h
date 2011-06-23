@@ -35,35 +35,35 @@ extern uint64 hashBox[ZBOX_SIZE];
 
 extern const int typeLookup[32];
 
-class TransTable;
-extern TransTable *tt;
+class GenTransTable;
+extern GenTransTable *gtt;
 
-class TransItem {
+class GenTransItem {
 public:
 	uint64 hash;
 	int score;
-	Move move;
+	GenMove move;
 	int8 depth;
 	int8 type;
 
-	TransItem();
+	GenTransItem();
 
 	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const;
 
-	bool getMove(Move &inMove) const;
+	bool getMove(GenMove &inMove) const;
 };
 
-class TransTable {
+class GenTransTable {
 private:
-	TransItem *table;
+	GenTransItem *table;
 	int size;
 
 public:
 	uint64 hit, miss, scorehit, scoremiss, movehit, movemiss;
 
-	TransTable(const int num_MB);
+	GenTransTable(const int num_MB);
 
-	~TransTable();
+	~GenTransTable();
 	
 	sixInt stats() const;
 
@@ -71,9 +71,9 @@ public:
 
 	void clearStats();
 
-	bool getItem(const uint64 hash, TransItem *&item);
+	bool getItem(const uint64 hash, GenTransItem *&item);
 
-	void setItem(const uint64 hash, const int score, const Move &move, const int8 depth, const int8 type) const;
+	void setItem(const uint64 hash, const int score, const GenMove &move, const int8 depth, const int8 type) const;
 };
 
 #endif

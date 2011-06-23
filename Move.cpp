@@ -46,14 +46,14 @@ string printLoc(const int8 loc)
 	}
 }
 
-bool Move::operator==(const Move &rhs) const
+bool GenMove::operator==(const GenMove &rhs) const
 {
 	if (to == rhs.to && from == rhs.from && index == rhs.index && xindex == rhs.xindex)
 		return true;
 	return false;
 }
 
-void Move::setNull()
+void GenMove::setNull()
 {
 	index = NULL_MOVE;
 	xindex = NULL_MOVE;
@@ -61,14 +61,14 @@ void Move::setNull()
 	to = NULL_MOVE;
 }
 
-bool Move::isNull() const
+bool GenMove::isNull() const
 {
 	if (index == NULL_MOVE && xindex == NULL_MOVE && from == NULL_MOVE && to == NULL_MOVE)
 		return true;
 	return false;
 }
 
-int Move::type() const
+int GenMove::type() const
 {
 	if (from == PLACEABLE)
 		return MOVE_PLACE;
@@ -78,7 +78,7 @@ int Move::type() const
 		return MOVE_MOVE;
 }
 
-string Move::toString() const
+string GenMove::toString() const
 {
 	string out;
 
@@ -90,7 +90,7 @@ string Move::toString() const
 	return out;
 }
 
-bool Move::parse(const string s)
+bool GenMove::parse(const string s)
 {
 	int8 piece;
 	bool place = true;
@@ -144,7 +144,7 @@ bool Move::parse(const string s)
 	return true;
 }
 
-string Move::dump() const
+string GenMove::dump() const
 {
 	char data[24];
 
@@ -153,7 +153,7 @@ string Move::dump() const
 	return string(data);
 }
 
-void MoveList::print() const
+void GenMoveList::print() const
 {
 	for (int i = 0; i < size; i++)
 		cout << list[i].move.toString() << "[" << list[i].score << "] ";

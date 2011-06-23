@@ -26,13 +26,13 @@ using namespace std;
 extern const int8 pieceType[32];
 extern const char pieceSymbol[7];
 
-struct Move {
+struct GenMove {
 	int8 index;
 	int8 to;
 	int8 from;
 	int8 xindex;
 
-	bool operator==(const Move &rhs) const;
+	bool operator==(const GenMove &rhs) const;
 
 	void setNull();
 
@@ -48,28 +48,28 @@ struct Move {
 };
 
 // forward declations
-struct MoveNode;
-struct MoveList;
+struct GenMoveNode;
+struct GenMoveList;
 
-struct MoveNode {
-	Move move;
+struct GenMoveNode {
+	GenMove move;
 	int score;
 	bool check;
 
-	MoveNode() : score(0), check(false) {}
+	GenMoveNode() : score(0), check(false) {}
 };
 
-struct MoveList {
-	boost::array<MoveNode, 320> list;
+struct GenMoveList {
+	boost::array<GenMoveNode, 320> list;
 	int size;
 
-	MoveList() : size(0) {}
+	GenMoveList() : size(0) {}
 
 	void print() const;
 };
 
-struct ScoreSort {
-	bool operator()(const MoveNode &a, const MoveNode &b) const
+struct GenScoreSort {
+	bool operator()(const GenMoveNode &a, const GenMoveNode &b) const
 	{
 		return a.score > b.score;
 	}

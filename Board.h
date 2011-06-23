@@ -23,11 +23,11 @@
 //#define DEBUG_MAKE_MOVE
 #define TT_ENABLED
 
-extern const int pieceValue[16];
+extern const int genPieceValue[16];
 
-extern const int locValue[7][64];
+extern const int genLocValue[7][64];
 
-class Board {
+class GenBoard {
 private:
 	int8 square[64];
 
@@ -42,7 +42,7 @@ private:
 	int pieceIndex(const int8 loc, const int8 type) const;
 
 public:
-	Board();
+	GenBoard();
 
 	uint64 hash() const
 	{
@@ -63,37 +63,37 @@ public:
 
 	void rebuildHash();
 
-	void setBoard(const Position &pos);
+	void setBoard(const GenPosition &pos);
 
-	Position getPosition() const;
+	GenPosition getPosition() const;
 
-	void make(const Move &move);
+	void make(const GenMove &move);
 
-	void unmake(const Move &move);
+	void unmake(const GenMove &move);
 
-	void makeP(const Move &move);
+	void makeP(const GenMove &move);
 
-	void unmakeP(const Move &move);
+	void unmakeP(const GenMove &move);
 
 	bool incheck(const int8 color);
 
 	int isMate();
 
-	bool validMove(const Move &moveIn, Move &move);
+	bool validMove(const GenMove &moveIn, GenMove &move);
 
-	int validMove(const string smove, const int8 color, Move &move);
+	int validMove(const string smove, const int8 color, GenMove &move);
 
 	int eval() const;
 
 	bool anyMoves(const int8 color);
 
-	void getPlaceMoveList(MoveList* const data, const int8 pieceType);
+	void getPlaceMoveList(GenMoveList* const data, const int8 pieceType);
 
-	void getMoveList(MoveList* const data, const int8 color, const int movetype);
+	void getMoveList(GenMoveList* const data, const int8 color, const int movetype);
 
-	MoveList* getMoveList(const int8 color, const int movetype);
+	GenMoveList* getMoveList(const int8 color, const int movetype);
 
-	MoveList* getPerftMoveList(const int8 color, const int movetype);
+	GenMoveList* getPerftMoveList(const int8 color, const int movetype);
 
 	string printSquare(const int index) const;
 

@@ -19,7 +19,7 @@
 #include "Terminal.h"
 #include "CVEP.h"
 
-Board board;
+GenBoard board;
 
 /* depth=1	nodes=64
  * depth=2	nodes=3612
@@ -29,7 +29,7 @@ Board board;
  */
 uint64 perft(int depth)
 {
-	MoveList *list;
+	GenMoveList *list;
 	uint64 nodes;
 
 	if (depth == 1) {
@@ -138,10 +138,10 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	if (xMode) {
-		Terminal ui(white, black);
+		GenTerminal ui(white, black);
 		ui.run();
 	} else {
-		CVEP ui;
+		GenCVEP ui;
 		ui.run();
 	}
 

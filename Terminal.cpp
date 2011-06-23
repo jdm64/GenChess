@@ -18,9 +18,9 @@
 #include <iostream>
 #include "Terminal.h"
 
-const string Terminal::PS[3] = {"black", "", "white"};
+const string GenTerminal::PS[3] = {"black", "", "white"};
 
-Terminal::Terminal(const int white, const int black)
+GenTerminal::GenTerminal(const int white, const int black)
 {
 	PT[0] = black;
 	PT[2] = white;
@@ -28,7 +28,7 @@ Terminal::Terminal(const int white, const int black)
 	playerString = PS + 1;
 }
 
-void Terminal::displayHelp() const
+void GenTerminal::displayHelp() const
 {
 	cout << "Command\t\t\tDescription\n\n"
 		<< "new\t\t\tstarts a new game\n"
@@ -38,7 +38,7 @@ void Terminal::displayHelp() const
 		<< "print [fen|zfen]\tprints the current board's (Z)FEN notation\n\n";
 }
 
-bool Terminal::playerCmd()
+bool GenTerminal::playerCmd()
 {
 	string cmd;
 
@@ -46,7 +46,7 @@ bool Terminal::playerCmd()
 	cin >> cmd;
 	if (cmd == "move") {
 		string mv;
-		Move move;
+		GenMove move;
 
 		cin >> mv;
 		const int status = board.validMove(mv, board.getStm(), move);
@@ -83,7 +83,7 @@ bool Terminal::playerCmd()
 	} else if (cmd == "set") {
 		cin >> cmd;
 
-		Position pos;
+		GenPosition pos;
 		if (cmd == "fen") {
 			getline(cin, cmd);
 			if (!pos.parseFen(cmd)) {
@@ -112,7 +112,7 @@ bool Terminal::playerCmd()
 	return false;
 }
 
-bool Terminal::mainMenu()
+bool GenTerminal::mainMenu()
 {
 	string cmd;
 
@@ -141,7 +141,7 @@ bool Terminal::mainMenu()
 	return false;
 }
 
-void Terminal::run()
+void GenTerminal::run()
 {
 	board.printBoard();
 
@@ -149,7 +149,7 @@ void Terminal::run()
 		if (playerType[board.getStm()] == HUMAN) {
 			while (playerCmd());
 		} else {
-			Move move = engine->think();
+			GenMove move = engine->think();
 			game->doMove(move);
 			cout << "My move is: " << move.toString() << endl;
 		}

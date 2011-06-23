@@ -28,7 +28,7 @@
 #define NOT_CAPTURE(A, B)	(A * B >= 0)
 #define OWN_PIECE(A, B)		(A * B >  0)
 
-class MoveLookup {
+class GenMoveLookup {
 private:
 	static const int8 mailbox[120];
 
@@ -39,7 +39,7 @@ private:
 	const int8 *square;
 
 public:
-	MoveLookup(int8 *Square) : square(Square) {}
+	GenMoveLookup(int8 *Square) : square(Square) {}
 
 	int8* genAll(const int8 &from) const;
 

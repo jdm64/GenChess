@@ -21,7 +21,7 @@
 #include "Move.h"
 #include "MoveLookup.h"
 
-class Position {
+class GenPosition {
 public:
 	int8 square[64];
 	int8 piece[32];

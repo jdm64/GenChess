@@ -18,7 +18,7 @@
 #include <iostream>
 #include "CVEP.h"
 
-bool CVEP::moveResults()
+bool GenCVEP::moveResults()
 {
 	switch (board.isMate()) {
 	case NOTMATE:
@@ -42,14 +42,14 @@ bool CVEP::moveResults()
 	}
 }
 
-bool CVEP::gameCmd()
+bool GenCVEP::gameCmd()
 {
 	string cmd;
 
 	cin >> cmd;
 	if (cmd == "move") {
 		string mv;
-		Move move;
+		GenMove move;
 
 		cin >> mv;
 		int status = board.validMove(mv, board.getStm(), move);
@@ -71,16 +71,16 @@ bool CVEP::gameCmd()
 		game->undoMove();
 		game->undoMove();
 	} else if (cmd == "go") {
-		const Move move = engine->think();
+		const GenMove move = engine->think();
 		game->doMove(move);
 		cout << "move " << move.toString() << endl;
 		return moveResults();
 	} else if (cmd == "clearhash") {
-		tt->clear();
+		gtt->clear();
 	} else if (cmd == "setboard") {
 		cin >> cmd;
 
-		Position pos;
+		GenPosition pos;
 		if (cmd == "fen") {
 			getline(cin, cmd);
 			if (!pos.parseFen(cmd)) {
@@ -106,7 +106,7 @@ bool CVEP::gameCmd()
 	return true;
 }
 
-bool CVEP::mainCmd()
+bool GenCVEP::mainCmd()
 {
 	string cmd;
 
@@ -127,7 +127,7 @@ bool CVEP::mainCmd()
 	return false;
 }
 
-void CVEP::run()
+void GenCVEP::run()
 {
 	while (true) {
 		while (mainCmd());

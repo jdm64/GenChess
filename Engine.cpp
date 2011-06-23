@@ -17,13 +17,13 @@
 
 #include <iostream>
 #include <climits>
-#include "ComputerPlayer.h"
+#include "Engine.h"
 #include "Util.h"
 
 //#define DEBUG_SCORES
 #define PRINT_HASH_STATS
 
-void ComputerPlayer::pickRandomMove()
+void GenEngine::pickRandomMove()
 {
 	const int score = curr->list[0].score;
 	int end = 1;
@@ -37,9 +37,9 @@ void ComputerPlayer::pickRandomMove()
 	pvMove[0] = curr->list[rand() % end].move;
 }
 
-int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
+int GenEngine::Quiescence(int alpha, int beta, int depth)
 {
-	MoveList* const ptr = board->getMoveList(board->getStm(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
+	GenMoveList* const ptr = board->getMoveList(board->getStm(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -75,10 +75,10 @@ int ComputerPlayer::Quiescence(int alpha, int beta, int depth)
 	return best;
 }
 
-bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
-		const int depth, const int limit, Array<Move> &killer, const int type)
+bool GenEngine::NegaMoveType(int &alpha, const int beta, int &best,
+		const int depth, const int limit, Array<GenMove> &killer, const int type)
 {
-	Move move;
+	GenMove move;
 
 	best = MIN_SCORE;
 
@@ -95,7 +95,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		board->unmake(move);
 
 		if (best >= beta) {
-			tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
+			gtt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
 			return true;
 		} else if (best > alpha) {
 			alpha = best;
@@ -103,7 +103,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		}
 	}
 	// Try all of moveType Moves
-	MoveList* const ptr = board->getMoveList(board->getStm(), type);
+	GenMoveList* const ptr = board->getMoveList(board->getStm(), type);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -127,7 +127,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 		best = max(best, ptr->list[n].score);
 		if (best >= beta) {
 			killer[depth] = ptr->list[n].move;
-			tt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
+			gtt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
 			delete ptr;
 			return true;
 		} else if (best > alpha) {
@@ -140,7 +140,7 @@ bool ComputerPlayer::NegaMoveType(int &alpha, const int beta, int &best,
 	return false;
 }
 
-int ComputerPlayer::NegaScout(int alpha, const int beta, const int depth, int limit)
+int GenEngine::NegaScout(int alpha, const int beta, const int depth, int limit)
 {
 	if (depth >= limit) {
 		if (!tactical[depth])
@@ -148,15 +148,15 @@ int ComputerPlayer::NegaScout(int alpha, const int beta, const int depth, int li
 		else
 			limit++;
 	}
-	TransItem *tt_item;
+	GenTransItem *tt_item;
 	int score, best = MIN_SCORE;
-	Move move;
+	GenMove move;
 
 	ismate[depth] = true;
 	pvMove[depth].setNull();
 
 	// Try Transposition Table
-	if (tt->getItem(board->hash(), tt_item)) {
+	if (gtt->getItem(board->hash(), tt_item)) {
 		// Try score
 		if (tt_item->getScore(alpha, beta, limit - depth, score))
 			return score;
@@ -176,7 +176,7 @@ int ComputerPlayer::NegaScout(int alpha, const int beta, const int depth, int li
 			board->unmake(move);
 
 			if (best >= beta) {
-				tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
+				gtt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
 				return best;
 			} else if (best > alpha) {
 				alpha = best;
@@ -197,12 +197,12 @@ hashMiss:
 
 	if (ismate[depth])
 		best = tactical[depth]? CHECKMATE_SCORE + board->getPly() : STALEMATE_SCORE;
-	tt->setItem(board->hash(), best, pvMove[depth], limit - depth, (pvMove[depth].isNull())? ALL_NODE : PV_NODE);
+	gtt->setItem(board->hash(), best, pvMove[depth], limit - depth, (pvMove[depth].isNull())? ALL_NODE : PV_NODE);
 
 	return best;
 }
 
-void ComputerPlayer::search(int alpha, const int beta, const int depth, const int limit)
+void GenEngine::search(int alpha, const int beta, const int depth, const int limit)
 {
 	curr = curr? curr : board->getMoveList(board->getStm(), MOVE_ALL);
 
@@ -219,14 +219,14 @@ void ComputerPlayer::search(int alpha, const int beta, const int depth, const in
 		if (curr->list[n].score > alpha) {
 			alpha = curr->list[n].score;
 			pvMove[depth] = curr->list[n].move;
-			tt->setItem(board->hash(), alpha, pvMove[depth], limit - depth, PV_NODE);
+			gtt->setItem(board->hash(), alpha, pvMove[depth], limit - depth, PV_NODE);
 		}
 		b = alpha + 1;
 	}
 	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
 }
 
-Move ComputerPlayer::think()
+GenMove GenEngine::think()
 {
 	timeval t1, t2;
 
@@ -241,11 +241,11 @@ Move ComputerPlayer::think()
 	}
 
 #ifdef PRINT_HASH_STATS
-	sixInt st = tt->stats();
+	sixInt st = gtt->stats();
 	cout << "stats total=" << st.one + st.two << " hits=" << 100 * st.one / double(st.one + st.two)
 		<< "% scorehits=" << 100 * st.three / double(st.three + st.four)
 		<< "% movehits=" << 100 * st.five / double(st.five + st.six) << "%" << endl;
-	tt->clearStats();
+	gtt->clearStats();
 #endif
 
 	// Randomize opening
@@ -258,13 +258,13 @@ Move ComputerPlayer::think()
 	return pvMove[0];
 }
 
-void ComputerPlayer::debugTree()
+void GenEngine::debugTree()
 {
-	MoveList *ptr = new MoveList(*curr);
+	GenMoveList *ptr = new GenMoveList(*curr);
 	string cmd;
 	int mDepth = maxNg, cDepth = 0;
-	Move move;
-	vector<Move> mstack;
+	GenMove move;
+	vector<GenMove> mstack;
 
 	while (true) {
 		ptr->print();

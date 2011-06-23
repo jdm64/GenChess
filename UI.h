@@ -18,25 +18,25 @@
 #ifndef __UI_H__
 #define __UI_H__
 
-#include "ComputerPlayer.h"
+#include "Engine.h"
 #include "Game.h"
 
-class UI {
+class GenUI {
 protected:
 	static const string moveError[NUM_MOVE_ERRORS];
 
-	Board board;
+	GenBoard board;
 	
-	ComputerPlayer *engine;
+	GenEngine *engine;
 
-	Game *game;
+	GenGame *game;
 
 	bool again;
 
 public:
-	UI();
+	GenUI();
 
-	virtual ~UI();
+	virtual ~GenUI();
 
 	virtual void run() = 0;
 };
