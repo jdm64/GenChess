@@ -52,4 +52,32 @@ public:
 	bool isAttacked(const int8 &from) const;
 };
 
+// --- Start Regular Chess ---
+
+class RegMoveLookup {
+private:
+	static int8 mailbox[120];
+
+	static int8 mailbox64[64];
+
+	static int8 offsets[7][8];
+
+	int8 *square;
+
+public:
+	RegMoveLookup(int8 *Square) : square(Square) {}
+
+	void dumpZFen() const;
+
+	int8* genAll(const int8 &from) const;
+
+	int8* genCapture(const int8 &from) const;
+
+	int8* genMove(const int8 &from) const;
+
+	bool fromto(const int8 &From, const int8 &To) const;
+
+	bool isAttacked(const int8 &from, const int8 bycolor) const;
+};
+
 #endif

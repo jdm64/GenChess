@@ -77,4 +77,75 @@ struct GenScoreSort {
 
 string printLoc(const int8 loc);
 
+// ---Start Regular Chess ---
+
+#define IS_PROMOTE(TO, COLOR)	((COLOR == WHITE)? (TO < A7) : (TO > H2))
+
+struct RegMove {
+	int8 index;
+	int8 to;
+	int8 from;
+	int8 xindex;
+	int8 flags; // castle, promote. en passant
+
+	RegMove()
+	{
+		flags = 0;
+	}
+
+	bool operator==(const RegMove &rhs) const;
+
+	int8 getCastle() const;
+
+	void setCastle(int8 side);
+
+	void setEnPassant();
+
+	bool getEnPassant() const;
+
+	void setPromote(int8 type);
+
+	int8 getPromote() const;
+
+	void setNull();
+
+	bool isNull() const;
+
+	int type() const;
+
+	string toString() const;
+
+	bool parse(const string s);
+
+	string dump() const;
+};
+
+// forward declations
+struct RegMoveNode;
+struct RegMoveList;
+
+struct RegMoveNode {
+	RegMove move;
+	int score;
+	bool check;
+
+	RegMoveNode() : score(0), check(false) {}
+};
+
+struct RegMoveList {
+	boost::array<RegMoveNode, 320> list;
+	int size;
+
+	RegMoveList() : size(0) {}
+
+	void print() const;
+};
+
+struct RegScoreSort {
+	bool operator()(const RegMoveNode &a, const RegMoveNode &b) const
+	{
+		return a.score > b.score;
+	}
+};
+
 #endif

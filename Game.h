@@ -37,4 +37,22 @@ public:
 	bool undoMove();
 };
 
+// --- Start Regular Chess ---
+
+class RegGame {
+private:
+	RegBoard *board;
+
+	vector<HistoryNode> history;
+
+public:
+	RegGame(RegBoard *Board) : board(Board) {}
+
+	void newGame();
+
+	void doMove(const RegMove &move);
+
+	bool undoMove();
+};
+
 #endif

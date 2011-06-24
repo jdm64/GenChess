@@ -38,3 +38,30 @@ bool GenGame::undoMove()
 
         return true;
 }
+
+// --- Start Regular Chess ---
+
+void RegGame::newGame()
+{
+	board->reset();
+	history.clear();
+}
+
+void RegGame::doMove(const RegMove &move)
+{
+	const HistoryNode item = {move, board->getMoveFlags()};
+
+	board->make(move);
+	history.push_back(item);
+}
+
+bool RegGame::undoMove()
+{
+	if (!history.size())
+		return false;
+	HistoryNode node = history.back();
+	board->unmake(node.move, node.flags);
+        history.pop_back();
+
+        return true;
+}

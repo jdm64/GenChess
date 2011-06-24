@@ -31,4 +31,17 @@ public:
 	void run();
 };
 
+// --- Start Regular Chess ---
+
+class RegCVEP : public RegUI {
+public:
+	bool moveResults();
+
+	bool gameCmd();
+
+	bool mainCmd();
+
+	void run();
+};
+
 #endif

@@ -41,4 +41,26 @@ public:
 	virtual void run() = 0;
 };
 
+// --- Start Regular Chess ---
+
+class RegUI {
+protected:
+	static const string moveError[NUM_MOVE_ERRORS];
+
+	RegBoard board;
+
+	RegEngine *engine;
+
+	RegGame *game;
+
+	bool again;
+
+public:
+	RegUI();
+
+	virtual ~RegUI();
+
+	virtual void run() = 0;
+};
+
 #endif

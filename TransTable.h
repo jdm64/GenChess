@@ -22,9 +22,12 @@
 
 //#define COLLISION_DEBUG
 
-#define ZBOX_SIZE 781
-#define WTM_HASH 780
+#define ZBOX_SIZE 838
+#define WTM_HASH 837
 #define HOLD_START 768
+#define HOLD_END 781
+#define ENPASSANT_HASH 834
+#define CASTLE_HASH 834
 
 enum {NONE_NODE = 0, ALL_NODE = 3, CUT_NODE = 6, PV_NODE = 7};
 enum {HAS_SCORE = 2, HAS_MOVE = 4};
@@ -74,6 +77,49 @@ public:
 	bool getItem(const uint64 hash, GenTransItem *&item);
 
 	void setItem(const uint64 hash, const int score, const GenMove &move, const int8 depth, const int8 type) const;
+};
+
+// --- Start Regular Chess ---
+
+class RegTransTable;
+extern RegTransTable *rtt;
+
+class RegTransItem {
+public:
+	uint64 hash;
+	int score;
+	RegMove move;
+	int8 depth;
+	int8 type;
+
+	RegTransItem();
+
+	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const;
+
+	bool getMove(RegMove &inMove) const;
+};
+
+class RegTransTable {
+private:
+	RegTransItem *table;
+	int size;
+
+public:
+	uint64 hit, miss, scorehit, scoremiss, movehit, movemiss;
+
+	RegTransTable(const int num_MB);
+
+	~RegTransTable();
+
+	sixInt stats() const;
+
+	void clear();
+
+	void clearStats();
+
+	bool getItem(const uint64 hash, RegTransItem *&item);
+
+	void setItem(const uint64 hash, const int score, const RegMove &move, const int8 depth, const int8 type) const;
 };
 
 #endif

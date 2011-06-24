@@ -42,4 +42,32 @@ public:
 	void run();
 };
 
+// --- Start Regular Chess ---
+
+class RegTerminal : public RegUI {
+private:
+	static const string PS[3];
+
+	const string *playerString;
+
+	int PT[3];
+
+	int *playerType;
+
+public:
+	RegTerminal(const int white, const int black);
+
+	uint64 perft(int depth);
+
+	void divide(int depth);
+
+	void displayHelp() const;
+
+	bool playerCmd();
+
+	bool mainMenu();
+
+	void run();
+};
+
 #endif

@@ -17,7 +17,12 @@
 
 #include <cstdlib>
 #include <cassert>
+#include <sstream>
+#include <iostream>
 #include "MoveLookup.h"
+#include "Move.h"
+
+using namespace std;
 
 const int8 GenMoveLookup::mailbox[120] = {
 	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
@@ -370,6 +375,423 @@ bool GenMoveLookup::isAttacked(const int8 &from) const
 		if (to == -1)
 			continue;
 		else if (NOT_CAPTURE(square[from], square[to]))
+			continue;
+		else if (ABS(square[to]) == KNIGHT)
+			return true;
+	}
+	return false;
+}
+
+// --- Start Regular Chess ---
+
+int8 RegMoveLookup::mailbox[120] = {
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	-1,  0,  1,  2,  3,  4,  5,  6,  7, -1,
+	-1,  8,  9, 10, 11, 12, 13, 14, 15, -1,
+	-1, 16, 17, 18, 19, 20, 21, 22, 23, -1,
+	-1, 24, 25, 26, 27, 28, 29, 30, 31, -1,
+	-1, 32, 33, 34, 35, 36, 37, 38, 39, -1,
+	-1, 40, 41, 42, 43, 44, 45, 46, 47, -1,
+	-1, 48, 49, 50, 51, 52, 53, 54, 55, -1,
+	-1, 56, 57, 58, 59, 60, 61, 62, 63, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+	-1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+
+int8 RegMoveLookup::mailbox64[64] = {
+	21, 22, 23, 24, 25, 26, 27, 28,
+	31, 32, 33, 34, 35, 36, 37, 38,
+	41, 42, 43, 44, 45, 46, 47, 48,
+	51, 52, 53, 54, 55, 56, 57, 58,
+	61, 62, 63, 64, 65, 66, 67, 68,
+	71, 72, 73, 74, 75, 76, 77, 78,
+	81, 82, 83, 84, 85, 86, 87, 88,
+	91, 92, 93, 94, 95, 96, 97, 98};
+
+int8 RegMoveLookup::offsets[7][8] = {
+	{  0,   0,   0,  0,   0,  0,  0,  0},
+	{-11,  -9,   9, 11, -10, -1,  1, 10},
+	{-21, -19, -12, -8,   8, 12, 19, 21},
+	{-11,  -9,   9, 11,   0,  0,  0,  0},
+	{-10,  -1,   1, 10,   0,  0,  0,  0},
+	{-11, -10,  -9, -1,   1,  9, 10, 11},
+	{-11, -10,  -9, -1,   1,  9, 10, 11} };
+
+void RegMoveLookup::dumpZFen() const
+{
+	stringstream buf;
+	string fen;
+
+	for (int i = 0, empty = 0; i < 64; i++) {
+		if (square[i] == EMPTY) {
+			empty++;
+			continue;
+		}
+		if (empty) {
+			buf.str(string());
+			buf << empty;
+			fen += buf.str();
+		}
+		if (square[i] > EMPTY)
+			fen += pieceSymbol[square[i]];
+		else
+			fen += tolower(pieceSymbol[-square[i]]);
+		empty = 0;
+	}
+	cout << fen << endl;
+}
+
+int8* RegMoveLookup::genAll(const int8 &from) const
+{
+	int type = ABS(square[from]), next = 0, mfrom = mailbox64[from];
+	int8 to, *list = new int8[28], *offset = offsets[type];
+
+	switch (type) {
+	case PAWN:
+		if (square[from] > 0) { // WHITE
+			if (COL(from) != 0 && CAPTURE_MOVE(square[from], square[from - 9]))
+				list[next++] = from - 9;
+			if (COL(from) != 7 && CAPTURE_MOVE(square[from], square[from - 7]))
+				list[next++] = from - 7;
+			if (!square[from - 8]) {
+				list[next++] = from - 8;
+				if (from >= 48 && !square[from - 16])
+					list[next++] = from - 16;
+			}
+		} else { // BLACK
+			if (COL(from) != 0 && CAPTURE_MOVE(square[from], square[from + 7]))
+				list[next++] = from + 7;
+			if (COL(from) != 7 && CAPTURE_MOVE(square[from], square[from + 9]))
+				list[next++] = from + 9;
+			if (!square[from + 8]) {
+				list[next++] = from + 8;
+				if (from <= 15 && !square[from + 16])
+					list[next++] = from + 16;
+			}
+		}
+		break;
+	case KNIGHT:
+	case KING:
+		for (int dir = 0; dir < 8; dir++) {
+			to = mailbox[mfrom + offset[dir]];
+			if (to == -1)
+				continue;
+			else if (ANY_MOVE(square[from], square[to]))
+				list[next++] = to;
+		}
+		break;
+	case BISHOP:
+	case ROOK:
+		for (int dir = 0; dir < 4; dir++) {
+			for (int k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
+				if (to == -1) {
+					break;
+				} else if (square[to] == EMPTY) {
+					list[next++] = to;
+					continue;
+				} else if (CAPTURE_MOVE(square[from], square[to])) {
+					list[next++] = to;
+				}
+				break;
+			}
+		}
+		break;
+	case QUEEN:
+		for (int dir = 0; dir < 8; dir++) {
+			for (int k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
+				if (to == -1) {
+					break;
+				} else if (square[to] == EMPTY) {
+					list[next++] = to;
+					continue;
+				} else if (CAPTURE_MOVE(square[from], square[to])) {
+					list[next++] = to;
+				}
+				break;
+			}
+		}
+		break;
+	default:
+		dumpZFen();
+		assert(0);
+	}
+	list[next] = -1;
+	return list;
+}
+
+int8* RegMoveLookup::genCapture(const int8 &from) const
+{
+	int type = ABS(square[from]), next = 0, mfrom = mailbox64[from];
+	int8 to, *list = new int8[28], *offset = offsets[type];
+
+	switch (type) {
+	case PAWN:
+		if (square[from] > 0) { // WHITE
+			if (COL(from) != 0 && CAPTURE_MOVE(square[from], square[from - 9]))
+				list[next++] = from - 9;
+			if (COL(from) != 7 && CAPTURE_MOVE(square[from], square[from - 7]))
+				list[next++] = from - 7;
+		} else { // BLACK
+			if (COL(from) != 0 && CAPTURE_MOVE(square[from], square[from + 7]))
+				list[next++] = from + 7;
+			if (COL(from) != 7 && CAPTURE_MOVE(square[from], square[from + 9]))
+				list[next++] = from + 9;
+		}
+		break;
+	case KNIGHT:
+	case KING:
+		for (int dir = 0; dir < 8; dir++) {
+			to = mailbox[mfrom + offset[dir]];
+			if (to == -1)
+				continue;
+			else if (CAPTURE_MOVE(square[from], square[to]))
+				list[next++] = to;
+		}
+		break;
+	case BISHOP:
+	case ROOK:
+		for (int dir = 0; dir < 4; dir++) {
+			for (int k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
+				if (to == -1)
+					break;
+				else if (square[to] == EMPTY)
+					continue;
+				else if (CAPTURE_MOVE(square[from], square[to]))
+					list[next++] = to;
+				break;
+			}
+		}
+		break;
+	case QUEEN:
+		for (int dir = 0; dir < 8; dir++) {
+			for (int k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
+				if (to == -1)
+					break;
+				else if (square[to] == EMPTY)
+					continue;
+				else if (CAPTURE_MOVE(square[from], square[to]))
+					list[next++] = to;
+				break;
+			}
+		}
+		break;
+	default:
+		dumpZFen();
+		assert(0);
+	}
+	list[next] = -1;
+	return list;
+}
+
+int8* RegMoveLookup::genMove(const int8 &from) const
+{
+	int type = ABS(square[from]), next = 0, mfrom = mailbox64[from];
+	int8 to, *list = new int8[28], *offset = offsets[type];
+
+	switch (type) {
+	case PAWN:
+		if (square[from] > 0) { // WHITE
+			if (!square[from - 8]) {
+				list[next++] = from - 8;
+				if (from >= 48 && !square[from - 16])
+					list[next++] = from - 16;
+			}
+		} else { // BLACK
+			if (!square[from + 8]) {
+				list[next++] = from + 8;
+				if (from <= 15 && !square[from + 16])
+					list[next++] = from + 16;
+			}
+		}
+		break;
+	case KNIGHT:
+	case KING:
+		for (int dir = 0; dir < 8; dir++) {
+			to = mailbox[mfrom + offset[dir]];
+			if (to == -1)
+				continue;
+			else if (square[to] == EMPTY)
+				list[next++] = to;
+		}
+		break;
+	case BISHOP:
+	case ROOK:
+		for (int dir = 0; dir < 4; dir++) {
+			for (int k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
+				if (to == -1) {
+					break;
+				} else if (square[to] == EMPTY) {
+					list[next++] = to;
+					continue;
+				}
+				break;
+			}
+		}
+		break;
+	case QUEEN:
+		for (int dir = 0; dir < 8; dir++) {
+			for (int k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
+				if (to == -1) {
+					break;
+				} else if (square[to] == EMPTY) {
+					list[next++] = to;
+					continue;
+				}
+				break;
+			}
+		}
+		break;
+	default:
+		dumpZFen();
+		assert(0);
+	}
+	list[next] = -1;
+	return list;
+}
+
+bool RegMoveLookup::fromto(const int8 &From, const int8 &To) const
+{
+	int type = ABS(square[From]), mfrom = mailbox64[From];
+	int8 to, *offset = offsets[type];
+
+	switch (type) {
+	case PAWN:
+		if (square[From] > 0) { // WHITE
+			if (From - 9 == To && COL(From) != 0 && CAPTURE_MOVE(square[From], square[From - 9]))
+				return true;
+			if (From - 7 == To && COL(From) != 7 && CAPTURE_MOVE(square[From], square[From - 7]))
+				return true;
+			if (!square[From - 8]) {
+				if (From - 8 == To)
+					return true;
+				if (From >= 48 && !square[From - 16] && From - 16 == To)
+					return true;
+			}
+		} else { // BLACK
+			if (From + 7 == To && COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 7]))
+				return true;
+			if (From + 9 == To && COL(From) != 7 && CAPTURE_MOVE(square[From], square[From + 9]))
+				return true;
+			if (!square[From + 8]) {
+				if (From + 8 == To)
+					return true;
+				if (From <= 15 && !square[From + 16] && From + 16 == To)
+					return true;
+			}
+		}
+		break;
+	case KNIGHT:
+	case KING:
+		for (int dir = 0; dir < 8; dir++) {
+			to = mailbox[mfrom + offset[dir]];
+			if (to == -1)
+				continue;
+			else if (ANY_MOVE(square[From], square[to]) && to == To)
+				return true;
+		}
+		break;
+	case BISHOP:
+	case ROOK:
+		for (int dir = 0; dir < 4; dir++) {
+			for (int k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
+				if (to == -1) {
+					break;
+				} else if (square[to] == EMPTY) {
+					if (to == To)
+						return true;
+					continue;
+				} else if (CAPTURE_MOVE(square[From], square[to])) {
+					if (to == To)
+						return true;
+				}
+				break;
+			}
+		}
+		break;
+	case QUEEN:
+		for (int dir = 0; dir < 8; dir++) {
+			for (int k = 1; k < 8; k++) {
+				to = mailbox[mfrom + k * offset[dir]];
+				if (to == -1) {
+					break;
+				} else if (square[to] == EMPTY) {
+					if (to == To)
+						return true;
+					continue;
+				} else if (CAPTURE_MOVE(square[From], square[to])) {
+					if (to == To)
+						return true;
+				}
+				break;
+			}
+		}
+		break;
+	default:
+		dumpZFen();
+		assert(0);
+	}
+	return false;
+}
+
+bool RegMoveLookup::isAttacked(const int8 &from, const int8 bycolor) const
+{
+	int mfrom = mailbox64[from];
+	int8 to, *offset;
+
+	offset = offsets[ROOK];
+	for (int dir = 0; dir < 4; dir++) {
+		for (int k = 1; k < 8; k++) {
+			to = mailbox[mfrom + k * offset[dir]];
+			if (to == -1)
+				break;
+			else if (square[to] == EMPTY)
+				continue;
+			else if (OWN_PIECE(square[to], bycolor))
+				break;
+			else if (ABS(square[to]) == ROOK || ABS(square[to]) == QUEEN)
+				return true;
+			else if (k == 1 && ABS(square[to]) == KING)
+				return true;
+			break;
+		}
+	}
+
+	offset = offsets[BISHOP];
+	for (int dir = 0; dir < 4; dir++) {
+		for (int k = 1; k < 8; k++) {
+			to = mailbox[mfrom + k * offset[dir]];
+			if (to == -1) {
+				break;
+			} else if (square[to] == EMPTY) {
+				continue;
+			} else if (OWN_PIECE(square[to], bycolor)) {
+				break;
+			} else if (ABS(square[to]) == BISHOP || ABS(square[to]) == QUEEN) {
+				return true;
+			} else if (k == 1) {
+				//cout << (int) square[to] << " " << from << " " << to << endl;
+				if (ABS(square[to]) == PAWN && bycolor * (from - to) > 0)
+					return true;
+				else if (ABS(square[to]) == KING)
+					return true;
+			}
+			break;
+		}
+	}
+
+	offset = offsets[KNIGHT];
+	for (int dir = 0; dir < 8; dir++) {
+		to = mailbox[mfrom + offset[dir]];
+		if (to == -1)
+			continue;
+		else if (NOT_CAPTURE(square[to], bycolor))
 			continue;
 		else if (ABS(square[to]) == KNIGHT)
 			return true;

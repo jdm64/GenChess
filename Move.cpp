@@ -159,3 +159,148 @@ void GenMoveList::print() const
 		cout << list[i].move.toString() << "[" << list[i].score << "] ";
 	cout << "\n";
 }
+
+// --- Start Regular Chess ---
+
+bool RegMove::operator==(const RegMove &rhs) const
+{
+	if (to == rhs.to && from == rhs.from && index == rhs.index && xindex == rhs.xindex)
+		return true;
+	return false;
+}
+
+void RegMove::setNull()
+{
+	index = NULL_MOVE;
+	xindex = NULL_MOVE;
+	from = NULL_MOVE;
+	to = NULL_MOVE;
+}
+
+bool RegMove::isNull() const
+{
+	if (index == NULL_MOVE && xindex == NULL_MOVE && from == NULL_MOVE && to == NULL_MOVE)
+		return true;
+	return false;
+}
+
+int8 RegMove::getCastle() const
+{
+	return flags & 0x30;
+}
+
+void RegMove::setCastle(int8 side) // 0x10 =kingside, 0x20=queensize
+{
+	flags = side & 0x30;
+}
+
+void RegMove::setEnPassant()
+{
+	flags = 0x8;
+}
+
+bool RegMove::getEnPassant() const
+{
+	return flags & 0x8;
+}
+
+void RegMove::setPromote(int8 type)
+{
+	flags = 0x7 & type;
+}
+
+int8 RegMove::getPromote() const
+{
+	return flags & 0x7;
+}
+
+int RegMove::type() const
+{
+	if (from == PLACEABLE)
+		return MOVE_PLACE;
+	else if (xindex != NONE)
+		return MOVE_CAPTURE;
+	else
+		return MOVE_MOVE;
+}
+
+string RegMove::toString() const
+{
+	string out;
+
+	out = printLoc(from);
+	out += printLoc(to);
+	return out;
+}
+
+bool RegMove::parse(const string s)
+{
+	int8 piece;
+	bool place = true;
+
+	switch (s[0]) {
+	case 'O':
+	case 'o':
+	case '0':
+		if (s[1] != '-')
+			return false;
+
+		if (s[2] != 'O' && s[2] != 'o' && s[2] != '0')
+			return false;
+		if (s.length() == 3) {
+			setCastle(0x10);
+			return true;
+		}
+		if (s[3] != '-')
+			return false;
+		if (s[4] != 'O' && s[4] != 'o' && s[4] != '0')
+			return false;
+		setCastle(0x20);
+		return true;
+	}
+
+	if (s[0] < 'a' || s[0] > 'h' || s[1] < '1' || s[1] > '8' ||
+			s[2] < 'a' || s[2] > 'h' || s[3] < '1' || s[3] > '8')
+		return false;
+
+	from = s[0] - 'a';
+	from += 8 * (8 - (s[1] - '0'));
+	to = s[2] - 'a';
+	to += 8 * (8 - (s[3] - '0'));
+
+	if (s.length() == 5) {
+		switch (s[4]) {
+		case 'Q':
+			setPromote(QUEEN);
+			break;
+		case 'R':
+			setPromote(ROOK);
+			break;
+		case 'B':
+			setPromote(BISHOP);
+			break;
+		case 'N':
+			setPromote(KNIGHT);
+			break;
+		default:
+			return false;
+		}
+	}
+	return true;
+}
+
+string RegMove::dump() const
+{
+	char data[24];
+
+	sprintf(data, "[%d %d %d %d %d]", (int)index, (int)xindex, (int)from, (int)to, (int)flags);
+
+	return string(data);
+}
+
+void RegMoveList::print() const
+{
+	for (int i = 0; i < size; i++)
+		cout << list[i].move.toString() << "[" << list[i].score << "] ";
+	cout << "\n";
+}

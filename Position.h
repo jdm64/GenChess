@@ -19,6 +19,7 @@
 #define __POSITION_H__
 
 #include "Move.h"
+#include "Piece.h"
 #include "MoveLookup.h"
 
 class GenPosition {
@@ -40,6 +41,30 @@ public:
 	string printFen() const;
 
 	string printZfen() const;
+};
+
+// --- Start Regular Chess ---
+
+class RegPosition {
+public:
+	int8 square[64];
+	Piece piece[32];
+	int ply;
+	MoveFlags flags;
+
+	void reset();
+
+	bool setPiece(const int8 loc, const int8 type);
+
+	bool incheck(const int8 color);
+
+	bool parseFen(const string st);
+
+	bool parseZfen(const string st);
+
+	string printFen();
+
+	string printZfen();
 };
 
 #endif

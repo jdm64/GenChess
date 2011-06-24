@@ -71,4 +71,48 @@ public:
 	void debugTree();
 };
 
+// --- Start Regular Chess ---
+
+class RegEngine {
+private:
+	RegMoveList *curr;
+
+	RegBoard *board;
+
+	Array<RegMove> captureKiller;
+	Array<RegMove> moveKiller;
+	Array<RegMove> pvMove;
+
+	int maxNg;
+
+	Array<bool> tactical;
+	Array<bool> ismate;
+
+	RegScoreSort cmpScore;
+
+public:
+	RegEngine(RegBoard* Board) : curr(NULL), board(Board)
+	{
+		maxNg = 7;
+	}
+
+	~RegEngine()
+	{
+	}
+
+	void pickRandomMove();
+
+	int Quiescence(int alpha, int beta, int depth);
+
+	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<RegMove> &killer, const int type);
+
+	int NegaScout(int alpha, int beta, int depth, int limit);
+
+	void search(int alpha, int beta, int depth, int limit);
+
+	RegMove think();
+
+	void debugTree();
+};
+
 #endif

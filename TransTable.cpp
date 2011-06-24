@@ -136,3 +136,115 @@ void GenTransTable::setItem(const uint64 hash, const int score, const GenMove &m
 	item->depth = depth;
 	item->type = type;
 }
+
+// --- Start Regular Chess ---
+
+RegTransTable *rtt;
+
+RegTransItem::RegTransItem()
+{
+	hash = 0;
+	score = 0;
+	depth = 0;
+	type = NONE_NODE;
+}
+
+bool RegTransItem::getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
+{
+	if ((type & HAS_SCORE) && depth >= inDepth) {
+		switch (type) {
+		case PV_NODE:
+			outScore = score;
+			rtt->scorehit++;
+			return true;
+		case CUT_NODE:
+			if (score >= beta) {
+				outScore = score;
+				rtt->scorehit++;
+				return true;
+			}
+			break;
+		case ALL_NODE:
+			if (score <= alpha) {
+				outScore = score;
+				rtt->scorehit++;
+				return true;
+			}
+			break;
+		case NONE_NODE:
+			assert(0);
+		}
+	}
+	rtt->scoremiss++;
+	return false;
+}
+
+bool RegTransItem::getMove(RegMove &inMove) const
+{
+	if (type & HAS_MOVE) {
+		inMove = move;
+		rtt->movehit++;
+		return true;
+	} else {
+		rtt->movemiss++;
+		return false;
+	}
+}
+
+RegTransTable::RegTransTable(const int num_MB)
+{
+	Rand64 rad;
+
+	for (int i = 0; i < ZBOX_SIZE; i++)
+		hashBox[i] = rad.next();
+	size = (num_MB * 1048576) / sizeof(RegTransItem);
+	table = new RegTransItem[size];
+
+	startHash = rad.next();
+	hit = miss = scorehit = scoremiss = movehit = movemiss = 0;
+}
+
+RegTransTable::~RegTransTable()
+{
+	delete[] table;
+}
+
+sixInt RegTransTable::stats() const
+{
+	return {hit, miss, scorehit, scoremiss, movehit, movemiss};
+}
+
+void RegTransTable::clear()
+{
+	for (int i = 0; i < size; i++)
+		table[i].hash = 0;
+}
+
+void RegTransTable::clearStats()
+{
+	hit = miss = scorehit = scoremiss = movehit = movemiss = 0;
+}
+
+bool RegTransTable::getItem(const uint64 hash, RegTransItem *&item)
+{
+	item = &table[hash % size];
+
+	if (item->hash == hash) {
+		hit++;
+		return true;
+	} else {
+		miss++;
+		return false;
+	}
+}
+
+void RegTransTable::setItem(const uint64 hash, const int score, const RegMove &move, const int8 depth, const int8 type) const
+{
+	RegTransItem* const item = &table[hash % size];
+
+	item->hash = hash;
+	item->score = score;
+	item->move = move;
+	item->depth = depth;
+	item->type = type;
+}

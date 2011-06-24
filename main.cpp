@@ -95,12 +95,12 @@ int main(int argc, char **argv)
 {
 	int white = HUMAN, black = COMPUTER;
 	char c;
-	bool error = false, xMode = false;
+	bool error = false, xMode = false, genesis = true;
 
 	// set I/O to unbuffered
 	cout.setf(ios::unitbuf);
 
-	while ((c = getopt(argc, argv, "iw:b:hp:v")) != -1) {
+	while ((c = getopt(argc, argv, "iw:b:hp:vgr")) != -1) {
 		switch (c) {
 		case 'i':
 			xMode = true;
@@ -127,6 +127,12 @@ int main(int argc, char **argv)
 		case 'p':
 			cout << perft(atoi(optarg)) << endl;
 			return EXIT_SUCCESS;
+		case 'g':
+			genesis = true;
+			break;
+		case 'r':
+			genesis = false;
+			break;
 		case 'v':
 			cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
 				<< "Copyright (C) 2011 Justin Madru under the GPLv3\n\n";
@@ -137,13 +143,24 @@ int main(int argc, char **argv)
 		cout << "invalid command line\n";
 		return EXIT_FAILURE;
 	}
-	if (xMode) {
-		GenTerminal ui(white, black);
-		ui.run();
+	if (genesis) {
+		if (xMode) {
+			GenTerminal ui(white, black);
+			ui.run();
+		} else {
+			GenCVEP ui;
+			ui.run();
+		}
 	} else {
-		GenCVEP ui;
-		ui.run();
+		if (xMode) {
+			RegTerminal ui(white, black);
+			ui.run();
+		} else {
+			RegCVEP ui;
+			ui.run();
+		}
 	}
+
 
 	return EXIT_SUCCESS;
 }

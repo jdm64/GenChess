@@ -104,4 +104,110 @@ public:
 	void dumpDebug() const;
 };
 
+// --- Start Regular Chess --
+
+extern const int regPieceValue[7];
+
+extern const int regLocValue[7][64];
+
+struct HistoryNode
+{
+	RegMove move;
+	MoveFlags flags;
+};
+
+class RegBoard {
+private:
+	int8 square[64];
+
+	Piece piece[32];
+
+	MoveFlags flags;
+
+	uint64 key;
+
+	int ply;
+
+	int8 stm;
+
+	int pieceIndex(const int8 loc, const int8 type) const;
+
+	bool isPromote(const RegMove move, const int8 color) const;
+
+	int validCastle(RegMove &move, const int8 color);
+
+	int validEnPassant(RegMove &move, const int8 color);
+
+	void validateBoard(const RegMove move);
+
+public:
+	RegBoard();
+
+	uint64 hash() const
+	{
+		return key;
+	}
+
+	int getPly() const
+	{
+		return ply;
+	}
+
+	int8 getStm() const
+	{
+		return stm;
+	}
+
+	MoveFlags getMoveFlags() const
+	{
+		return flags;
+	}
+
+	void reset();
+
+	void rebuildHash();
+
+	void setBoard(RegPosition pos);
+
+	RegPosition getPosition() const;
+
+	void make(const RegMove &move);
+
+	void unmake(const RegMove &move, const MoveFlags undoFlags);
+
+	void makeP(const RegMove &move);
+
+	void unmakeP(const RegMove &move, const MoveFlags undoFlags);
+
+	bool incheck(const int8 color);
+
+	int isMate();
+
+	bool validMove(const RegMove &moveIn, RegMove &move);
+
+	int validMove(const string smove, const int8 color, RegMove &move);
+
+	int eval() const;
+
+	bool anyMoves(const int8 color);
+
+	void getMoveList(RegMoveList *data, const int8 color, int movetype);
+
+	void getCastleMoveList(RegMoveList *data, const int8 color);
+
+	void getEnPassantMoveList(RegMoveList *data, const int8 color);
+
+	RegMoveList* getMoveList(const int8 color, const int movetype);
+
+	RegMoveList* getPerftMoveList(const int8 color);
+
+	string printSquare(const int index) const;
+
+	void printBoard() const;
+
+	void printPieceList() const;
+
+	void dumpDebug() const;
+};
+
 #endif
