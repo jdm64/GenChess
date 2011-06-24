@@ -22,7 +22,8 @@
 #include "Piece.h"
 #include "MoveLookup.h"
 
-class GenPosition {
+class GenPosition
+{
 public:
 	int8 square[64];
 	int8 piece[32];
@@ -32,20 +33,19 @@ public:
 
 	bool setPiece(const int8 loc, const int8 type);
 
-	bool incheck(const int8 color);
+	bool incheck(const int8 color) const;
 
-	bool parseFen(const string st);
+	bool parseFen(const string &st);
 
-	bool parseZfen(const string st);
+	bool parseZfen(const string &st);
 
 	string printFen() const;
 
 	string printZfen() const;
 };
 
-// --- Start Regular Chess ---
-
-class RegPosition {
+class RegPosition
+{
 public:
 	int8 square[64];
 	Piece piece[32];
@@ -56,15 +56,15 @@ public:
 
 	bool setPiece(const int8 loc, const int8 type);
 
-	bool incheck(const int8 color);
+	bool incheck(const int8 color) const;
 
-	bool parseFen(const string st);
+	bool parseFen(const string &st);
 
-	bool parseZfen(const string st);
+	bool parseZfen(const string &st);
 
-	string printFen();
+	string printFen() const;
 
-	string printZfen();
+	string printZfen() const;
 };
 
 #endif

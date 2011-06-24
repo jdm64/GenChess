@@ -301,7 +301,7 @@ void GenBoard::unmakeP(const GenMove &move)
 	ply--;
 }
 
-bool GenBoard::incheck(const int8 color)
+bool GenBoard::incheck(const int8 color) const
 {
 	const GenMoveLookup ml(square);
 	const int king = (color == WHITE)? 31:15;
@@ -354,7 +354,7 @@ bool GenBoard::validMove(const GenMove &moveIn, GenMove &move)
 	return ret;
 }
 
-int GenBoard::validMove(const string smove, const int8 color, GenMove &move)
+int GenBoard::validMove(const string &smove, const int8 color, GenMove &move)
 {
 	// pre-setup move
 	if (!move.parse(smove))
@@ -954,7 +954,7 @@ bool RegBoard::isPromote(const RegMove move, int8 color) const
 		(move.to >= A1 && move.from >= A2);
 }
 
-void RegBoard::validateBoard(const RegMove move)
+void RegBoard::validateBoard(const RegMove move) const
 {
 	int cpt = 0;
 
@@ -1229,7 +1229,7 @@ void RegBoard::unmakeP(const RegMove &move, MoveFlags undoFlags)
 	ply--;
 }
 
-bool RegBoard::incheck(const int8 color)
+bool RegBoard::incheck(const int8 color) const
 {
 	const RegMoveLookup ml(square);
 	const int king = (color == WHITE)? 31:15;
@@ -1347,10 +1347,9 @@ int RegBoard::validEnPassant(RegMove &move, const int8 color)
 	return INVALID_MOVEMENT;
 }
 
-int RegBoard::validMove(const string smove, const int8 color, RegMove &move)
+int RegBoard::validMove(const string &smove, const int8 color, RegMove &move)
 {
 	const MoveFlags undoFlags = flags;
-	bool valid;
 
 	// pre-setup move
 	if (!move.parse(smove))

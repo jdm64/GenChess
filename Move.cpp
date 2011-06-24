@@ -90,7 +90,7 @@ string GenMove::toString() const
 	return out;
 }
 
-bool GenMove::parse(const string s)
+bool GenMove::parse(const string &s)
 {
 	int8 piece;
 	bool place = true;
@@ -233,11 +233,8 @@ string RegMove::toString() const
 	return out;
 }
 
-bool RegMove::parse(const string s)
+bool RegMove::parse(const string &s)
 {
-	int8 piece;
-	bool place = true;
-
 	switch (s[0]) {
 	case 'O':
 	case 'o':

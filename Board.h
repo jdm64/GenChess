@@ -75,13 +75,13 @@ public:
 
 	void unmakeP(const GenMove &move);
 
-	bool incheck(const int8 color);
+	bool incheck(const int8 color) const;
 
 	int isMate();
 
 	bool validMove(const GenMove &moveIn, GenMove &move);
 
-	int validMove(const string smove, const int8 color, GenMove &move);
+	int validMove(const string &smove, const int8 color, GenMove &move);
 
 	int eval() const;
 
@@ -138,7 +138,7 @@ private:
 
 	int validEnPassant(RegMove &move, const int8 color);
 
-	void validateBoard(const RegMove move);
+	void validateBoard(const RegMove move) const;
 
 public:
 	RegBoard();
@@ -179,13 +179,13 @@ public:
 
 	void unmakeP(const RegMove &move, const MoveFlags undoFlags);
 
-	bool incheck(const int8 color);
+	bool incheck(const int8 color) const;
 
 	int isMate();
 
 	bool validMove(const RegMove &moveIn, RegMove &move);
 
-	int validMove(const string smove, const int8 color, RegMove &move);
+	int validMove(const string &smove, const int8 color, RegMove &move);
 
 	int eval() const;
 

@@ -20,64 +20,47 @@
 
 #include "Defines.h"
 
-#define ATCK_CMP(A, B)		((A^B) >> 3) - ((A^(-B)) >> 3)
 #define CAPTURE_MOVE(A, B)	(A * B <  0)
 #define ANY_MOVE(A, B)		(A * B <= 0)
-// #define NOT_EMPTY(A, B)	(A * B != 0)
-// #define EMPTY_MOVE(A, B)	(A * B == 0)
 #define NOT_CAPTURE(A, B)	(A * B >= 0)
 #define OWN_PIECE(A, B)		(A * B >  0)
 
-class GenMoveLookup {
+class GenMoveLookup
+{
 private:
-	static const int8 mailbox[120];
-
-	static const int8 mailbox64[64];
-
-	static const int8 offsets[7][8];
-
 	const int8 *square;
 
 public:
-	GenMoveLookup(int8 *Square) : square(Square) {}
+	GenMoveLookup(const int8 *Square) : square(Square) {}
 
-	int8* genAll(const int8 &from) const;
+	int8* genAll(const int8 From) const;
 
-	int8* genCapture(const int8 &from) const;
+	int8* genCapture(const int8 From) const;
 
-	int8* genMove(const int8 &from) const;
+	int8* genMove(const int8 From) const;
 
-	bool fromto(const int8 &From, const int8 &To) const;
+	bool fromto(const int8 From, const int8 To) const;
 
-	bool isAttacked(const int8 &from) const;
+	bool isAttacked(const int8 From) const;
 };
 
-// --- Start Regular Chess ---
-
-class RegMoveLookup {
+class RegMoveLookup
+{
 private:
-	static int8 mailbox[120];
-
-	static int8 mailbox64[64];
-
-	static int8 offsets[7][8];
-
-	int8 *square;
+	const int8 *square;
 
 public:
-	RegMoveLookup(int8 *Square) : square(Square) {}
+	RegMoveLookup(const int8 *Square) : square(Square) {}
 
-	void dumpZFen() const;
+	int8* genAll(const int8 From) const;
 
-	int8* genAll(const int8 &from) const;
+	int8* genCapture(const int8 From) const;
 
-	int8* genCapture(const int8 &from) const;
+	int8* genMove(const int8 From) const;
 
-	int8* genMove(const int8 &from) const;
+	bool fromto(const int8 From, const int8 To) const;
 
-	bool fromto(const int8 &From, const int8 &To) const;
-
-	bool isAttacked(const int8 &from, const int8 bycolor) const;
+	bool isAttacked(const int8 From, const int8 Bycolor) const;
 };
 
 #endif

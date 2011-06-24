@@ -42,7 +42,7 @@ struct GenMove {
 
 	string toString() const;
 
-	bool parse(const string s);
+	bool parse(const string &s);
 
 	string dump() const;
 };
@@ -115,7 +115,7 @@ struct RegMove {
 
 	string toString() const;
 
-	bool parse(const string s);
+	bool parse(const string &s);
 
 	string dump() const;
 };

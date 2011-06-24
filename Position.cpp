@@ -48,7 +48,7 @@ bool GenPosition::setPiece(const int8 loc, const int8 type)
 	return false;
 }
 
-bool GenPosition::incheck(const int8 color)
+bool GenPosition::incheck(const int8 color) const
 {
 	const GenMoveLookup ml(square);
 	const int king = (color == WHITE)? 31:15;
@@ -56,7 +56,7 @@ bool GenPosition::incheck(const int8 color)
 	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
 }
 
-bool GenPosition::parseFen(const string st)
+bool GenPosition::parseFen(const string &st)
 {
 	reset();
 
@@ -149,7 +149,7 @@ bool GenPosition::parseFen(const string st)
 	return true;
 }
 
-bool GenPosition::parseZfen(const string st)
+bool GenPosition::parseZfen(const string &st)
 {
 	reset();
 
@@ -368,7 +368,7 @@ bool RegPosition::setPiece(const int8 loc, const int8 type)
 	return false;
 }
 
-bool RegPosition::incheck(const int8 color)
+bool RegPosition::incheck(const int8 color) const
 {
 	RegMoveLookup ml(square);
 	int king = (color == WHITE)? 31:15;
@@ -376,7 +376,7 @@ bool RegPosition::incheck(const int8 color)
 	return ml.isAttacked(piece[king].loc, color);
 }
 
-bool RegPosition::parseFen(const string st)
+bool RegPosition::parseFen(const string &st)
 {
 	reset();
 
@@ -471,7 +471,7 @@ bool RegPosition::parseFen(const string st)
 	return true;
 }
 
-bool RegPosition::parseZfen(const string st)
+bool RegPosition::parseZfen(const string &st)
 {
 	reset();
 
@@ -546,7 +546,7 @@ bool RegPosition::parseZfen(const string st)
 	return true;
 }
 
-string RegPosition::printFen()
+string RegPosition::printFen() const
 {
 	ostringstream buf;
 	string fen;
@@ -615,7 +615,7 @@ string RegPosition::printFen()
 	return fen;
 }
 
-string RegPosition::printZfen()
+string RegPosition::printZfen() const
 {
 	stringstream buf;
 	string fen;

@@ -36,12 +36,12 @@ struct MoveFlags {
 		bits = 0xf0;
 	}
 
-	int8 canEnPassant()
+	int8 canEnPassant() const
 	{
 		return bits & 0x8;
 	}
 
-	int8 enPassantFile()
+	int8 enPassantFile() const
 	{
 		return bits & 0x7;
 	}
@@ -56,17 +56,17 @@ struct MoveFlags {
 		bits &= ~0xf;
 	}
 
-	int8 canCastle(int8 color)
+	int8 canCastle(const int8 color) const
 	{
 		return bits & ((color == WHITE)? 0x30 : 0xc0);
 	}
 
-	int8 canKingCastle(int8 color)
+	int8 canKingCastle(const int8 color) const
 	{
 		return bits & ((color == WHITE)? 0x10 : 0x40);
 	}
 
-	int8 canQueenCastle(int8 color)
+	int8 canQueenCastle(const int8 color) const
 	{
 		return bits & ((color == WHITE)? 0x20 : 0x80);
 	}
