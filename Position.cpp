@@ -16,6 +16,7 @@
 */
 
 #include <cstring>
+#include <iostream>
 #include <sstream>
 #include "Position.h"
 
@@ -25,7 +26,33 @@ const int8 stype[] = {
 	EMPTY,		EMPTY,		WHITE_KING,	EMPTY,		BLACK_BISHOP,
 	WHITE_KNIGHT,	EMPTY,		WHITE_PAWN,	WHITE_QUEEN,	WHITE_ROOK};
 
-void GenPosition::reset()
+string Position::printSquare(const int index) const
+{
+	string tmp;
+
+	if (!square[index])
+		return "  ";
+	tmp = { pieceSymbol[ABS(square[index])],
+		(square[index] > 0)? ' ':'*' };
+	return tmp;
+}
+
+void Position::printBoard() const
+{
+	cout << "  / - + - + - + - + - + - + - + - \\\n";
+	for (int i = 0, rank = 8; ;) {
+		cout << rank-- << " |";
+		for (int j = 0; j < 8; j++)
+			cout << " " << printSquare(i++) << "|";
+		if (i == 64)
+			break;
+		cout << "\n  + - + - + - + - + - + - + - + - +\n";
+	}
+	cout << "\n  \\ - + - + - + - + - + - + - + - /\n"
+		<< "    a   b   c   d   e   f   g   h\n";
+}
+
+void GenPosition::parseReset()
 {
 	memset(square, EMPTY, 64);
 	memset(piece, DEAD, 32);
@@ -50,15 +77,14 @@ bool GenPosition::setPiece(const int8 loc, const int8 type)
 
 bool GenPosition::incheck(const int8 color) const
 {
-	const GenMoveLookup ml(square);
 	const int king = (color == WHITE)? 31:15;
 
-	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
+	return (piece[king] != PLACEABLE)? isAttacked(piece[king]) : false;
 }
 
 bool GenPosition::parseFen(const string &st)
 {
-	reset();
+	parseReset();
 
 	// index counter for st
 	int n = 0;
@@ -91,7 +117,7 @@ bool GenPosition::parseFen(const string &st)
 		}
 	}
 	// pick up color-to-move
-	const int8 ctm = (st[n] == 'w')? WHITE : BLACK;
+	stm = (st[n] == 'w')? WHITE : BLACK;
 	n += 2;
 
 	// parse placeable pieces
@@ -124,7 +150,7 @@ bool GenPosition::parseFen(const string &st)
 		num += st[n];
 		n++;
 	}
-	ply = 2 * atoi(num.c_str()) - 2 + ((ctm == BLACK)? 1:0);
+	ply = 2 * atoi(num.c_str()) - 2 + ((stm == BLACK)? 1:0);
 
 	// verify if ply is reasonable
 	int mply = 0;
@@ -144,14 +170,14 @@ bool GenPosition::parseFen(const string &st)
 		return false;
 
 	// check if color not on move is in check
-	if (incheck(ctm ^ -2))
+	if (incheck(stm ^ -2))
 		return false;
 	return true;
 }
 
 bool GenPosition::parseZfen(const string &st)
 {
-	reset();
+	parseReset();
 
 	// index counter for st
 	int n = 0;
@@ -215,9 +241,10 @@ bool GenPosition::parseZfen(const string &st)
 	if (ply < mply)
 		return false;
 
+	stm = (ply % 2)? BLACK : WHITE;
+
 	// check if color not on move is in check
-	const int8 ctm = (ply % 2)? BLACK : WHITE;
-	if (incheck(ctm ^ -2))
+	if (incheck(stm ^ -2))
 		return false;
 	return true;
 }
@@ -319,7 +346,7 @@ string GenPosition::printZfen() const
 
 // --- Start Regular Chess ---
 
-void RegPosition::reset()
+void RegPosition::parseReset()
 {
 	memset(square, EMPTY, 64);
 
@@ -370,15 +397,14 @@ bool RegPosition::setPiece(const int8 loc, const int8 type)
 
 bool RegPosition::incheck(const int8 color) const
 {
-	RegMoveLookup ml(square);
-	int king = (color == WHITE)? 31:15;
+	const int king = (color == WHITE)? 31:15;
 
-	return ml.isAttacked(piece[king].loc, color);
+	return isAttacked(piece[king].loc, color);
 }
 
 bool RegPosition::parseFen(const string &st)
 {
-	reset();
+	parseReset();
 
 	// index counter for st
 	int n = 0;
@@ -411,7 +437,7 @@ bool RegPosition::parseFen(const string &st)
 		}
 	}
 	// pick up color-to-move
-	int8 ctm = (st[n] == 'w')? WHITE : BLACK;
+	stm = (st[n] == 'w')? WHITE : BLACK;
 	n += 2;
 
 	// castle rights
@@ -463,17 +489,17 @@ bool RegPosition::parseFen(const string &st)
 	int tply = atoi(num.c_str());
 	if (tply < 1)
 		tply = 1;
-	ply = 2 * tply - 2 + ((ctm == BLACK)? 1:0);
+	ply = 2 * tply - 2 + ((stm == BLACK)? 1:0);
 
 	// check if color not on move is in check
-	if (incheck(ctm ^ -2))
+	if (incheck(stm ^ -2))
 		return false;
 	return true;
 }
 
 bool RegPosition::parseZfen(const string &st)
 {
-	reset();
+	parseReset();
 
 	// index counter for st
 	int n = 0;
@@ -540,8 +566,8 @@ bool RegPosition::parseZfen(const string &st)
 	ply = (tply >= 0)? tply:0;
 
 	// check if color not on move is in check
-	int8 ctm = (ply % 2)? BLACK : WHITE;
-	if (incheck(ctm ^ -2))
+	stm = (ply % 2)? BLACK : WHITE;
+	if (incheck(stm ^ -2))
 		return false;
 	return true;
 }

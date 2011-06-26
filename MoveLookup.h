@@ -18,6 +18,7 @@
 #ifndef __MOVE_LOOKUP_H__
 #define __MOVE_LOOKUP_H__
 
+#include <string>
 #include "Defines.h"
 
 #define CAPTURE_MOVE(A, B)	(A * B <  0)
@@ -25,14 +26,23 @@
 #define NOT_CAPTURE(A, B)	(A * B >= 0)
 #define OWN_PIECE(A, B)		(A * B >  0)
 
-class GenMoveLookup
+using namespace std;
+
+class Position
 {
-private:
-	const int8 *square;
-
+protected:
+	int8 square[64];
+	int ply;
+	int8 stm;
 public:
-	GenMoveLookup(const int8 *Square) : square(Square) {}
+	string printSquare(const int index) const;
 
+	void printBoard() const;
+};
+
+class GenMoveLookup : public Position
+{
+public:
 	int8* genAll(const int8 From) const;
 
 	int8* genCapture(const int8 From) const;
@@ -44,14 +54,9 @@ public:
 	bool isAttacked(const int8 From) const;
 };
 
-class RegMoveLookup
+class RegMoveLookup : public Position
 {
-private:
-	const int8 *square;
-
 public:
-	RegMoveLookup(const int8 *Square) : square(Square) {}
-
 	int8* genAll(const int8 From) const;
 
 	int8* genCapture(const int8 From) const;

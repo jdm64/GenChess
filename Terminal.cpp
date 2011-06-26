@@ -74,9 +74,9 @@ bool GenTerminal::playerCmd()
 		if (cmd == "board")
 			board.printBoard();
 		else if (cmd == "fen")
-			cout << board.getPosition().printFen() << endl;
+			cout << board.printFen() << endl;
 		else if (cmd == "zfen")
-			cout << board.getPosition().printZfen() << endl;
+			cout << board.printZfen() << endl;
 		else
 			cout << "error: required argument (board, fen, zfen)\n";
 		return true;
@@ -281,9 +281,9 @@ bool RegTerminal::playerCmd()
 		if (cmd == "board")
 			board.printBoard();
 		else if (cmd == "fen")
-			cout << board.getPosition().printFen() << endl;
+			cout << board.printFen() << endl;
 		else if (cmd == "zfen")
-			cout << board.getPosition().printZfen() << endl;
+			cout << board.printZfen() << endl;
 		else
 			cout << "error: required argument (board, fen, zfen)\n";
 		return true;

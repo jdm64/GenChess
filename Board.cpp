@@ -144,10 +144,12 @@ void GenBoard::rebuildHash()
 
 void GenBoard::setBoard(const GenPosition &pos)
 {
-	memcpy(square, pos.square, 64);
-	memcpy(piece, pos.piece, 32);
+	copy(pos.square, pos.square + 64, square);
+	copy(pos.piece, pos.piece + 32, piece);
+
 	ply = pos.ply;
-	stm = (pos.ply % 2)? BLACK : WHITE;
+	stm = pos.stm;
+
 	rebuildHash();
 }
 
@@ -301,14 +303,6 @@ void GenBoard::unmakeP(const GenMove &move)
 	ply--;
 }
 
-bool GenBoard::incheck(const int8 color) const
-{
-	const GenMoveLookup ml(square);
-	const int king = (color == WHITE)? 31:15;
-
-	return (piece[king] != PLACEABLE)? ml.isAttacked(piece[king]) : false;
-}
-
 int GenBoard::isMate()
 {
 	if (anyMoves(stm))
@@ -335,8 +329,7 @@ bool GenBoard::validMove(const GenMove &moveIn, GenMove &move)
 	}
 
 	if (move.from != PLACEABLE) {
-		const GenMoveLookup ml(square);
-		if (!ml.fromto(move.from, move.to))
+		if (!fromto(move.from, move.to))
 			return false;
 	}
 	if (ply < 2 && ABS(pieceType[move.index]) != KING)
@@ -382,8 +375,7 @@ int GenBoard::validMove(const string &smove, const int8 color, GenMove &move)
 	if (ply < 2 && ABS(pieceType[move.index]) != KING)
 		return KING_FIRST;
 	if (move.from != PLACEABLE) {
-		const GenMoveLookup ml(square);
-		if (!ml.fromto(move.from, move.to))
+		if (!fromto(move.from, move.to))
 			return INVALID_MOVEMENT;
 	}
 	int ret = VALID_MOVE;
@@ -430,7 +422,6 @@ int GenBoard::eval() const
 
 bool GenBoard::anyMoves(const int8 color)
 {
-	const GenMoveLookup movelookup(square);
 	GenMove move;
 
 	// shortest games takes 5 half-moves
@@ -443,7 +434,7 @@ bool GenBoard::anyMoves(const int8 color)
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
 
-		const int8* const loc = movelookup.genAll(piece[idx]);
+		const int8* const loc = genAll(piece[idx]);
 		for (int n = 0; loc[n] != -1; n++) {
 			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			move.to = loc[n];
@@ -514,7 +505,6 @@ void GenBoard::getPlaceMoveList(GenMoveList* const data, const int8 pieceType)
 
 void GenBoard::getMoveList(GenMoveList* const data, const int8 color, const int movetype)
 {
-	const GenMoveLookup movelookup(square);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	GenMoveNode item;
 
@@ -526,13 +516,13 @@ void GenBoard::getMoveList(GenMoveList* const data, const int8 color, const int 
 		switch (movetype) {
 		case MOVE_ALL:
 		default:
-			loc = movelookup.genAll(piece[idx]);
+			loc = genAll(piece[idx]);
 			break;
 		case MOVE_CAPTURE:
-			loc = movelookup.genCapture(piece[idx]);
+			loc = genCapture(piece[idx]);
 			break;
 		case MOVE_MOVE:
-			loc = movelookup.genMove(piece[idx]);
+			loc = genMove(piece[idx]);
 			break;
 		}
 
@@ -588,7 +578,6 @@ GenMoveList* GenBoard::getMoveList(const int8 color, const int movetype)
 GenMoveList* GenBoard::getPerftMoveList(const int8 color, const int movetype)
 {
 	// TODO list might work better as a stl::list, or initialize to prev size
-	const GenMoveLookup movelookup(square);
 	const int start = (color == BLACK)? 15:31, end = (color == BLACK)? 0:16;
 	GenMoveList* const data = new GenMoveList;
 	GenMoveNode item;
@@ -636,7 +625,7 @@ GenMoveList* GenBoard::getPerftMoveList(const int8 color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			const int8* const loc = movelookup.genAll(piece[idx]);
+			const int8* const loc = genAll(piece[idx]);
 			for (int n = 0; loc[n] != -1; n++) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 				item.move.to = loc[n];
@@ -655,7 +644,7 @@ GenMoveList* GenBoard::getPerftMoveList(const int8 color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			const int8* const loc = movelookup.genCapture(piece[idx]);
+			const int8* const loc = genCapture(piece[idx]);
 			for (int n = 0; loc[n] != -1; n++) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 				item.move.to = loc[n];
@@ -674,7 +663,7 @@ GenMoveList* GenBoard::getPerftMoveList(const int8 color, const int movetype)
 		for (int idx = start; idx >= end; idx--) {
 			if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 				continue;
-			const int8* const loc = movelookup.genMove(piece[idx]);
+			const int8* const loc = genMove(piece[idx]);
 			for (int n = 0; loc[n] != -1; n++) {
 				item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 				item.move.to = loc[n];
@@ -732,32 +721,6 @@ GenMoveList* GenBoard::getPerftMoveList(const int8 color, const int movetype)
 	return data;
 }
 
-string GenBoard::printSquare(const int index) const
-{
-	string tmp;
-
-	if (!square[index])
-		return "  ";
-	tmp = { pieceSymbol[ABS(square[index])],
-		(square[index] > 0)? ' ':'*' };
-	return tmp;
-}
-
-void GenBoard::printBoard() const
-{
-	cout << "  / - + - + - + - + - + - + - + - \\\n";
-	for (int i = 0, rank = 8; ;) {
-		cout << rank-- << " |";
-		for (int j = 0; j < 8; j++)
-			cout << " " << printSquare(i++) << "|";
-		if (i == 64)
-			break;
-		cout << "\n  + - + - + - + - + - + - + - + - +\n";
-	}
-	cout << "\n  \\ - + - + - + - + - + - + - + - /\n"
-		<< "    a   b   c   d   e   f   g   h\n";
-}
-
 void GenBoard::printPieceList() const
 {
 	string tmp;
@@ -785,7 +748,8 @@ void GenBoard::printPieceList() const
 		else
 			cout << tmp;
 		cout << ") ";
-	}																																															cout << endl;
+	}
+	cout << endl;
 }
 
 void GenBoard::dumpDebug() const
@@ -914,12 +878,12 @@ void RegBoard::rebuildHash()
 
 void RegBoard::setBoard(RegPosition pos)
 {
-	memcpy(square, pos.square, 64);
-	memcpy(piece, pos.piece, 64);
+	copy(pos.square, pos.square + 64, square);
+	copy(pos.piece, pos.piece + 32, piece);
 
 	flags = pos.flags;
 	ply = pos.ply;
-	stm = (pos.ply % 2)? BLACK : WHITE;
+	stm = pos.stm;
 
 	rebuildHash();
 }
@@ -928,11 +892,12 @@ RegPosition RegBoard::getPosition() const
 {
 	RegPosition pos;
 
-	memcpy(pos.square, square, 64);
-	memcpy(pos.piece, piece, 64);
+	copy(square, square + 64, pos.square);
+	copy(piece, piece + 32, pos.piece);
 
-	pos.ply = ply;
 	pos.flags = flags;
+	pos.ply = ply;
+	pos.stm = stm;
 
 	return pos;
 }
@@ -990,7 +955,7 @@ void RegBoard::validateBoard(const RegMove move) const
 	}
 	return;
 error:
-	cerr << "E:" << move.dump() << " " << getPosition().printZfen() << " "
+	cerr << "E:" << move.dump() << " " << printZfen() << " "
 	<< (int)square[move.from] << " " << (int)square[move.to] << " " << cpt << endl;
 	for (int i = 0; i < 32; i++)
 		cerr << (int)piece[i].loc << "," << (int)piece[i].type << " ";
@@ -1229,14 +1194,6 @@ void RegBoard::unmakeP(const RegMove &move, MoveFlags undoFlags)
 	ply--;
 }
 
-bool RegBoard::incheck(const int8 color) const
-{
-	const RegMoveLookup ml(square);
-	const int king = (color == WHITE)? 31:15;
-
-	return ml.isAttacked(piece[king].loc, color);
-}
-
 int RegBoard::isMate()
 {
 	if (anyMoves(stm))
@@ -1275,8 +1232,7 @@ bool RegBoard::validMove(const RegMove &moveIn, RegMove &move)
 		move.flags = 0;
 	}
 
-	RegMoveLookup ml(square);
-	if (!ml.fromto(move.from, move.to))
+	if (!fromto(move.from, move.to))
 		return false;
 
 	int ret = true;
@@ -1299,12 +1255,11 @@ int RegBoard::validCastle(RegMove &move, const int8 color)
 	if (incheck(color))
 		return CANT_CASTLE;
 
-	const RegMoveLookup ml(square);
 	const int king = (color == WHITE)? E1 : E8;
 
 	// king side
 	if (move.getCastle() == 0x10 && square[king + 1] == EMPTY && square[king + 2] == EMPTY &&
-	!ml.isAttacked(king + 1, color) && !ml.isAttacked(king + 2, color) &&
+	!isAttacked(king + 1, color) && !isAttacked(king + 2, color) &&
 	ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
 		move.index = (color == WHITE)? 31 : 15;
 		move.xindex = NONE;
@@ -1312,7 +1267,7 @@ int RegBoard::validCastle(RegMove &move, const int8 color)
 		move.to = king + 2;
 		return VALID_MOVE;
 	} else if (move.getCastle() == 0x20 && square[king - 1] == EMPTY && square[king - 2] == EMPTY &&
-	square[king - 3] == EMPTY && !ml.isAttacked(king - 1, color) && !ml.isAttacked(king - 2, color) &&
+	square[king - 3] == EMPTY && !isAttacked(king - 1, color) && !isAttacked(king - 2, color) &&
 	ABS(square[((color == WHITE)? A1:A8)]) == ROOK) {
 		move.index = (color == WHITE)? 31 : 15;
 		move.xindex = NONE;
@@ -1394,8 +1349,7 @@ int RegBoard::validMove(const string &smove, const int8 color, RegMove &move)
 	if (move.xindex != NONE && square[move.to] * color > 0)
 		return CAPTURE_OWN;
 
-	RegMoveLookup ml(square);
-	if (!ml.fromto(move.from, move.to))
+	if (!fromto(move.from, move.to))
 		return INVALID_MOVEMENT;
 
 	int ret = VALID_MOVE;
@@ -1433,7 +1387,6 @@ int RegBoard::eval() const
 
 bool RegBoard::anyMoves(const int8 color)
 {
-	const RegMoveLookup movelookup(square);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
 	RegMoveNode item;
@@ -1442,7 +1395,7 @@ bool RegBoard::anyMoves(const int8 color)
 		if (piece[idx].loc == DEAD)
 			continue;
 
-		const int8* const loc = movelookup.genAll(piece[idx].loc);
+		const int8* const loc = genAll(piece[idx].loc);
 
 		for (int n = 0; loc[n] != -1; n++) {
 			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
@@ -1467,8 +1420,8 @@ bool RegBoard::anyMoves(const int8 color)
 
 	// King Side
 	if (!inCheck && flags.canKingCastle(color) && square[king + 1] == EMPTY &&
-	square[king + 2] == EMPTY && !movelookup.isAttacked(king + 1, color) &&
-	!movelookup.isAttacked(king + 2, color) && ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
+	square[king + 2] == EMPTY && !isAttacked(king + 1, color) &&
+	!isAttacked(king + 2, color) && ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
 		item.move.xindex = NONE;
 		item.move.to = king + 1;
 		item.move.from = king;
@@ -1484,7 +1437,7 @@ bool RegBoard::anyMoves(const int8 color)
 	// Queen Side
 	if (!inCheck && flags.canQueenCastle(color) && square[king - 1] == EMPTY &&
 	square[king - 2] == EMPTY && square[king - 3] == EMPTY &&
-	!movelookup.isAttacked(king - 1, color) && !movelookup.isAttacked(king - 2, color) &&
+	!isAttacked(king - 1, color) && !isAttacked(king - 2, color) &&
 	ABS(square[((color == WHITE)? A1:A8)]) == ROOK) {
 		item.move.xindex = NONE;
 		item.move.to = king - 1;
@@ -1542,7 +1495,6 @@ bool RegBoard::anyMoves(const int8 color)
 
 void RegBoard::getMoveList(RegMoveList *data, const int8 color, int movetype)
 {
-	const RegMoveLookup movelookup(square);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
 
@@ -1554,13 +1506,13 @@ void RegBoard::getMoveList(RegMoveList *data, const int8 color, int movetype)
 		switch (movetype) {
 		case MOVE_ALL:
 		default:
-			loc = movelookup.genAll(piece[idx].loc);
+			loc = genAll(piece[idx].loc);
 			break;
 		case MOVE_CAPTURE:
-			loc = movelookup.genCapture(piece[idx].loc);
+			loc = genCapture(piece[idx].loc);
 			break;
 		case MOVE_MOVE:
-			loc = movelookup.genMove(piece[idx].loc);
+			loc = genMove(piece[idx].loc);
 			break;
 		}
 
@@ -1571,12 +1523,6 @@ void RegBoard::getMoveList(RegMoveList *data, const int8 color, int movetype)
 			item.move.to = loc[n];
 			item.move.from = piece[idx].loc;
 			item.move.index = idx;
-
-			if (loc[n] < 0 || loc[n] > 63) {
-				cout << (int)square[piece[idx].loc] << " " << (int)loc[n] << endl <<
-				getPosition().printZfen() << endl;
-				assert(0);
-			}
 
 			if (ABS(piece[idx].type) == PAWN && IS_PROMOTE(item.move.to, color)) {
 				item.move.setPromote(QUEEN);
@@ -1621,14 +1567,13 @@ void RegBoard::getCastleMoveList(RegMoveList *data, const int8 color)
 	if (incheck(color))
 		return;
 
-	const RegMoveLookup movelookup(square);
 	const int king = (color == WHITE)? E1 : E8;
 	const int8 kindex = (color == WHITE)? 31 : 15;
 	RegMoveNode item;
 
 	// King Side
 	if (flags.canKingCastle(color) && square[king + 1] == EMPTY && square[king + 2] == EMPTY &&
-	!movelookup.isAttacked(king + 1, color) && !movelookup.isAttacked(king + 2, color) &&
+	!isAttacked(king + 1, color) && !isAttacked(king + 2, color) &&
 	ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
 		item.move.xindex = NONE;
 		item.move.to = king + 2;
@@ -1642,7 +1587,7 @@ void RegBoard::getCastleMoveList(RegMoveList *data, const int8 color)
 	}
 	// Queen Side
 	if (flags.canQueenCastle(color) && square[king - 1] == EMPTY && square[king - 2] == EMPTY &&
-	square[king - 3] == EMPTY && !movelookup.isAttacked(king - 1, color) && !movelookup.isAttacked(king - 2, color) &&
+	square[king - 3] == EMPTY && !isAttacked(king - 1, color) && !isAttacked(king - 2, color) &&
 	ABS(square[((color == WHITE)? A1:A8)]) == ROOK) {
 		item.move.xindex = NONE;
 		item.move.to = king - 2;
@@ -1727,7 +1672,6 @@ RegMoveList* RegBoard::getMoveList(const int8 color, const int movetype)
 
 RegMoveList* RegBoard::getPerftMoveList(const int8 color)
 {
-	const RegMoveLookup movelookup(square);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
 	RegMoveList *data = new RegMoveList;
@@ -1738,7 +1682,7 @@ RegMoveList* RegBoard::getPerftMoveList(const int8 color)
 		if (piece[idx].loc == DEAD)
 			continue;
 
-		int8 *loc = movelookup.genAll(piece[idx].loc);
+		int8 *loc = genAll(piece[idx].loc);
 
 		for (int n = 0; loc[n] != -1; n++) {
 			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
@@ -1776,7 +1720,7 @@ RegMoveList* RegBoard::getPerftMoveList(const int8 color)
 
 	// King Side
 	if (!inCheck && flags.canKingCastle(color) && square[king + 1] == EMPTY && square[king + 2] == EMPTY &&
-	!movelookup.isAttacked(king + 1, color) && !movelookup.isAttacked(king + 2, color) &&
+	!isAttacked(king + 1, color) && !isAttacked(king + 2, color) &&
 	ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
 		item.move.xindex = NONE;
 		item.move.to = king + 2;
@@ -1788,7 +1732,7 @@ RegMoveList* RegBoard::getPerftMoveList(const int8 color)
 	}
 	// Queen Side
 	if (!inCheck && flags.canQueenCastle(color) && square[king - 1] == EMPTY && square[king - 2] == EMPTY &&
-	square[king - 3] == EMPTY && !movelookup.isAttacked(king - 1, color) && !movelookup.isAttacked(king - 2, color) &&
+	square[king - 3] == EMPTY && !isAttacked(king - 1, color) && !isAttacked(king - 2, color) &&
 	ABS(square[((color == WHITE)? A1:A8)]) == ROOK) {
 		item.move.xindex = NONE;
 		item.move.to = king - 2;
@@ -1833,30 +1777,4 @@ RegMoveList* RegBoard::getPerftMoveList(const int8 color)
 		unmake(item.move, undoFlags);
 	}
 	return data;
-}
-
-string RegBoard::printSquare(const int index) const
-{
-	string tmp;
-
-	if (!square[index])
-		return "  ";
-	tmp = { pieceSymbol[ABS(square[index])],
-		(square[index] > 0)? ' ':'*' };
-	return tmp;
-}
-
-void RegBoard::printBoard() const
-{
-	cout << "  / - + - + - + - + - + - + - + - \\\n";
-	for (int i = 0, rank = 8; ;) {
-		cout << rank-- << " |";
-		for (int j = 0; j < 8; j++)
-			cout << " " << printSquare(i++) << "|";
-		if (i == 64)
-			break;
-		cout << "\n  + - + - + - + - + - + - + - + - +\n";
-	}
-	cout << "\n  \\ - + - + - + - + - + - + - + - /\n"
-		<< "    a   b   c   d   e   f   g   h\n";
 }

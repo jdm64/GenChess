@@ -27,17 +27,10 @@ extern const int genPieceValue[16];
 
 extern const int genLocValue[7][64];
 
-class GenBoard {
+class GenBoard : public GenPosition
+{
 private:
-	int8 square[64];
-
-	int8 piece[32];
-
 	uint64 key;
-
-	int ply;
-
-	int8 stm;
 
 	int pieceIndex(const int8 loc, const int8 type) const;
 
@@ -75,8 +68,6 @@ public:
 
 	void unmakeP(const GenMove &move);
 
-	bool incheck(const int8 color) const;
-
 	int isMate();
 
 	bool validMove(const GenMove &moveIn, GenMove &move);
@@ -95,10 +86,6 @@ public:
 
 	GenMoveList* getPerftMoveList(const int8 color, const int movetype);
 
-	string printSquare(const int index) const;
-
-	void printBoard() const;
-
 	void printPieceList() const;
 
 	void dumpDebug() const;
@@ -116,19 +103,9 @@ struct HistoryNode
 	MoveFlags flags;
 };
 
-class RegBoard {
+class RegBoard : public RegPosition {
 private:
-	int8 square[64];
-
-	Piece piece[32];
-
-	MoveFlags flags;
-
 	uint64 key;
-
-	int ply;
-
-	int8 stm;
 
 	int pieceIndex(const int8 loc, const int8 type) const;
 
@@ -179,8 +156,6 @@ public:
 
 	void unmakeP(const RegMove &move, const MoveFlags undoFlags);
 
-	bool incheck(const int8 color) const;
-
 	int isMate();
 
 	bool validMove(const RegMove &moveIn, RegMove &move);
@@ -200,10 +175,6 @@ public:
 	RegMoveList* getMoveList(const int8 color, const int movetype);
 
 	RegMoveList* getPerftMoveList(const int8 color);
-
-	string printSquare(const int index) const;
-
-	void printBoard() const;
 
 	void printPieceList() const;
 

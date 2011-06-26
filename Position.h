@@ -22,14 +22,14 @@
 #include "Piece.h"
 #include "MoveLookup.h"
 
-class GenPosition
+class GenPosition : public GenMoveLookup
 {
-public:
-	int8 square[64];
+	friend class GenBoard;
+protected:
 	int8 piece[32];
-	int ply;
 
-	void reset();
+public:
+	void parseReset();
 
 	bool setPiece(const int8 loc, const int8 type);
 
@@ -44,15 +44,15 @@ public:
 	string printZfen() const;
 };
 
-class RegPosition
+class RegPosition : public RegMoveLookup
 {
-public:
-	int8 square[64];
+	friend class RegBoard;
+protected:
 	Piece piece[32];
-	int ply;
 	MoveFlags flags;
 
-	void reset();
+public:
+	void parseReset();
 
 	bool setPiece(const int8 loc, const int8 type);
 
