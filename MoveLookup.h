@@ -18,8 +18,7 @@
 #ifndef __MOVE_LOOKUP_H__
 #define __MOVE_LOOKUP_H__
 
-#include <string>
-#include "Defines.h"
+#include "BaseBoard.h"
 
 #define CAPTURE_MOVE(A, B)	(A * B <  0)
 #define ANY_MOVE(A, B)		(A * B <= 0)
@@ -28,19 +27,7 @@
 
 using namespace std;
 
-class Position
-{
-protected:
-	int8 square[64];
-	int ply;
-	int8 stm;
-public:
-	string printSquare(const int index) const;
-
-	void printBoard() const;
-};
-
-class GenMoveLookup : public Position
+class GenMoveLookup : public BaseBoard
 {
 protected:
 	int8* genAll(const int8 From) const;
@@ -54,7 +41,7 @@ protected:
 	bool isAttacked(const int8 From) const;
 };
 
-class RegMoveLookup : public Position
+class RegMoveLookup : public BaseBoard
 {
 protected:
 	int8* genAll(const int8 From) const;

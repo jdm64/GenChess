@@ -36,32 +36,6 @@ const Piece InitRegParse[32] = {
 	{DEAD, WHITE_KNIGHT}, {DEAD, WHITE_KNIGHT}, {DEAD, WHITE_BISHOP}, {DEAD, WHITE_BISHOP},
 	{DEAD, WHITE_ROOK}, {DEAD, WHITE_ROOK}, {DEAD, WHITE_QUEEN}, {DEAD, WHITE_KING} };
 
-string Position::printSquare(const int index) const
-{
-	string tmp;
-
-	if (!square[index])
-		return "  ";
-	tmp = { pieceSymbol[ABS(square[index])],
-		(square[index] > 0)? ' ':'*' };
-	return tmp;
-}
-
-void Position::printBoard() const
-{
-	cout << "  / - + - + - + - + - + - + - + - \\\n";
-	for (int i = 0, rank = 8; ;) {
-		cout << rank-- << " |";
-		for (int j = 0; j < 8; j++)
-			cout << " " << printSquare(i++) << "|";
-		if (i == 64)
-			break;
-		cout << "\n  + - + - + - + - + - + - + - + - +\n";
-	}
-	cout << "\n  \\ - + - + - + - + - + - + - + - /\n"
-		<< "    a   b   c   d   e   f   g   h\n";
-}
-
 void GenPosition::parseReset()
 {
 	memset(square, EMPTY, 64);

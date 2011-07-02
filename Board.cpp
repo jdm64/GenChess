@@ -735,7 +735,7 @@ void GenBoard::printPieceList() const
 void GenBoard::dumpDebug() const
 {
 	cout << "hash:" << key << " stm:" << (int)stm << " ply:" << ply << endl;
-	printBoard();
+	cout << printBoard();
 	printPieceList();
 }
 

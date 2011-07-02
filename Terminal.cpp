@@ -72,7 +72,7 @@ bool GenTerminal::playerCmd()
 		cin >> cmd;
 
 		if (cmd == "board")
-			board.printBoard();
+			cout << board.printBoard();
 		else if (cmd == "fen")
 			cout << board.printFen() << endl;
 		else if (cmd == "zfen")
@@ -143,7 +143,7 @@ bool GenTerminal::mainMenu()
 
 void GenTerminal::run()
 {
-	board.printBoard();
+	cout << board.printBoard();
 
 	while (again) {
 		if (playerType[board.getStm()] == HUMAN) {
@@ -279,7 +279,7 @@ bool RegTerminal::playerCmd()
 		cin >> cmd;
 
 		if (cmd == "board")
-			board.printBoard();
+			cout << board.printBoard();
 		else if (cmd == "fen")
 			cout << board.printFen() << endl;
 		else if (cmd == "zfen")
@@ -353,7 +353,7 @@ bool RegTerminal::mainMenu()
 
 void RegTerminal::run()
 {
-	board.printBoard();
+	cout << board.printBoard();
 
 	while (again) {
 		if (playerType[board.getStm()] == HUMAN) {
@@ -364,7 +364,7 @@ void RegTerminal::run()
 			cout << "My move is: " << move.toString() << endl;
 		}
 		if (again)
-			board.printBoard();
+			cout << board.printBoard();
 
 		switch (board.isMate()) {
 		case NOTMATE:
