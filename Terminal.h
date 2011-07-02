@@ -30,14 +30,14 @@ private:
 	
 	int *playerType;
 
-public:
-	GenTerminal(const int white, const int black);
-
 	void displayHelp() const;
 
 	bool playerCmd();
 
 	bool mainMenu();
+
+public:
+	GenTerminal(const int white, const int black);
 
 	void run();
 };
@@ -54,9 +54,6 @@ private:
 
 	int *playerType;
 
-public:
-	RegTerminal(const int white, const int black);
-
 	uint64 perft(int depth);
 
 	void divide(int depth);
@@ -66,6 +63,9 @@ public:
 	bool playerCmd();
 
 	bool mainMenu();
+
+public:
+	RegTerminal(const int white, const int black);
 
 	void run();
 };

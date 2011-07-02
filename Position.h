@@ -28,11 +28,11 @@ class GenPosition : public GenMoveLookup
 protected:
 	int8 piece[32];
 
-public:
 	void parseReset();
 
 	bool setPiece(const int8 loc, const int8 type);
 
+public:
 	bool incheck(const int8 color) const;
 
 	bool parseFen(const string &st);
@@ -51,11 +51,11 @@ protected:
 	Piece piece[32];
 	MoveFlags flags;
 
-public:
 	void parseReset();
 
 	bool setPiece(const int8 loc, const int8 type);
 
+public:
 	bool incheck(const int8 color) const;
 
 	bool parseFen(const string &st);

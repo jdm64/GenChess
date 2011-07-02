@@ -34,6 +34,8 @@ private:
 
 	int pieceIndex(const int8 loc, const int8 type) const;
 
+	void rebuildHash();
+
 public:
 	GenBoard();
 
@@ -53,8 +55,6 @@ public:
 	}
 
 	void reset();
-
-	void rebuildHash();
 
 	void setBoard(const GenPosition &pos);
 
@@ -117,6 +117,8 @@ private:
 
 	void validateBoard(const RegMove move) const;
 
+	void rebuildHash();
+
 public:
 	RegBoard();
 
@@ -141,8 +143,6 @@ public:
 	}
 
 	void reset();
-
-	void rebuildHash();
 
 	void setBoard(RegPosition pos);
 

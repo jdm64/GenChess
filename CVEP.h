@@ -21,26 +21,26 @@
 #include "UI.h"
 
 class GenCVEP : public GenUI {
-public:
+private:
 	bool moveResults();
 
 	bool gameCmd();
 
 	bool mainCmd();
-
+public:
 	void run();
 };
 
 // --- Start Regular Chess ---
 
 class RegCVEP : public RegUI {
-public:
+private:
 	bool moveResults();
 
 	bool gameCmd();
 
 	bool mainCmd();
-
+public:
 	void run();
 };
 

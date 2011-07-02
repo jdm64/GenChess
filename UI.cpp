@@ -33,8 +33,6 @@ GenUI::GenUI()
 	game = new GenGame(&board);
 	engine = new GenEngine(&board);
 	gtt = new GenTransTable(32);
-
-	board.rebuildHash();
 }
 
 GenUI::~GenUI()
@@ -62,8 +60,6 @@ RegUI::RegUI()
 	game = new RegGame(&board);
 	engine = new RegEngine(&board);
 	rtt = new RegTransTable(32);
-
-	board.rebuildHash();
 }
 
 RegUI::~RegUI()

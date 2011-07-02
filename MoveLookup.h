@@ -42,7 +42,7 @@ public:
 
 class GenMoveLookup : public Position
 {
-public:
+protected:
 	int8* genAll(const int8 From) const;
 
 	int8* genCapture(const int8 From) const;
@@ -56,7 +56,7 @@ public:
 
 class RegMoveLookup : public Position
 {
-public:
+protected:
 	int8* genAll(const int8 From) const;
 
 	int8* genCapture(const int8 From) const;

@@ -46,16 +46,6 @@ private:
 
 	GenScoreSort cmpScore;
 
-public:
-	GenEngine(GenBoard* GenBoard) : curr(NULL), board(GenBoard)
-	{
-		maxNg = 5;
-	}
-
-	~GenEngine()
-	{
-	}
-
 	void pickRandomMove();
 
 	int Quiescence(int alpha, int beta, int depth);
@@ -66,9 +56,19 @@ public:
 
 	void search(int alpha, int beta, int depth, int limit);
 
-	GenMove think();
-
 	void debugTree();
+
+public:
+	GenEngine(GenBoard* GenBoard) : curr(NULL), board(GenBoard)
+	{
+		maxNg = 5;
+	}
+
+	~GenEngine()
+	{
+	}
+
+	GenMove think();
 };
 
 // --- Start Regular Chess ---
@@ -90,16 +90,6 @@ private:
 
 	RegScoreSort cmpScore;
 
-public:
-	RegEngine(RegBoard* Board) : curr(NULL), board(Board)
-	{
-		maxNg = 7;
-	}
-
-	~RegEngine()
-	{
-	}
-
 	void pickRandomMove();
 
 	int Quiescence(int alpha, int beta, int depth);
@@ -110,9 +100,19 @@ public:
 
 	void search(int alpha, int beta, int depth, int limit);
 
-	RegMove think();
-
 	void debugTree();
+
+public:
+	RegEngine(RegBoard* Board) : curr(NULL), board(Board)
+	{
+		maxNg = 7;
+	}
+
+	~RegEngine()
+	{
+	}
+
+	RegMove think();
 };
 
 #endif
