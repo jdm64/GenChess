@@ -216,9 +216,7 @@ int8 RegMove::getPromote() const
 
 int RegMove::type() const
 {
-	if (from == PLACEABLE)
-		return MOVE_PLACE;
-	else if (xindex != NONE)
+	if (xindex != NONE)
 		return MOVE_CAPTURE;
 	else
 		return MOVE_MOVE;
@@ -226,10 +224,30 @@ int RegMove::type() const
 
 string RegMove::toString() const
 {
+	if (getCastle() == 0x10)
+		return "O-O";
+	else if (getCastle() == 0x10)
+		return "O-O-O";
+
 	string out;
 
 	out = printLoc(from);
 	out += printLoc(to);
+
+	switch (getPromote()) {
+	case 2:
+		out += 'N';
+		break;
+	case 3:
+		out += 'B';
+		break;
+	case 4:
+		out += 'R';
+		break;
+	case 5:
+		out += 'Q';
+		break;
+	}
 	return out;
 }
 
