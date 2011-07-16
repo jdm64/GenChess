@@ -1475,7 +1475,7 @@ void RegBoard::getMoveList(RegMoveList *data, const int8 color, int movetype)
 			item.move.from = piece[idx].loc;
 			item.move.index = idx;
 
-			if (ABS(piece[idx].type) == PAWN && IS_PROMOTE(item.move.to, color)) {
+			if (ABS(piece[idx].type) == PAWN && isPromote(item.move, color)) {
 				item.move.setPromote(QUEEN);
 
 				make(item.move);
@@ -1641,7 +1641,7 @@ RegMoveList* RegBoard::getPerftMoveList(const int8 color)
 			item.move.from = piece[idx].loc;
 			item.move.index = idx;
 
-			if (ABS(piece[idx].type) == PAWN && IS_PROMOTE(item.move.to, color)) {
+			if (ABS(piece[idx].type) == PAWN && isPromote(item.move, color)) {
 
 				make(item.move);
 				if (incheck(color)) {

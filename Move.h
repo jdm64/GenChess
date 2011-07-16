@@ -79,8 +79,6 @@ string printLoc(const int8 loc);
 
 // ---Start Regular Chess ---
 
-#define IS_PROMOTE(TO, COLOR)	((COLOR == WHITE)? (TO < A7) : (TO > H2))
-
 struct RegMove {
 	int8 index;
 	int8 to;
