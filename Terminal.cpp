@@ -187,14 +187,9 @@ uint64 RegTerminal::perft(int depth)
 	RegMoveList *list = board.getPerftMoveList(board.getStm());
 
 	for (int i = 0; i < list->size; i++) {
-		uint64 hash = board.hash();
-
 		board.makeP(list->list[i].move);
 		nodes += perft(depth - 1);
 		board.unmakeP(list->list[i].move, undoFlags);
-
-		if (hash != board.hash())
-			cout << "error: " << list->list[i].move.toString() << endl;
 	}
 	delete list;
 	return nodes;
@@ -207,16 +202,11 @@ void RegTerminal::divide(int depth)
 	RegMoveList *list = board.getPerftMoveList(board.getStm());
 
 	for (int i = 0; i < list->size; i++) {
-		uint64 hash = board.hash();
-
 		board.makeP(list->list[i].move);
 		children = perft(depth - 1);
 		cout << list->list[i].move.toString() << " " << children << endl;
 		nodes += children;
 		board.unmakeP(list->list[i].move, undoFlags);
-
-		if (hash != board.hash())
-			cout << "error: " << list->list[i].move.toString() << endl;
 	}
 	cout << "total " << nodes << endl;
 	delete list;
