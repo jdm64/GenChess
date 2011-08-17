@@ -39,17 +39,17 @@ private:
 public:
 	GenBoard();
 
-	uint64 hash() const
+	inline uint64 hash() const
 	{
 		return key;
 	}
 
-	int getPly() const
+	inline int getPly() const
 	{
 		return ply;
 	}
 
-	int8 getStm() const
+	inline int8 getStm() const
 	{
 		return stm;
 	}
@@ -109,35 +109,40 @@ private:
 
 	int pieceIndex(const int8 loc, const int8 type) const;
 
-	bool isPromote(const RegMove move, const int8 color) const;
+	inline bool isPromote(const RegMove &move, int8 color) const
+	{
+		return (color == WHITE)?
+			(move.to <= H8 && move.from <= H7) :
+			(move.to >= A1 && move.from >= A2);
+	}
 
 	int validCastle(RegMove &move, const int8 color);
 
 	int validEnPassant(RegMove &move, const int8 color);
 
-	void validateBoard(const RegMove move) const;
+	void validateBoard(const RegMove &move) const;
 
 	void rebuildHash();
 
 public:
 	RegBoard();
 
-	uint64 hash() const
+	inline uint64 hash() const
 	{
 		return key;
 	}
 
-	int getPly() const
+	inline int getPly() const
 	{
 		return ply;
 	}
 
-	int8 getStm() const
+	inline int8 getStm() const
 	{
 		return stm;
 	}
 
-	MoveFlags getMoveFlags() const
+	inline MoveFlags getMoveFlags() const
 	{
 		return flags;
 	}
@@ -150,11 +155,11 @@ public:
 
 	void make(const RegMove &move);
 
-	void unmake(const RegMove &move, const MoveFlags undoFlags);
+	void unmake(const RegMove &move, const MoveFlags &undoFlags);
 
 	void makeP(const RegMove &move);
 
-	void unmakeP(const RegMove &move, const MoveFlags undoFlags);
+	void unmakeP(const RegMove &move, const MoveFlags &undoFlags);
 
 	int isMate();
 

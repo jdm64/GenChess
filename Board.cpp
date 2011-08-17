@@ -893,14 +893,7 @@ int RegBoard::pieceIndex(const int8 loc, const int8 type) const
 	return NONE;
 }
 
-bool RegBoard::isPromote(const RegMove move, int8 color) const
-{
-	return (color == WHITE)?
-		(move.to <= H8 && move.from <= H7) :
-		(move.to >= A1 && move.from >= A2);
-}
-
-void RegBoard::validateBoard(const RegMove move) const
+void RegBoard::validateBoard(const RegMove &move) const
 {
 	int cpt = 0;
 
@@ -1058,7 +1051,7 @@ void RegBoard::makeP(const RegMove &move)
 	ply++;
 }
 
-void RegBoard::unmake(const RegMove &move, MoveFlags undoFlags)
+void RegBoard::unmake(const RegMove &move, const MoveFlags &undoFlags)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
 	const int8 bits = flags.bits ^ undoFlags.bits;
@@ -1107,10 +1100,9 @@ void RegBoard::unmake(const RegMove &move, MoveFlags undoFlags)
 	ply--;
 }
 
-void RegBoard::unmakeP(const RegMove &move, MoveFlags undoFlags)
+void RegBoard::unmakeP(const RegMove &move, const MoveFlags &undoFlags)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
-	const int8 bits = flags.bits ^ undoFlags.bits;
 
 	if (move.getCastle()) {
 		bool left = (move.from - move.to > 0);
