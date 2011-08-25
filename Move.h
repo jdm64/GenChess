@@ -18,6 +18,7 @@
 #ifndef __MOVE_H__
 #define __MOVE_H__
 
+#include <iostream>
 #include <boost/array.hpp>
 #include "Defines.h"
 
@@ -26,13 +27,17 @@ using namespace std;
 extern const int8 pieceType[32];
 extern const char pieceSymbol[7];
 
-struct GenMove {
+string printLoc(const int8 loc);
+
+template<char Type>
+struct Move
+{
 	int8 index;
 	int8 to;
 	int8 from;
 	int8 xindex;
 
-	bool operator==(const GenMove &rhs) const;
+	bool operator==(const Move<Type> &rhs) const;
 
 	void setNull();
 
@@ -47,51 +52,33 @@ struct GenMove {
 	string dump() const;
 };
 
-// forward declations
-struct GenMoveNode;
-struct GenMoveList;
-
-struct GenMoveNode {
-	GenMove move;
-	int score;
-	bool check;
-
-	GenMoveNode() : score(0), check(false) {}
-};
-
-struct GenMoveList {
-	boost::array<GenMoveNode, 320> list;
-	int size;
-
-	GenMoveList() : size(0) {}
-
-	void print() const;
-};
-
-struct GenScoreSort {
-	bool operator()(const GenMoveNode &a, const GenMoveNode &b) const
-	{
-		return a.score > b.score;
-	}
-};
-
-string printLoc(const int8 loc);
-
-// ---Start Regular Chess ---
-
-struct RegMove {
+template<>
+struct Move<'R'>
+{
 	int8 index;
 	int8 to;
 	int8 from;
 	int8 xindex;
-	int8 flags; // castle, promote. en passant
+	int8 flags;
 
-	RegMove()
+	Move()
 	{
 		flags = 0;
 	}
 
-	bool operator==(const RegMove &rhs) const;
+	bool operator==(const Move<'R'> &rhs) const;
+
+	void setNull();
+
+	bool isNull() const;
+
+	int type() const;
+
+	string toString() const;
+
+	bool parse(const string &s);
+
+	string dump() const;
 
 	int8 getCastle() const;
 
@@ -104,46 +91,56 @@ struct RegMove {
 	void setPromote(int8 type);
 
 	int8 getPromote() const;
-
-	void setNull();
-
-	bool isNull() const;
-
-	int type() const;
-
-	string toString() const;
-
-	bool parse(const string &s);
-
-	string dump() const;
 };
 
-// forward declations
-struct RegMoveNode;
-struct RegMoveList;
+typedef Move<'G'> GenMove;
+typedef Move<'R'> RegMove;
 
-struct RegMoveNode {
-	RegMove move;
+
+template<class MoveType>
+struct MoveNode
+{
+	MoveType move;
 	int score;
 	bool check;
 
-	RegMoveNode() : score(0), check(false) {}
+	MoveNode() : score(0), check(false) {}
 };
 
-struct RegMoveList {
-	boost::array<RegMoveNode, 320> list;
+typedef MoveNode<GenMove> GenMoveNode;
+typedef MoveNode<RegMove> RegMoveNode;
+
+
+template<class NodeType>
+struct MoveList
+{
+	boost::array<NodeType, 320> list;
 	int size;
 
-	RegMoveList() : size(0) {}
+	MoveList() : size(0) {}
 
-	void print() const;
+	void print() const
+	{
+		for (int i = 0; i < size; i++)
+			cout << list[i].move.toString() << "[" << list[i].score << "] ";
+		cout << "\n";
+	}
 };
 
-struct RegScoreSort {
-	bool operator()(const RegMoveNode &a, const RegMoveNode &b) const
+typedef MoveList<GenMoveNode> GenMoveList;
+typedef MoveList<RegMoveNode> RegMoveList;
+
+
+template<class NodeType>
+struct ScoreSort
+{
+	bool operator()(const NodeType &a, const NodeType &b) const
 	{
 		return a.score > b.score;
 	}
 };
+
+typedef ScoreSort<GenMoveNode> GenScoreSort;
+typedef ScoreSort<RegMoveNode> RegScoreSort;
 
 #endif
