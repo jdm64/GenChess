@@ -19,6 +19,7 @@
 #define __TRANS_TABLE_H__
 
 #include "Board.h"
+#include "Rand64.h"
 
 //#define COLLISION_DEBUG
 
@@ -38,88 +39,156 @@ extern uint64 hashBox[ZBOX_SIZE];
 
 extern const int typeLookup[32];
 
-class GenTransTable;
-extern GenTransTable *gtt;
+struct TableStats
+{
+	static uint64 hit;
+	static uint64 miss;
+	static uint64 scorehit;
+	static uint64 scoremiss;
+	static uint64 movehit;
+	static uint64 movemiss;
 
-class GenTransItem {
+	static void clear()
+	{
+		hit = miss = scorehit = scoremiss = movehit = movemiss = 0;
+	}
+};
+
+template<class MoveType>
+class TransItem
+{
 public:
 	uint64 hash;
 	int score;
-	GenMove move;
+	MoveType move;
 	int8 depth;
 	int8 type;
 
-	GenTransItem();
+	TransItem()
+	{
+		hash = score = depth = 0;
+		type = NONE_NODE;
+	}
 
-	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const;
+	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
+	{
+		if ((type & HAS_SCORE) && depth >= inDepth) {
+			switch (type) {
+			case PV_NODE:
+				outScore = score;
+				TableStats::scorehit++;
+				return true;
+			case CUT_NODE:
+				if (score >= beta) {
+					outScore = score;
+					TableStats::scorehit++;
+					return true;
+				}
+				break;
+			case ALL_NODE:
+				if (score <= alpha) {
+					outScore = score;
+					TableStats::scorehit++;
+					return true;
+				}
+				break;
+			case NONE_NODE:
+				assert(0);
+			}
+		}
+		TableStats::scoremiss++;
+		return false;
+	}
 
-	bool getMove(GenMove &inMove) const;
+	bool getMove(MoveType &inMove) const
+	{
+		if (type & HAS_MOVE) {
+			inMove = move;
+			TableStats::movehit++;
+			return true;
+		} else {
+			TableStats::movemiss++;
+			return false;
+		}
+	}
 };
 
-class GenTransTable {
+typedef TransItem<GenMove> GenTransItem;
+typedef TransItem<RegMove> RegTransItem;
+
+
+template<class MoveType>
+class TransTable 
+{
 private:
-	GenTransItem *table;
+	TransItem<MoveType> *table;
 	int size;
 
 public:
-	uint64 hit, miss, scorehit, scoremiss, movehit, movemiss;
+	TransTable(const int num_MB)
+	{
+		Rand64 rad;
 
-	GenTransTable(const int num_MB);
+		for (int i = 0; i < ZBOX_SIZE; i++)
+			hashBox[i] = rad.next();
+		size = (num_MB * 1048576) / sizeof(TransItem<MoveType>);
+		table = new TransItem<MoveType>[size];
 
-	~GenTransTable();
+		startHash = rad.next();
+		TableStats::clear();
+	}
+
+	~TransTable()
+	{
+		delete[] table;
+	}
 	
-	sixInt stats() const;
+	sixInt stats() const
+	{
+		return {TableStats::hit, TableStats::miss, TableStats::scorehit,
+		TableStats::scoremiss, TableStats::movehit, TableStats::movemiss};
+	}
 
-	void clear();
+	void clear()
+	{
+		for (int i = 0; i < size; i++)
+			table[i].hash = 0;
+	}
 
-	void clearStats();
+	void clearStats()
+	{
+		TableStats::clear();
+	}
 
-	bool getItem(const uint64 hash, GenTransItem *&item);
+	bool getItem(const uint64 hash, TransItem<MoveType> *&item)
+	{
+		item = &table[hash % size];
 
-	void setItem(const uint64 hash, const int score, const GenMove &move, const int8 depth, const int8 type) const;
+		if (item->hash == hash) {
+			TableStats::hit++;
+			return true;
+		} else {
+			TableStats::miss++;
+			return false;
+		}
+	}
+
+	void setItem(const uint64 hash, const int score, const MoveType &move, const int8 depth, const int8 type) const
+	{
+		TransItem<MoveType>* const item = &table[hash % size];
+
+		item->hash = hash;
+		item->score = score;
+		item->move = move;
+		item->depth = depth;
+		item->type = type;
+	}
 };
 
-// --- Start Regular Chess ---
+typedef TransTable<GenMove> GenTransTable;
+typedef TransTable<RegMove> RegTransTable;
 
-class RegTransTable;
+extern GenTransTable *gtt;
 extern RegTransTable *rtt;
-
-class RegTransItem {
-public:
-	uint64 hash;
-	int score;
-	RegMove move;
-	int8 depth;
-	int8 type;
-
-	RegTransItem();
-
-	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const;
-
-	bool getMove(RegMove &inMove) const;
-};
-
-class RegTransTable {
-private:
-	RegTransItem *table;
-	int size;
-
-public:
-	uint64 hit, miss, scorehit, scoremiss, movehit, movemiss;
-
-	RegTransTable(const int num_MB);
-
-	~RegTransTable();
-
-	sixInt stats() const;
-
-	void clear();
-
-	void clearStats();
-
-	bool getItem(const uint64 hash, RegTransItem *&item);
-
-	void setItem(const uint64 hash, const int score, const RegMove &move, const int8 depth, const int8 type) const;
-};
 
 #endif
