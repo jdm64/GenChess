@@ -21,13 +21,16 @@
 #include "Engine.h"
 #include "Game.h"
 
-class GenUI {
+class GenUI
+{
 protected:
 	static const string moveError[NUM_MOVE_ERRORS];
 
 	GenBoard board;
 	
 	GenEngine *engine;
+
+	GenTransTable *tt;
 
 	GenGame *game;
 
@@ -43,13 +46,16 @@ public:
 
 // --- Start Regular Chess ---
 
-class RegUI {
+class RegUI
+{
 protected:
 	static const string moveError[NUM_MOVE_ERRORS];
 
 	RegBoard board;
 
 	RegEngine *engine;
+
+	RegTransTable *tt;
 
 	RegGame *game;
 

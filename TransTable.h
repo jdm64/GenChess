@@ -188,7 +188,4 @@ public:
 typedef TransTable<GenMove> GenTransTable;
 typedef TransTable<RegMove> RegTransTable;
 
-extern GenTransTable *gtt;
-extern RegTransTable *rtt;
-
 #endif

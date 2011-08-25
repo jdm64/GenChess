@@ -26,9 +26,6 @@ const int typeLookup[32] = {0, 0, 0, 0, 0, 0,  0,  0,
 			    6, 6, 6, 6, 6, 6,  6,  6,
 			    7, 7, 8, 8, 9, 9, 10, 11};
 
-GenTransTable *gtt;
-RegTransTable *rtt;
-
 uint64 TableStats::hit;
 uint64 TableStats::miss;
 uint64 TableStats::scorehit;

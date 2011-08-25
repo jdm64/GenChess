@@ -31,15 +31,15 @@ GenUI::GenUI()
 	again = true;
 
 	game = new GenGame(&board);
-	engine = new GenEngine(&board);
-	gtt = new GenTransTable(32);
+	tt = new GenTransTable(32);
+	engine = new GenEngine(&board, tt);
 }
 
 GenUI::~GenUI()
 {
 	delete game;
 	delete engine;
-	delete gtt;
+	delete tt;
 }
 
 // --- Start Regular Chess ---
@@ -58,13 +58,13 @@ RegUI::RegUI()
 	again = true;
 
 	game = new RegGame(&board);
-	engine = new RegEngine(&board);
-	rtt = new RegTransTable(32);
+	tt = new RegTransTable(32);
+	engine = new RegEngine(&board, tt);
 }
 
 RegUI::~RegUI()
 {
 	delete game;
 	delete engine;
-	delete gtt;
+	delete tt;
 }

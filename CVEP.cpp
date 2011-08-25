@@ -76,7 +76,7 @@ bool GenCVEP::gameCmd()
 		cout << "move " << move.toString() << endl;
 		return moveResults();
 	} else if (cmd == "clearhash") {
-		gtt->clear();
+		tt->clear();
 	} else if (cmd == "setboard") {
 		cin >> cmd;
 
@@ -202,7 +202,7 @@ bool RegCVEP::gameCmd()
 		cout << "move " << move.toString() << endl;
 		return moveResults();
 	} else if (cmd == "clearhash") {
-		gtt->clear();
+		tt->clear();
 	} else if (cmd == "setboard") {
 		cin >> cmd;
 
