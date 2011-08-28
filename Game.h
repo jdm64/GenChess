@@ -55,4 +55,13 @@ public:
 	bool undoMove();
 };
 
+template<class MoveType>
+struct Game;
+
+template<>
+struct Game<GenMove> { typedef GenGame type; };
+
+template<>
+struct Game<RegMove> { typedef RegGame type; };
+
 #endif

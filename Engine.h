@@ -117,4 +117,13 @@ public:
 	RegMove think();
 };
 
+template<class MoveType>
+struct Engine;
+
+template<>
+struct Engine<GenMove> { typedef GenEngine type; };
+
+template<>
+struct Engine<RegMove> { typedef RegEngine type; };
+
 #endif

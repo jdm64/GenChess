@@ -188,4 +188,13 @@ public:
 	void dumpDebug() const;
 };
 
+template<class MoveType>
+struct Board;
+
+template<>
+struct Board<GenMove> { typedef GenBoard type; };
+
+template<>
+struct Board<RegMove> { typedef RegBoard type; };
+
 #endif
