@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <sstream>
 #include "Board.h"
 #include "TransTable.h"
 
@@ -701,42 +702,43 @@ GenMoveList* GenBoard::getPerftMoveList(const int8 color, const int movetype)
 	return data;
 }
 
-void GenBoard::printPieceList() const
+string GenBoard::printPieceList() const
 {
+	stringstream buff;
 	string tmp;
 
-	cout << "White:\t";
+	buff << "White:\t";
 	for (int i = 16; i < 32; i++) {
 		if (i != 16 && !(i % 8))
-			cout << "\n\t";
-		cout << pieceSymbol[pieceType[i]] << "(";
+			buff << "\n\t";
+		buff << pieceSymbol[pieceType[i]] << "(";
 		tmp = printLoc(piece[i]);
 		if (tmp.length() == 2)
-			cout << ' ' << tmp << ' ';
+			buff << ' ' << tmp << ' ';
 		else
-			cout << tmp;
-		cout << ") ";
+			buff << tmp;
+		buff << ") ";
 	}
-	cout << "\nBlack:\t";
+	buff << "\nBlack:\t";
 	for (int i = 0; i < 16; i++) {
 		if (i && !(i % 8))
-			cout << "\n\t";
-		cout << pieceSymbol[-pieceType[i]] << "(";
+			buff << "\n\t";
+		buff << pieceSymbol[-pieceType[i]] << "(";
 		tmp = printLoc(piece[i]);
 		if (tmp.length() == 2)
-			cout << ' ' << tmp << ' ';
+			buff << ' ' << tmp << ' ';
 		else
-			cout << tmp;
-		cout << ") ";
+			buff << tmp;
+		buff << ") ";
 	}
-	cout << endl;
+	return buff.str();
 }
 
 void GenBoard::dumpDebug() const
 {
 	cout << "hash:" << key << " stm:" << (int)stm << " ply:" << ply << endl;
 	cout << printBoard();
-	printPieceList();
+	cout << printPieceList() << endl;
 }
 
 // --- Start Regular Chess ---
@@ -1720,4 +1722,36 @@ RegMoveList* RegBoard::getPerftMoveList(const int8 color)
 		unmake(item.move, undoFlags);
 	}
 	return data;
+}
+
+string RegBoard::printPieceList() const
+{
+	stringstream buff;
+	string tmp;
+
+	buff << "White:\t";
+	for (int i = 16; i < 32; i++) {
+		if (i != 16 && !(i % 8))
+			buff << "\n\t";
+		buff << pieceSymbol[piece[i].type] << "(";
+		tmp = printLoc(piece[i].loc);
+		if (tmp.length() == 2)
+			buff << ' ' << tmp << ' ';
+		else
+			buff << tmp;
+		buff << ") ";
+	}
+	buff << "\nBlack:\t";
+	for (int i = 0; i < 16; i++) {
+		if (i && !(i % 8))
+			buff << "\n\t";
+		buff << pieceSymbol[-piece[i].type] << "(";
+		tmp = printLoc(piece[i].loc);
+		if (tmp.length() == 2)
+			buff << ' ' << tmp << ' ';
+		else
+			buff << tmp;
+		buff << ") ";
+	}
+	return buff.str();
 }

@@ -86,7 +86,7 @@ public:
 
 	GenMoveList* getPerftMoveList(const int8 color, const int movetype);
 
-	void printPieceList() const;
+	string printPieceList() const;
 
 	void dumpDebug() const;
 };
@@ -181,7 +181,7 @@ public:
 
 	RegMoveList* getPerftMoveList(const int8 color);
 
-	void printPieceList() const;
+	string printPieceList() const;
 
 	void dumpDebug() const;
 };
