@@ -86,6 +86,8 @@ public:
 
 	GenMoveList* getPerftMoveList(const int8 color, const int movetype);
 
+	GenMoveList* getPerftMoveList(const int8 color);
+
 	string printPieceList() const;
 
 	void dumpDebug() const;

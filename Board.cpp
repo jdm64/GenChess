@@ -702,6 +702,11 @@ GenMoveList* GenBoard::getPerftMoveList(const int8 color, const int movetype)
 	return data;
 }
 
+GenMoveList* GenBoard::getPerftMoveList(const int8 color)
+{
+	return getPerftMoveList(color, MOVE_ALL);
+}
+
 string GenBoard::printPieceList() const
 {
 	stringstream buff;
