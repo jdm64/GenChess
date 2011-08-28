@@ -111,10 +111,10 @@ typedef MoveNode<GenMove> GenMoveNode;
 typedef MoveNode<RegMove> RegMoveNode;
 
 
-template<class NodeType>
+template<class MoveType>
 struct MoveList
 {
-	boost::array<NodeType, 320> list;
+	boost::array<MoveNode<MoveType>, 320> list;
 	int size;
 
 	MoveList() : size(0) {}
@@ -127,20 +127,20 @@ struct MoveList
 	}
 };
 
-typedef MoveList<GenMoveNode> GenMoveList;
-typedef MoveList<RegMoveNode> RegMoveList;
+typedef MoveList<GenMove> GenMoveList;
+typedef MoveList<RegMove> RegMoveList;
 
 
-template<class NodeType>
+template<class MoveType>
 struct ScoreSort
 {
-	bool operator()(const NodeType &a, const NodeType &b) const
+	bool operator()(const MoveNode<MoveType> &a, const MoveNode<MoveType> &b) const
 	{
 		return a.score > b.score;
 	}
 };
 
-typedef ScoreSort<GenMoveNode> GenScoreSort;
-typedef ScoreSort<RegMoveNode> RegScoreSort;
+typedef ScoreSort<GenMove> GenScoreSort;
+typedef ScoreSort<RegMove> RegScoreSort;
 
 #endif
