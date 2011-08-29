@@ -133,17 +133,6 @@ void GenBoard::setBoard(const GenPosition &pos)
 	rebuildHash();
 }
 
-GenPosition GenBoard::getPosition() const
-{
-	GenPosition pos;
-
-	memcpy(pos.square, square, 64);
-	memcpy(pos.piece, piece, 32);
-	pos.ply = ply;
-
-	return pos;
-}
-
 int GenBoard::pieceIndex(const int8 loc, const int8 type) const
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
@@ -868,20 +857,6 @@ void RegBoard::setBoard(RegPosition pos)
 #ifdef TT_ENABLED
 	rebuildHash();
 #endif
-}
-
-RegPosition RegBoard::getPosition() const
-{
-	RegPosition pos;
-
-	copy(square, square + 64, pos.square);
-	copy(piece, piece + 32, pos.piece);
-
-	pos.flags = flags;
-	pos.ply = ply;
-	pos.stm = stm;
-
-	return pos;
 }
 
 int RegBoard::pieceIndex(const int8 loc, const int8 type) const

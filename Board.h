@@ -58,8 +58,6 @@ public:
 
 	void setBoard(const GenPosition &pos);
 
-	GenPosition getPosition() const;
-
 	void make(const GenMove &move);
 
 	void unmake(const GenMove &move);
@@ -150,8 +148,6 @@ public:
 	void reset();
 
 	void setBoard(RegPosition pos);
-
-	RegPosition getPosition() const;
 
 	void make(const RegMove &move);
 
