@@ -865,8 +865,9 @@ void RegBoard::setBoard(RegPosition pos)
 	flags = pos.flags;
 	ply = pos.ply;
 	stm = pos.stm;
-
+#ifdef TT_ENABLED
 	rebuildHash();
+#endif
 }
 
 RegPosition RegBoard::getPosition() const
@@ -940,21 +941,21 @@ error:
 void RegBoard::make(const RegMove &move)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
-
+#ifdef TT_ENABLED
 	key ^= hashBox[13 * move.from + piece[move.index].type + 6];
-
+#endif
 	if (move.getCastle()) {
 		bool left = (move.getCastle() == 0x20);
 		int castleTo = move.to + (left? 1 : -1);
 		int castleI = pieceIndex(move.to - (move.to & 0x7) + (left? 0 : 7), color * ROOK);
-
+#ifdef TT_ENABLED
 		key ^= hashBox[13 * piece[castleI].loc + piece[castleI].type + 6];
 		key ^= hashBox[13 * castleTo + piece[castleI].type + 6];
 		if (flags.canKingCastle(color))
 			key ^= hashBox[CASTLE_HASH + color];
 		if (flags.canQueenCastle(color))
 			key ^= hashBox[CASTLE_HASH + color * 2];
-
+#endif
 		square[castleTo] = piece[castleI].type;
 		square[piece[castleI].loc] = EMPTY;
 		piece[castleI].loc = castleTo;
@@ -962,25 +963,35 @@ void RegBoard::make(const RegMove &move)
 	} else if (ABS(piece[move.index].type) == ROOK) {
 		if (move.from == (isWhite? H1:H8) && flags.canKingCastle(color)) {
 			flags.clearKingCastle(color);
+#ifdef TT_ENABLED
 			key ^= hashBox[CASTLE_HASH + color];
+#endif
 		} else if (move.from == (isWhite? A1:A8) && flags.canQueenCastle(color)) {
 			flags.clearQueenCastle(color);
+#ifdef TT_ENABLED
 			key ^= hashBox[CASTLE_HASH + color * 2];
+#endif
 		}
 	} else if (ABS(piece[move.index].type) == KING && flags.canCastle(color)) {
+#ifdef TT_ENABLED
 		if (flags.canKingCastle(color))
 			key ^= hashBox[CASTLE_HASH + color];
 		if (flags.canQueenCastle(color))
 			key ^= hashBox[CASTLE_HASH + color * 2];
+#endif
 		flags.clearCastle(color);
 	} else if (move.getPromote()) {
 		piece[move.index].type = move.getPromote() * color;
 	}
+#ifdef TT_ENABLED
 	key ^= hashBox[13 * move.to + piece[move.index].type + 6];
+#endif
 
 	if (flags.canEnPassant()) {
 		flags.clearEnPassant();
+#ifdef TT_ENABLED
 		key ^= hashBox[ENPASSANT_HASH];
+#endif
 	}
 
 	// update board information
@@ -989,16 +1000,21 @@ void RegBoard::make(const RegMove &move)
 	// update piece information
 	piece[move.index].loc = move.to;
 	if (move.xindex != NONE) {
+#ifdef TT_ENABLED
 		key ^= hashBox[13 * piece[move.xindex].loc + piece[move.xindex].type + 6];
+#endif
 		if (move.getEnPassant())
 			square[piece[move.xindex].loc] = EMPTY;
 		piece[move.xindex].loc = DEAD;
 	} else if (ABS(piece[move.index].type) == PAWN && ABS(move.to - move.from) == 16) {
 		flags.setEnPassant(move.to & 0x7);
+#ifdef TT_ENABLED
 		key ^= hashBox[ENPASSANT_HASH];
+#endif
 	}
-
+#ifdef TT_ENABLED
 	key ^= hashBox[WTM_HASH];
+#endif
 	stm ^= -2;
 	ply++;
 }
@@ -1028,10 +1044,8 @@ void RegBoard::makeP(const RegMove &move)
 		piece[move.index].type = move.getPromote() * color;
 	}
 
-	if (flags.canEnPassant()) {
+	if (flags.canEnPassant())
 		flags.clearEnPassant();
-		key ^= hashBox[ENPASSANT_HASH];
-	}
 
 	// update board information
 	square[move.from] = EMPTY;
@@ -1054,29 +1068,32 @@ void RegBoard::makeP(const RegMove &move)
 void RegBoard::unmake(const RegMove &move, const MoveFlags &undoFlags)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
-	const int8 bits = flags.bits ^ undoFlags.bits;
 
+#ifdef TT_ENABLED
+	const int8 bits = flags.bits ^ undoFlags.bits;
 	key ^= (bits & ((color == WHITE)? 0x10 : 0x40))? hashBox[CASTLE_HASH + color] : 0;
 	key ^= (bits & ((color == WHITE)? 0x20 : 0x80))? hashBox[CASTLE_HASH + 2 * color] : 0;
 	key ^= (bits & 0x8)? hashBox[ENPASSANT_HASH] : 0;
 	key ^= hashBox[13 * move.to + piece[move.index].type + 6];
+#endif
 
 	if (move.getCastle()) {
 		bool left = (move.from - move.to > 0);
 		int castleFrom = move.to - (move.to & 0x7) + (left? 0 : 7);
 		int castleI = pieceIndex(move.to + (left? 1 : -1), isWhite? WHITE_ROOK : BLACK_ROOK);
-
+#ifdef TT_ENABLED
 		key ^= hashBox[13 * piece[castleI].loc + piece[castleI].type + 6];
 		key ^= hashBox[13 * castleFrom + piece[castleI].type + 6];
-
+#endif
 		square[piece[castleI].loc] = EMPTY;
 		square[castleFrom] = piece[castleI].type;
 		piece[castleI].loc = castleFrom;
 	} else if (move.getPromote()) {
 		piece[move.index].type = PAWN * color;
 	}
-
+#ifdef TT_ENABLED
 	key ^= hashBox[13 * move.from + piece[move.index].type + 6];
+#endif
 
 	piece[move.index].loc = move.from;
 	if (move.xindex == NONE) {
@@ -1090,11 +1107,14 @@ void RegBoard::unmake(const RegMove &move, const MoveFlags &undoFlags)
 			piece[move.xindex].loc = move.to;
 			square[move.to] = piece[move.xindex].type;
 		}
+#ifdef TT_ENABLED
 		key ^= hashBox[13 * piece[move.xindex].loc + piece[move.xindex].type + 6];
+#endif
 	}
 	square[move.from] = piece[move.index].type;
-
+#ifdef TT_ENABLED
 	key ^= hashBox[WTM_HASH];
+#endif
 	flags = undoFlags;
 	stm ^= -2;
 	ply--;
@@ -1131,7 +1151,6 @@ void RegBoard::unmakeP(const RegMove &move, const MoveFlags &undoFlags)
 	}
 	square[move.from] = piece[move.index].type;
 
-	key ^= hashBox[WTM_HASH];
 	flags = undoFlags;
 	stm ^= -2;
 	ply--;
