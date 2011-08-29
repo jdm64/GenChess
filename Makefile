@@ -7,7 +7,7 @@ VERSION = $(shell grep "define VERSION" Defines.h | cut -d'"' -f2)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
 objs = Util.o Move.o BaseBoard.o MoveLookup.o Position.o Board.o \
-	TransTable.o Engine.o Game.o UI.o CVEP.o Terminal.o main.o
+	TransTable.o Engine.o Game.o main.o
 
 all : genchess enginetester
 

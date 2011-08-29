@@ -15,7 +15,6 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
 #include "Move.h"
 
 const int8 pieceType[32] = {
@@ -46,14 +45,16 @@ string printLoc(const int8 loc)
 	}
 }
 
-bool GenMove::operator==(const GenMove &rhs) const
+template<char Type>
+bool Move<Type>::operator==(const Move<Type> &rhs) const
 {
 	if (to == rhs.to && from == rhs.from && index == rhs.index && xindex == rhs.xindex)
 		return true;
 	return false;
 }
 
-void GenMove::setNull()
+template<>
+void Move<'G'>::setNull()
 {
 	index = NULL_MOVE;
 	xindex = NULL_MOVE;
@@ -61,14 +62,31 @@ void GenMove::setNull()
 	to = NULL_MOVE;
 }
 
-bool GenMove::isNull() const
+void Move<'R'>::setNull()
+{
+	index = NULL_MOVE;
+	xindex = NULL_MOVE;
+	from = NULL_MOVE;
+	to = NULL_MOVE;
+}
+
+template<>
+bool Move<'G'>::isNull() const
 {
 	if (index == NULL_MOVE && xindex == NULL_MOVE && from == NULL_MOVE && to == NULL_MOVE)
 		return true;
 	return false;
 }
 
-int GenMove::type() const
+bool Move<'R'>::isNull() const
+{
+	if (index == NULL_MOVE && xindex == NULL_MOVE && from == NULL_MOVE && to == NULL_MOVE)
+		return true;
+	return false;
+}
+
+template<char Type>
+int Move<Type>::type() const
 {
 	if (from == PLACEABLE)
 		return MOVE_PLACE;
@@ -78,7 +96,8 @@ int GenMove::type() const
 		return MOVE_MOVE;
 }
 
-string GenMove::toString() const
+template<>
+string Move<'G'>::toString() const
 {
 	string out;
 
@@ -90,7 +109,37 @@ string GenMove::toString() const
 	return out;
 }
 
-bool GenMove::parse(const string &s)
+string Move<'R'>::toString() const
+{
+	if (getCastle() == 0x10)
+		return "O-O";
+	else if (getCastle() == 0x10)
+		return "O-O-O";
+
+	string out;
+
+	out = printLoc(from);
+	out += printLoc(to);
+
+	switch (getPromote()) {
+	case 2:
+		out += 'N';
+		break;
+	case 3:
+		out += 'B';
+		break;
+	case 4:
+		out += 'R';
+		break;
+	case 5:
+		out += 'Q';
+		break;
+	}
+	return out;
+}
+
+template<>
+bool Move<'G'>::parse(const string &s)
 {
 	int8 piece;
 	bool place = true;
@@ -144,114 +193,7 @@ bool GenMove::parse(const string &s)
 	return true;
 }
 
-string GenMove::dump() const
-{
-	char data[24];
-
-	sprintf(data, "[%d %d %d %d]", (int)index, (int)xindex, (int)from, (int)to);
-
-	return string(data);
-}
-
-void GenMoveList::print() const
-{
-	for (int i = 0; i < size; i++)
-		cout << list[i].move.toString() << "[" << list[i].score << "] ";
-	cout << "\n";
-}
-
-// --- Start Regular Chess ---
-
-bool RegMove::operator==(const RegMove &rhs) const
-{
-	if (to == rhs.to && from == rhs.from && index == rhs.index && xindex == rhs.xindex)
-		return true;
-	return false;
-}
-
-void RegMove::setNull()
-{
-	index = NULL_MOVE;
-	xindex = NULL_MOVE;
-	from = NULL_MOVE;
-	to = NULL_MOVE;
-}
-
-bool RegMove::isNull() const
-{
-	if (index == NULL_MOVE && xindex == NULL_MOVE && from == NULL_MOVE && to == NULL_MOVE)
-		return true;
-	return false;
-}
-
-int8 RegMove::getCastle() const
-{
-	return flags & 0x30;
-}
-
-void RegMove::setCastle(int8 side) // 0x10 =kingside, 0x20=queensize
-{
-	flags = side & 0x30;
-}
-
-void RegMove::setEnPassant()
-{
-	flags = 0x8;
-}
-
-bool RegMove::getEnPassant() const
-{
-	return flags & 0x8;
-}
-
-void RegMove::setPromote(int8 type)
-{
-	flags = 0x7 & type;
-}
-
-int8 RegMove::getPromote() const
-{
-	return flags & 0x7;
-}
-
-int RegMove::type() const
-{
-	if (xindex != NONE)
-		return MOVE_CAPTURE;
-	else
-		return MOVE_MOVE;
-}
-
-string RegMove::toString() const
-{
-	if (getCastle() == 0x10)
-		return "O-O";
-	else if (getCastle() == 0x10)
-		return "O-O-O";
-
-	string out;
-
-	out = printLoc(from);
-	out += printLoc(to);
-
-	switch (getPromote()) {
-	case 2:
-		out += 'N';
-		break;
-	case 3:
-		out += 'B';
-		break;
-	case 4:
-		out += 'R';
-		break;
-	case 5:
-		out += 'Q';
-		break;
-	}
-	return out;
-}
-
-bool RegMove::parse(const string &s)
+bool Move<'R'>::parse(const string &s)
 {
 	switch (s[0]) {
 	case 'O':
@@ -304,7 +246,17 @@ bool RegMove::parse(const string &s)
 	return true;
 }
 
-string RegMove::dump() const
+template<>
+string Move<'G'>::dump() const
+{
+	char data[24];
+
+	sprintf(data, "[%d %d %d %d]", (int)index, (int)xindex, (int)from, (int)to);
+
+	return string(data);
+}
+
+string Move<'R'>::dump() const
 {
 	char data[24];
 
@@ -313,9 +265,32 @@ string RegMove::dump() const
 	return string(data);
 }
 
-void RegMoveList::print() const
+int8 Move<'R'>::getCastle() const
 {
-	for (int i = 0; i < size; i++)
-		cout << list[i].move.toString() << "[" << list[i].score << "] ";
-	cout << "\n";
+	return flags & 0x30;
+}
+
+void Move<'R'>::setCastle(int8 side) // 0x10 =kingside, 0x20=queensize
+{
+	flags = side & 0x30;
+}
+
+void Move<'R'>::setEnPassant()
+{
+	flags = 0x8;
+}
+
+bool Move<'R'>::getEnPassant() const
+{
+	return flags & 0x8;
+}
+
+void Move<'R'>::setPromote(int8 type)
+{
+	flags = 0x7 & type;
+}
+
+int8 Move<'R'>::getPromote() const
+{
+	return flags & 0x7;
 }

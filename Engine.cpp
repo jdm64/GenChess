@@ -95,7 +95,7 @@ bool GenEngine::NegaMoveType(int &alpha, const int beta, int &best,
 		board->unmake(move);
 
 		if (best >= beta) {
-			gtt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
+			tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
 			return true;
 		} else if (best > alpha) {
 			alpha = best;
@@ -127,7 +127,7 @@ bool GenEngine::NegaMoveType(int &alpha, const int beta, int &best,
 		best = max(best, ptr->list[n].score);
 		if (best >= beta) {
 			killer[depth] = ptr->list[n].move;
-			gtt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
+			tt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
 			delete ptr;
 			return true;
 		} else if (best > alpha) {
@@ -156,7 +156,7 @@ int GenEngine::NegaScout(int alpha, const int beta, const int depth, int limit)
 	pvMove[depth].setNull();
 
 	// Try Transposition Table
-	if (gtt->getItem(board->hash(), tt_item)) {
+	if (tt->getItem(board->hash(), tt_item)) {
 		// Try score
 		if (tt_item->getScore(alpha, beta, limit - depth, score))
 			return score;
@@ -176,7 +176,7 @@ int GenEngine::NegaScout(int alpha, const int beta, const int depth, int limit)
 			board->unmake(move);
 
 			if (best >= beta) {
-				gtt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
+				tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
 				return best;
 			} else if (best > alpha) {
 				alpha = best;
@@ -197,7 +197,7 @@ hashMiss:
 
 	if (ismate[depth])
 		best = tactical[depth]? CHECKMATE_SCORE + board->getPly() : STALEMATE_SCORE;
-	gtt->setItem(board->hash(), best, pvMove[depth], limit - depth, (pvMove[depth].isNull())? ALL_NODE : PV_NODE);
+	tt->setItem(board->hash(), best, pvMove[depth], limit - depth, (pvMove[depth].isNull())? ALL_NODE : PV_NODE);
 
 	return best;
 }
@@ -219,7 +219,7 @@ void GenEngine::search(int alpha, const int beta, const int depth, const int lim
 		if (curr->list[n].score > alpha) {
 			alpha = curr->list[n].score;
 			pvMove[depth] = curr->list[n].move;
-			gtt->setItem(board->hash(), alpha, pvMove[depth], limit - depth, PV_NODE);
+			tt->setItem(board->hash(), alpha, pvMove[depth], limit - depth, PV_NODE);
 		}
 		b = alpha + 1;
 	}
@@ -241,11 +241,11 @@ GenMove GenEngine::think()
 	}
 
 #ifdef PRINT_HASH_STATS
-	sixInt st = gtt->stats();
+	sixInt st = tt->stats();
 	cout << "stats total=" << st.one + st.two << " hits=" << 100 * st.one / double(st.one + st.two)
 		<< "% scorehits=" << 100 * st.three / double(st.three + st.four)
 		<< "% movehits=" << 100 * st.five / double(st.five + st.six) << "%" << endl;
-	gtt->clearStats();
+	tt->clearStats();
 #endif
 
 	// Randomize opening
@@ -381,7 +381,7 @@ bool RegEngine::NegaMoveType(int &alpha, const int beta, int &best,
 		board->unmake(move, undoFlags);
 
 		if (best >= beta) {
-			rtt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
+			tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
 			return true;
 		} else if (best > alpha) {
 			alpha = best;
@@ -413,7 +413,7 @@ bool RegEngine::NegaMoveType(int &alpha, const int beta, int &best,
 		best = max(best, ptr->list[n].score);
 		if (best >= beta) {
 			killer[depth] = ptr->list[n].move;
-			rtt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
+			tt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
 			delete ptr;
 			return true;
 		} else if (best > alpha) {
@@ -444,7 +444,7 @@ int RegEngine::NegaScout(int alpha, int beta, int depth, int limit)
 	pvMove[depth].setNull();
 
 	// Try Transposition Table
-	if (rtt->getItem(board->hash(), tt_item)) {
+	if (tt->getItem(board->hash(), tt_item)) {
 		// Try score
 		if (tt_item->getScore(alpha, beta, limit - depth, score))
 			return score;
@@ -464,7 +464,7 @@ int RegEngine::NegaScout(int alpha, int beta, int depth, int limit)
 			board->unmake(move, undoFlags);
 
 			if (best >= beta) {
-				rtt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
+				tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
 				return best;
 			} else if (best > alpha) {
 				alpha = best;
@@ -482,7 +482,7 @@ hashMiss:
 
 	if (ismate[depth])
 		best = tactical[depth]? CHECKMATE_SCORE + board->getPly() : STALEMATE_SCORE;
-	rtt->setItem(board->hash(), best, pvMove[depth], limit - depth, (pvMove[depth].isNull())? ALL_NODE : PV_NODE);
+	tt->setItem(board->hash(), best, pvMove[depth], limit - depth, (pvMove[depth].isNull())? ALL_NODE : PV_NODE);
 
 	return best;
 }
@@ -505,7 +505,7 @@ void RegEngine::search(int alpha, int beta, int depth, int limit)
 		if (curr->list[n].score > alpha) {
 			alpha = curr->list[n].score;
 			pvMove[depth] = curr->list[n].move;
-			rtt->setItem(board->hash(), alpha, pvMove[depth], limit - depth, PV_NODE);
+			tt->setItem(board->hash(), alpha, pvMove[depth], limit - depth, PV_NODE);
 		}
 		b = alpha + 1;
 	}
@@ -527,11 +527,11 @@ RegMove RegEngine::think()
 	}
 
 #ifdef PRINT_HASH_STATS
-	sixInt st = rtt->stats();
+	sixInt st = tt->stats();
 	cout << "stats total=" << st.one + st.two << " hits=" << 100 * st.one / double(st.one + st.two)
 		<< "% scorehits=" << 100 * st.three / double(st.three + st.four)
 		<< "% movehits=" << 100 * st.five / double(st.five + st.six) << "%" << endl;
-	rtt->clearStats();
+	tt->clearStats();
 #endif
 
 	// Randomize opening

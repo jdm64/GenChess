@@ -33,6 +33,7 @@ private:
 	GenMoveList *curr;
 
 	GenBoard *board;
+	GenTransTable *tt;
 
 	Array<GenMove> captureKiller;
 	Array<GenMove> moveKiller;
@@ -59,7 +60,7 @@ private:
 	void debugTree();
 
 public:
-	GenEngine(GenBoard* GenBoard) : curr(NULL), board(GenBoard)
+	GenEngine(GenBoard *GenBoard, GenTransTable *TT) : curr(NULL), board(GenBoard), tt(TT)
 	{
 		maxNg = 5;
 	}
@@ -78,6 +79,7 @@ private:
 	RegMoveList *curr;
 
 	RegBoard *board;
+	RegTransTable *tt;
 
 	Array<RegMove> captureKiller;
 	Array<RegMove> moveKiller;
@@ -103,7 +105,7 @@ private:
 	void debugTree();
 
 public:
-	RegEngine(RegBoard* Board) : curr(NULL), board(Board)
+	RegEngine(RegBoard *Board, RegTransTable *TT) : curr(NULL), board(Board), tt(TT)
 	{
 		maxNg = 7;
 	}
@@ -114,5 +116,14 @@ public:
 
 	RegMove think();
 };
+
+template<class MoveType>
+struct Engine;
+
+template<>
+struct Engine<GenMove> { typedef GenEngine type; };
+
+template<>
+struct Engine<RegMove> { typedef RegEngine type; };
 
 #endif

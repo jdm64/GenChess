@@ -67,4 +67,13 @@ public:
 	string printZfen() const;
 };
 
+template<class MoveType>
+struct Position;
+
+template<>
+struct Position<GenMove> { typedef GenPosition type; };
+
+template<>
+struct Position<RegMove> { typedef RegPosition type; };
+
 #endif
