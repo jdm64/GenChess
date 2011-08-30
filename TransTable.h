@@ -155,12 +155,12 @@ public:
 			table[i].hash = 0;
 	}
 
-	void clearStats()
+	void clearStats() const
 	{
 		TableStats::clear();
 	}
 
-	bool getItem(const uint64 hash, TransItem<MoveType> *&item)
+	bool getItem(const uint64 hash, TransItem<MoveType> *&item) const
 	{
 		item = &table[hash % size];
 
