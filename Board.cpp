@@ -298,10 +298,8 @@ bool GenBoard::validMove(const GenMove &moveIn, GenMove &move)
 		return false;
 	}
 
-	if (move.from != PLACEABLE) {
-		if (!fromto(move.from, move.to))
+	if (move.from != PLACEABLE && !fromto(move.from, move.to))
 			return false;
-	}
 	if (ply < 2 && ABS(pieceType[move.index]) != KING)
 		return false;
 
@@ -344,10 +342,8 @@ int GenBoard::validMove(const string &smove, const int8 color, GenMove &move)
 	// must place king first
 	if (ply < 2 && ABS(pieceType[move.index]) != KING)
 		return KING_FIRST;
-	if (move.from != PLACEABLE) {
-		if (!fromto(move.from, move.to))
+	if (move.from != PLACEABLE && !fromto(move.from, move.to))
 			return INVALID_MOVEMENT;
-	}
 	int ret = VALID_MOVE;
 
 	make(move);
