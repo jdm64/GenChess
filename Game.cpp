@@ -31,7 +31,7 @@ void GenGame::doMove(const GenMove &move)
 
 bool GenGame::undoMove()
 {
-	if (!history.size())
+	if (history.empty())
 		return false;
 	board->unmake(history.back());
         history.pop_back();
@@ -57,7 +57,7 @@ void RegGame::doMove(const RegMove &move)
 
 bool RegGame::undoMove()
 {
-	if (!history.size())
+	if (history.empty())
 		return false;
 	HistoryNode node = history.back();
 	board->unmake(node.move, node.flags);
