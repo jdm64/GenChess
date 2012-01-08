@@ -1146,7 +1146,7 @@ int RegBoard::isMate()
 
 bool RegBoard::validMove(const RegMove &moveIn, RegMove &move)
 {
-	if (move.from == move.to)
+	if (moveIn.from == moveIn.to)
 		return false;
 
 	const MoveFlags undoFlags = flags;
