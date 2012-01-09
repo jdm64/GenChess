@@ -214,12 +214,12 @@ uint64 Terminal<GenMove>::perft(int depth)
 		return 1;
 
 	uint64 nodes = 0;
-	MoveList<GenMove> *list = board.getPerftMoveList(board.getStm());
+	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MOVE_ALL);
 
 	for (int i = 0; i < list->size; i++) {
-		board.makeP(list->list[i].move);
+		board.make(list->list[i].move);
 		nodes += perft(depth - 1);
-		board.unmakeP(list->list[i].move);
+		board.unmake(list->list[i].move);
 	}
 	delete list;
 	return nodes;
@@ -233,12 +233,12 @@ uint64 Terminal<RegMove>::perft(int depth)
 
 	uint64 nodes = 0;
 	const MoveFlags undoFlags = board.getMoveFlags();
-	RegMoveList *list = board.getPerftMoveList(board.getStm());
+	RegMoveList *list = board.getMoveList(board.getStm(), MOVE_ALL);
 
 	for (int i = 0; i < list->size; i++) {
-		board.makeP(list->list[i].move);
+		board.make(list->list[i].move);
 		nodes += perft(depth - 1);
-		board.unmakeP(list->list[i].move, undoFlags);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 	delete list;
 	return nodes;
@@ -248,14 +248,14 @@ template<>
 void Terminal<GenMove>::divide(int depth)
 {
 	uint64 nodes = 0, children;
-	MoveList<GenMove> *list = board.getPerftMoveList(board.getStm());
+	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MOVE_ALL);
 
 	for (int i = 0; i < list->size; i++) {
-		board.makeP(list->list[i].move);
+		board.make(list->list[i].move);
 		children = perft(depth - 1);
 		cout << list->list[i].move.toString() << " " << children << endl;
 		nodes += children;
-		board.unmakeP(list->list[i].move);
+		board.unmake(list->list[i].move);
 	}
 	cout << "total " << nodes << endl;
 	delete list;
@@ -266,14 +266,14 @@ void Terminal<RegMove>::divide(int depth)
 {
 	uint64 nodes = 0, children;
 	const MoveFlags undoFlags = board.getMoveFlags();
-	RegMoveList *list = board.getPerftMoveList(board.getStm());
+	RegMoveList *list = board.getMoveList(board.getStm(), MOVE_ALL);
 
 	for (int i = 0; i < list->size; i++) {
-		board.makeP(list->list[i].move);
+		board.make(list->list[i].move);
 		children = perft(depth - 1);
 		cout << list->list[i].move.toString() << " " << children << endl;
 		nodes += children;
-		board.unmakeP(list->list[i].move, undoFlags);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 	cout << "total " << nodes << endl;
 	delete list;

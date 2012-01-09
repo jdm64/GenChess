@@ -62,8 +62,6 @@ public:
 
 	void unmake(const GenMove &move);
 
-	void makeP(const GenMove &move);
-
 	void unmakeP(const GenMove &move);
 
 	int isMate();
@@ -81,10 +79,6 @@ public:
 	void getMoveList(GenMoveList* const data, const int8 color, const int movetype);
 
 	GenMoveList* getMoveList(const int8 color, const int movetype);
-
-	GenMoveList* getPerftMoveList(const int8 color, const int movetype);
-
-	GenMoveList* getPerftMoveList(const int8 color);
 
 	string printPieceList() const;
 
@@ -155,10 +149,6 @@ public:
 
 	void unmake(const RegMove &move, const MoveFlags &undoFlags);
 
-	void makeP(const RegMove &move);
-
-	void unmakeP(const RegMove &move, const MoveFlags &undoFlags);
-
 	int isMate();
 
 	bool validMove(const RegMove &moveIn, RegMove &move);
@@ -176,8 +166,6 @@ public:
 	void getEnPassantMoveList(RegMoveList *data, const int8 color);
 
 	RegMoveList* getMoveList(const int8 color, const int movetype);
-
-	RegMoveList* getPerftMoveList(const int8 color);
 
 	string printPieceList() const;
 
