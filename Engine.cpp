@@ -39,7 +39,7 @@ void GenEngine::pickRandomMove()
 
 int GenEngine::Quiescence(int alpha, int beta, int depth)
 {
-	GenMoveList* const ptr = board->getMoveList(board->getStm(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
+	GenMoveList* const ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveType::ALL : MoveType::CAPTURE);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -76,7 +76,7 @@ int GenEngine::Quiescence(int alpha, int beta, int depth)
 }
 
 bool GenEngine::NegaMoveType(int &alpha, const int beta, int &best,
-		const int depth, const int limit, Array<GenMove> &killer, const int type)
+		const int depth, const int limit, Array<GenMove> &killer, const MoveType type)
 {
 	GenMove move;
 
@@ -185,13 +185,13 @@ int GenEngine::NegaScout(int alpha, const int beta, const int depth, int limit)
 		}
 	}
 hashMiss:
-	if (NegaMoveType(alpha, beta, score, depth, limit, captureKiller, MOVE_CAPTURE))
+	if (NegaMoveType(alpha, beta, score, depth, limit, captureKiller, MoveType::CAPTURE))
 		return score;
 	best = max(best, score);
-	if (NegaMoveType(alpha, beta, score, depth, limit, moveKiller, MOVE_MOVE))
+	if (NegaMoveType(alpha, beta, score, depth, limit, moveKiller, MoveType::MOVE))
 		return score;
 	best = max(best, score);
-	if (NegaMoveType(alpha, beta, score, depth, limit, placeKiller, MOVE_PLACE))
+	if (NegaMoveType(alpha, beta, score, depth, limit, placeKiller, MoveType::PLACE))
 		return score;
 	best = max(best, score);
 
@@ -204,7 +204,7 @@ hashMiss:
 
 void GenEngine::search(int alpha, const int beta, const int depth, const int limit)
 {
-	curr = curr? curr : board->getMoveList(board->getStm(), MOVE_ALL);
+	curr = curr? curr : board->getMoveList(board->getStm(), MoveType::ALL);
 
 	int b = beta;
 	for (int n = 0; n < curr->size; n++) {
@@ -323,7 +323,7 @@ void RegEngine::pickRandomMove()
 
 int RegEngine::Quiescence(int alpha, int beta, int depth)
 {
-	RegMoveList *ptr = board->getMoveList(board->getStm(), tactical[depth]? MOVE_ALL : MOVE_CAPTURE);
+	RegMoveList *ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveType::ALL : MoveType::CAPTURE);
 	const MoveFlags undoFlags = board->getMoveFlags();
 
 	if (!ptr->size) {
@@ -361,7 +361,7 @@ int RegEngine::Quiescence(int alpha, int beta, int depth)
 }
 
 bool RegEngine::NegaMoveType(int &alpha, const int beta, int &best,
-		const int depth, const int limit, Array<RegMove> &killer, const int type)
+		const int depth, const int limit, Array<RegMove> &killer, const MoveType type)
 {
 	const MoveFlags undoFlags = board->getMoveFlags();
 	RegMove move;
@@ -473,10 +473,10 @@ int RegEngine::NegaScout(int alpha, int beta, int depth, int limit)
 		}
 	}
 hashMiss:
-	if (NegaMoveType(alpha, beta, score, depth, limit, captureKiller, MOVE_CAPTURE))
+	if (NegaMoveType(alpha, beta, score, depth, limit, captureKiller, MoveType::CAPTURE))
 		return score;
 	best = max(best, score);
-	if (NegaMoveType(alpha, beta, score, depth, limit, moveKiller, MOVE_MOVE))
+	if (NegaMoveType(alpha, beta, score, depth, limit, moveKiller, MoveType::MOVE))
 		return score;
 	best = max(best, score);
 
@@ -490,7 +490,7 @@ hashMiss:
 void RegEngine::search(int alpha, int beta, int depth, int limit)
 {
 	const MoveFlags undoFlags = board->getMoveFlags();
-	curr = curr? curr : board->getMoveList(board->getStm(), MOVE_ALL);
+	curr = curr? curr : board->getMoveList(board->getStm(), MoveType::ALL);
 
 	int b = beta;
 	for (int n = 0; n < curr->size; n++) {

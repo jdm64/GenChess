@@ -43,7 +43,7 @@ struct Move
 
 	bool isNull() const;
 
-	int type() const;
+	MoveType type() const;
 
 	string toString() const;
 

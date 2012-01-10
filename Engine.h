@@ -51,7 +51,7 @@ private:
 
 	int Quiescence(int alpha, int beta, int depth);
 
-	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<GenMove> &killer, const int type);
+	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<GenMove> &killer, const MoveType type);
 
 	int NegaScout(int alpha, int beta, int depth, int limit);
 
@@ -96,7 +96,7 @@ private:
 
 	int Quiescence(int alpha, int beta, int depth);
 
-	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<RegMove> &killer, const int type);
+	bool NegaMoveType(int &alpha, const int beta, int &best, const int depth, const int limit, Array<RegMove> &killer, const MoveType type);
 
 	int NegaScout(int alpha, int beta, int depth, int limit);
 

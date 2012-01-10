@@ -76,9 +76,9 @@ public:
 
 	void getPlaceMoveList(GenMoveList* const data, const int8 pieceType);
 
-	void getMoveList(GenMoveList* const data, const int8 color, const int movetype);
+	void getMoveList(GenMoveList* const data, const int8 color, const MoveType movetype);
 
-	GenMoveList* getMoveList(const int8 color, const int movetype);
+	GenMoveList* getMoveList(const int8 color, const MoveType movetype);
 
 	string printPieceList() const;
 
@@ -159,13 +159,13 @@ public:
 
 	bool anyMoves(const int8 color);
 
-	void getMoveList(RegMoveList *data, const int8 color, int movetype);
+	void getMoveList(RegMoveList *data, const int8 color, const MoveType movetype);
 
 	void getCastleMoveList(RegMoveList *data, const int8 color);
 
 	void getEnPassantMoveList(RegMoveList *data, const int8 color);
 
-	RegMoveList* getMoveList(const int8 color, const int movetype);
+	RegMoveList* getMoveList(const int8 color, const MoveType movetype);
 
 	string printPieceList() const;
 

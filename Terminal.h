@@ -214,7 +214,7 @@ uint64 Terminal<GenMove>::perft(int depth)
 		return 1;
 
 	uint64 nodes = 0;
-	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MOVE_ALL);
+	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MoveType::ALL);
 
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
@@ -233,7 +233,7 @@ uint64 Terminal<RegMove>::perft(int depth)
 
 	uint64 nodes = 0;
 	const MoveFlags undoFlags = board.getMoveFlags();
-	RegMoveList *list = board.getMoveList(board.getStm(), MOVE_ALL);
+	RegMoveList *list = board.getMoveList(board.getStm(), MoveType::ALL);
 
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
@@ -248,7 +248,7 @@ template<>
 void Terminal<GenMove>::divide(int depth)
 {
 	uint64 nodes = 0, children;
-	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MOVE_ALL);
+	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MoveType::ALL);
 
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
@@ -266,7 +266,7 @@ void Terminal<RegMove>::divide(int depth)
 {
 	uint64 nodes = 0, children;
 	const MoveFlags undoFlags = board.getMoveFlags();
-	RegMoveList *list = board.getMoveList(board.getStm(), MOVE_ALL);
+	RegMoveList *list = board.getMoveList(board.getStm(), MoveType::ALL);
 
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
