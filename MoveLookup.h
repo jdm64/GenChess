@@ -27,7 +27,8 @@
 
 using namespace std;
 
-class GenMoveLookup : public BaseBoard
+template<class Type>
+class MoveLookup : public BaseBoard
 {
 protected:
 	int8* genAll(const int8 From) const;
@@ -39,18 +40,6 @@ protected:
 	bool fromto(const int8 From, const int8 To) const;
 
 	bool isAttacked(const int8 From) const;
-};
-
-class RegMoveLookup : public BaseBoard
-{
-protected:
-	int8* genAll(const int8 From) const;
-
-	int8* genCapture(const int8 From) const;
-
-	int8* genMove(const int8 From) const;
-
-	bool fromto(const int8 From, const int8 To) const;
 
 	bool isAttacked(const int8 From, const int8 Bycolor) const;
 };

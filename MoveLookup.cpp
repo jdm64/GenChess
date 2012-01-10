@@ -16,6 +16,7 @@
 */
 
 #include <cassert>
+#include "Move.h"
 #include "MoveLookup.h"
 
 const int8 mailbox[120] = {
@@ -51,7 +52,8 @@ const int8 offsets[7][8] = {
 	{-11, -10,  -9, -1,   1,  9, 10, 11},
 	{-11, -10,  -9, -1,   1,  9, 10, 11} };
 
-int8* GenMoveLookup::genAll(const int8 From) const
+template<>
+int8* MoveLookup<GenMove>::genAll(const int8 From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -120,7 +122,8 @@ int8* GenMoveLookup::genAll(const int8 From) const
 	return list;
 }
 
-int8* GenMoveLookup::genCapture(const int8 From) const
+template<>
+int8* MoveLookup<GenMove>::genCapture(const int8 From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -179,7 +182,8 @@ int8* GenMoveLookup::genCapture(const int8 From) const
 	return list;
 }
 
-int8* GenMoveLookup::genMove(const int8 From) const
+template<>
+int8* MoveLookup<GenMove>::genMove(const int8 From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -238,7 +242,8 @@ int8* GenMoveLookup::genMove(const int8 From) const
 	return list;
 }
 
-bool GenMoveLookup::fromto(const int8 From, const int8 To) const
+template<>
+bool MoveLookup<GenMove>::fromto(const int8 From, const int8 To) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -305,7 +310,8 @@ bool GenMoveLookup::fromto(const int8 From, const int8 To) const
 	return false;
 }
 
-bool GenMoveLookup::isAttacked(const int8 From) const
+template<>
+bool MoveLookup<GenMove>::isAttacked(const int8 From) const
 {
 	const int mfrom = mailbox64[From];
 
@@ -356,7 +362,8 @@ bool GenMoveLookup::isAttacked(const int8 From) const
 
 // --- Start Regular Chess ---
 
-int8* RegMoveLookup::genAll(const int8 From) const
+template<>
+int8* MoveLookup<RegMove>::genAll(const int8 From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -436,7 +443,8 @@ int8* RegMoveLookup::genAll(const int8 From) const
 	return list;
 }
 
-int8* RegMoveLookup::genCapture(const int8 From) const
+template<>
+int8* MoveLookup<RegMove>::genCapture(const int8 From) const
 {
 	const int type = ABS(square[From]),  mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -502,7 +510,8 @@ int8* RegMoveLookup::genCapture(const int8 From) const
 	return list;
 }
 
-int8* RegMoveLookup::genMove(const int8 From) const
+template<>
+int8* MoveLookup<RegMove>::genMove(const int8 From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -570,7 +579,8 @@ int8* RegMoveLookup::genMove(const int8 From) const
 	return list;
 }
 
-bool RegMoveLookup::fromto(const int8 From, const int8 To) const
+template<>
+bool MoveLookup<RegMove>::fromto(const int8 From, const int8 To) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -650,7 +660,8 @@ bool RegMoveLookup::fromto(const int8 From, const int8 To) const
 	return false;
 }
 
-bool RegMoveLookup::isAttacked(const int8 From, const int8 Bycolor) const
+template<>
+bool MoveLookup<RegMove>::isAttacked(const int8 From, const int8 Bycolor) const
 {
 	const int mfrom = mailbox64[From];
 

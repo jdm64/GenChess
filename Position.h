@@ -22,7 +22,7 @@
 #include "Piece.h"
 #include "MoveLookup.h"
 
-class GenPosition : public GenMoveLookup
+class GenPosition : public MoveLookup<GenMove>
 {
 	friend class GenBoard;
 protected:
@@ -42,7 +42,7 @@ public:
 	string printZfen() const;
 };
 
-class RegPosition : public RegMoveLookup
+class RegPosition : public MoveLookup<RegMove>
 {
 	friend class RegBoard;
 protected:
