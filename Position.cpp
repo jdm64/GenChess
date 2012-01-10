@@ -26,16 +26,6 @@ const int8 stype[] = {
 	EMPTY,		EMPTY,		WHITE_KING,	EMPTY,		BLACK_BISHOP,
 	WHITE_KNIGHT,	EMPTY,		WHITE_PAWN,	WHITE_QUEEN,	WHITE_ROOK};
 
-const Piece InitRegParse[32] = {
-	{DEAD, BLACK_PAWN}, {DEAD, BLACK_PAWN}, {DEAD, BLACK_PAWN}, {DEAD, BLACK_PAWN},
-	{DEAD, BLACK_PAWN}, {DEAD, BLACK_PAWN}, {DEAD, BLACK_PAWN}, {DEAD, BLACK_PAWN},
-	{DEAD, BLACK_KNIGHT}, {DEAD, BLACK_KNIGHT}, {DEAD, BLACK_BISHOP}, {DEAD, BLACK_BISHOP},
-	{DEAD, BLACK_ROOK}, {DEAD, BLACK_ROOK}, {DEAD, BLACK_QUEEN}, {DEAD, BLACK_KING},
-	{DEAD, WHITE_PAWN}, {DEAD, WHITE_PAWN}, {DEAD, WHITE_PAWN}, {DEAD, WHITE_PAWN},
-	{DEAD, WHITE_PAWN}, {DEAD, WHITE_PAWN}, {DEAD, WHITE_PAWN}, {DEAD, WHITE_PAWN},
-	{DEAD, WHITE_KNIGHT}, {DEAD, WHITE_KNIGHT}, {DEAD, WHITE_BISHOP}, {DEAD, WHITE_BISHOP},
-	{DEAD, WHITE_ROOK}, {DEAD, WHITE_ROOK}, {DEAD, WHITE_QUEEN}, {DEAD, WHITE_KING} };
-
 void GenPosition::parseReset()
 {
 	memset(square, EMPTY, 64);
@@ -333,7 +323,8 @@ string GenPosition::printZfen() const
 void RegPosition::parseReset()
 {
 	memset(square, EMPTY, 64);
-	copy(InitRegParse, InitRegParse + 32, piece);
+	memset(piece, DEAD, 32);
+	copy(InitPieceType, InitPieceType + 32, pieceType);
 	flags.reset();
 }
 
@@ -345,8 +336,8 @@ bool RegPosition::setPiece(const int8 loc, const int8 type)
 
 	// first try for setting non promoted pieces
 	for (int i = start; i < end; i++) {
-		if (piece[i].loc == DEAD) {
-			piece[i].loc = loc;
+		if (piece[i] == DEAD) {
+			piece[i] = loc;
 			square[loc] = type;
 			return true;
 		}
@@ -358,9 +349,9 @@ bool RegPosition::setPiece(const int8 loc, const int8 type)
 
 	const int pstart = (type > 0)? 16:0, pend = (type > 0)? 24:8;
 	for (int i = pstart; i < pend; i++) {
-		if (piece[i].loc == DEAD) {
-			piece[i].loc = loc;
-			piece[i].type = type;
+		if (piece[i] == DEAD) {
+			piece[i] = loc;
+			pieceType[i] = type;
 			square[loc] = type;
 			return true;
 		}
@@ -372,7 +363,7 @@ bool RegPosition::incheck(const int8 color) const
 {
 	const int king = (color == WHITE)? 31:15;
 
-	return isAttacked(piece[king].loc, color);
+	return isAttacked(piece[king], color);
 }
 
 bool RegPosition::parseFen(const string &st)

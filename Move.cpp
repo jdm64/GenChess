@@ -17,7 +17,7 @@
 
 #include "Move.h"
 
-const int8 pieceType[32] = {
+const int8 InitPieceType[32] = {
 	BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,
 	BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,   BLACK_PAWN,
 	BLACK_KNIGHT, BLACK_KNIGHT, BLACK_BISHOP, BLACK_BISHOP,
@@ -102,7 +102,7 @@ string Move<'G'>::toString() const
 	string out;
 
 	if (from == PLACEABLE)
-		out += pieceSymbol[ABS(pieceType[index])];
+		out += pieceSymbol[ABS(InitPieceType[index])];
 	else
 		out = printLoc(from);
 	out += printLoc(to);

@@ -18,11 +18,6 @@
 #ifndef __PIECE_H__
 #define __PIECE_H__
 
-struct Piece {
-	int8 loc;
-	int8 type;
-};
-
 struct MoveFlags {
 	uint8 bits;
 

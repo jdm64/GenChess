@@ -26,8 +26,6 @@ class GenPosition : public GenMoveLookup
 {
 	friend class GenBoard;
 protected:
-	int8 piece[32];
-
 	void parseReset();
 
 	bool setPiece(const int8 loc, const int8 type);
@@ -48,7 +46,6 @@ class RegPosition : public RegMoveLookup
 {
 	friend class RegBoard;
 protected:
-	Piece piece[32];
 	MoveFlags flags;
 
 	void parseReset();

@@ -24,7 +24,7 @@
 
 using namespace std;
 
-extern const int8 pieceType[32];
+extern const int8 InitPieceType[32];
 extern const char pieceSymbol[7];
 
 string printLoc(const int8 loc);
