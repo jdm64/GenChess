@@ -20,20 +20,22 @@
 
 #include <string>
 #include "Defines.h"
+#include "Piece.h"
 
 using namespace std;
 
 class BaseBoard
 {
-protected:
+public:
 	int8 square[64];
 	int8 piece[32];
 	int8 pieceType[32];
 	int ply;
 	int8 stm;
+	MoveFlags flags;
 
 	string printSquare(const int index) const;
-public:
+
 	string printBoard() const;
 };
 

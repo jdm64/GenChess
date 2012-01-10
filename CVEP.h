@@ -93,7 +93,7 @@ private:
 		} else if (cmd == "setboard") {
 			cin >> cmd;
 
-			typename Position<MoveType>::type pos;
+			Position<MoveType> pos;
 			if (cmd == "fen") {
 				getline(cin, cmd);
 				if (!pos.parseFen(cmd)) {

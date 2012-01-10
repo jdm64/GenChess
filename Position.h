@@ -22,9 +22,9 @@
 #include "Piece.h"
 #include "MoveLookup.h"
 
-class GenPosition : public MoveLookup<GenMove>
+template<class Type>
+class Position : public MoveLookup<Type>
 {
-	friend class GenBoard;
 protected:
 	void parseReset();
 
@@ -42,35 +42,7 @@ public:
 	string printZfen() const;
 };
 
-class RegPosition : public MoveLookup<RegMove>
-{
-	friend class RegBoard;
-protected:
-	MoveFlags flags;
-
-	void parseReset();
-
-	bool setPiece(const int8 loc, const int8 type);
-
-public:
-	bool incheck(const int8 color) const;
-
-	bool parseFen(const string &st);
-
-	bool parseZfen(const string &st);
-
-	string printFen() const;
-
-	string printZfen() const;
-};
-
-template<class MoveType>
-struct Position;
-
-template<>
-struct Position<GenMove> { typedef GenPosition type; };
-
-template<>
-struct Position<RegMove> { typedef RegPosition type; };
+typedef Position<GenMove> GenPosition;
+typedef Position<RegMove> RegPosition;
 
 #endif

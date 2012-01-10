@@ -26,13 +26,15 @@ const int8 stype[] = {
 	EMPTY,		EMPTY,		WHITE_KING,	EMPTY,		BLACK_BISHOP,
 	WHITE_KNIGHT,	EMPTY,		WHITE_PAWN,	WHITE_QUEEN,	WHITE_ROOK};
 
-void GenPosition::parseReset()
+template<>
+void Position<GenMove>::parseReset()
 {
 	memset(square, EMPTY, 64);
 	memset(piece, DEAD, 32);
 }
 
-bool GenPosition::setPiece(const int8 loc, const int8 type)
+template<>
+bool Position<GenMove>::setPiece(const int8 loc, const int8 type)
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
@@ -49,14 +51,16 @@ bool GenPosition::setPiece(const int8 loc, const int8 type)
 	return false;
 }
 
-bool GenPosition::incheck(const int8 color) const
+template<>
+bool Position<GenMove>::incheck(const int8 color) const
 {
 	const int king = (color == WHITE)? 31:15;
 
 	return (piece[king] != PLACEABLE)? isAttacked(piece[king]) : false;
 }
 
-bool GenPosition::parseFen(const string &st)
+template<>
+bool Position<GenMove>::parseFen(const string &st)
 {
 	parseReset();
 
@@ -149,7 +153,8 @@ bool GenPosition::parseFen(const string &st)
 	return true;
 }
 
-bool GenPosition::parseZfen(const string &st)
+template<>
+bool Position<GenMove>::parseZfen(const string &st)
 {
 	parseReset();
 
@@ -223,7 +228,8 @@ bool GenPosition::parseZfen(const string &st)
 	return true;
 }
 
-string GenPosition::printFen() const
+template<>
+string Position<GenMove>::printFen() const
 {
 	ostringstream buf;
 	string fen;
@@ -278,7 +284,8 @@ string GenPosition::printFen() const
 	return fen;
 }
 
-string GenPosition::printZfen() const
+template<>
+string Position<GenMove>::printZfen() const
 {
 	stringstream buf;
 	string fen;
@@ -320,7 +327,8 @@ string GenPosition::printZfen() const
 
 // --- Start Regular Chess ---
 
-void RegPosition::parseReset()
+template<>
+void Position<RegMove>::parseReset()
 {
 	memset(square, EMPTY, 64);
 	memset(piece, DEAD, 32);
@@ -328,7 +336,8 @@ void RegPosition::parseReset()
 	flags.reset();
 }
 
-bool RegPosition::setPiece(const int8 loc, const int8 type)
+template<>
+bool Position<RegMove>::setPiece(const int8 loc, const int8 type)
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
@@ -359,14 +368,16 @@ bool RegPosition::setPiece(const int8 loc, const int8 type)
 	return false;
 }
 
-bool RegPosition::incheck(const int8 color) const
+template<>
+bool Position<RegMove>::incheck(const int8 color) const
 {
 	const int king = (color == WHITE)? 31:15;
 
 	return isAttacked(piece[king], color);
 }
 
-bool RegPosition::parseFen(const string &st)
+template<>
+bool Position<RegMove>::parseFen(const string &st)
 {
 	parseReset();
 
@@ -461,7 +472,8 @@ bool RegPosition::parseFen(const string &st)
 	return true;
 }
 
-bool RegPosition::parseZfen(const string &st)
+template<>
+bool Position<RegMove>::parseZfen(const string &st)
 {
 	parseReset();
 
@@ -536,7 +548,8 @@ bool RegPosition::parseZfen(const string &st)
 	return true;
 }
 
-string RegPosition::printFen() const
+template<>
+string Position<RegMove>::printFen() const
 {
 	ostringstream buf;
 	string fen;
@@ -605,7 +618,8 @@ string RegPosition::printFen() const
 	return fen;
 }
 
-string RegPosition::printZfen() const
+template<>
+string Position<RegMove>::printZfen() const
 {
 	stringstream buf;
 	string fen;
