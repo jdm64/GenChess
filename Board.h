@@ -62,8 +62,6 @@ public:
 
 	void unmake(const GenMove &move);
 
-	void unmakeP(const GenMove &move);
-
 	int isMate();
 
 	bool validMove(const GenMove &moveIn, GenMove &move);

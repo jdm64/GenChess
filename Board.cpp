@@ -244,21 +244,6 @@ void GenBoard::unmake(const GenMove &move)
 #endif
 }
 
-void GenBoard::unmakeP(const GenMove &move)
-{
-	piece[move.index] = move.from;
-	if (move.xindex == NONE) {
-		square[move.to] = EMPTY;
-	} else {
-		square[move.to] = pieceType[move.xindex];
-		piece[move.xindex] = move.to;
-	}
-	if (move.from != PLACEABLE)
-		square[move.from] = pieceType[move.index];
-	stm ^= -2;
-	ply--;
-}
-
 int GenBoard::isMate()
 {
 	if (anyMoves(stm))
