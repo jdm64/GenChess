@@ -21,20 +21,20 @@
 #include <vector>
 #include "Board.h"
 
-template<class Type>
+template<class MoveType>
 class Game
 {
 private:
-	Board<Type> *board;
+	Board<MoveType> *board;
 
-	vector<HistoryNode<Type> > history;
+	vector<HistoryNode<MoveType> > history;
 
 public:
-	Game(Board<Type> *Board) : board(Board) {}
+	Game(Board<MoveType> *Board) : board(Board) {}
 
 	void newGame();
 
-	void doMove(const Type &move);
+	void doMove(const MoveType &move);
 
 	bool undoMove();
 };

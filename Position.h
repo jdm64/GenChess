@@ -22,8 +22,8 @@
 #include "Piece.h"
 #include "MoveLookup.h"
 
-template<class Type>
-class Position : public MoveLookup<Type>
+template<class MoveType>
+class Position : public MoveLookup<MoveType>
 {
 protected:
 	void parseReset();

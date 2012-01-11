@@ -86,14 +86,14 @@ bool Move<'R'>::isNull() const
 }
 
 template<char Type>
-MoveType Move<Type>::type() const
+MoveClass Move<Type>::moveclass() const
 {
 	if (from == PLACEABLE)
-		return MoveType::PLACE;
+		return MoveClass::PLACE;
 	else if (xindex != NONE)
-		return MoveType::CAPTURE;
+		return MoveClass::CAPTURE;
 	else
-		return MoveType::MOVE;
+		return MoveClass::MOVE;
 }
 
 template<>

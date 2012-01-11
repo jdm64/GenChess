@@ -43,7 +43,7 @@ struct Move
 
 	bool isNull() const;
 
-	MoveType type() const;
+	MoveClass moveclass() const;
 
 	string toString() const;
 
@@ -72,7 +72,7 @@ struct Move<'R'>
 
 	bool isNull() const;
 
-	int type() const;
+	MoveClass moveclass() const;
 
 	string toString() const;
 
@@ -96,7 +96,6 @@ struct Move<'R'>
 typedef Move<'G'> GenMove;
 typedef Move<'R'> RegMove;
 
-
 template<class MoveType>
 struct MoveNode
 {
@@ -109,7 +108,6 @@ struct MoveNode
 
 typedef MoveNode<GenMove> GenMoveNode;
 typedef MoveNode<RegMove> RegMoveNode;
-
 
 template<class MoveType>
 struct MoveList

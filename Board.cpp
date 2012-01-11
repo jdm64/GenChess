@@ -455,7 +455,7 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int8 pieceT
 }
 
 template<>
-void Board<GenMove>::getMoveList(GenMoveList* const data, const int8 color, const MoveType movetype)
+void Board<GenMove>::getMoveList(GenMoveList* const data, const int8 color, const MoveClass movetype)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	GenMoveNode item;
@@ -466,14 +466,14 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int8 color, cons
 
 		int8 *loc;
 		switch (movetype) {
-		case MoveType::ALL:
+		case MoveClass::ALL:
 		default:
 			loc = genAll(piece[idx]);
 			break;
-		case MoveType::CAPTURE:
+		case MoveClass::CAPTURE:
 			loc = genCapture(piece[idx]);
 			break;
-		case MoveType::MOVE:
+		case MoveClass::MOVE:
 			loc = genMove(piece[idx]);
 			break;
 		}
@@ -497,22 +497,22 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int8 color, cons
 }
 
 template<>
-GenMoveList* Board<GenMove>::getMoveList(const int8 color, const MoveType movetype)
+GenMoveList* Board<GenMove>::getMoveList(const int8 color, const MoveClass movetype)
 {
 	GenMoveList* const data = new GenMoveList;
 	data->size = 0;
 
 	switch (movetype) {
-	case MoveType::ALL:
+	case MoveClass::ALL:
 		if (ply < 2) {
 			getPlaceMoveList(data, KING * color);
 			break;
 		}
-		getMoveList(data, color, MoveType::ALL);
+		getMoveList(data, color, MoveClass::ALL);
 		for (int type = QUEEN; type >= PAWN; type--)
 			getPlaceMoveList(data, type * color);
 		break;
-	case MoveType::PLACE:
+	case MoveClass::PLACE:
 		if (ply < 2) {
 			getPlaceMoveList(data, KING * color);
 			break;
@@ -520,8 +520,8 @@ GenMoveList* Board<GenMove>::getMoveList(const int8 color, const MoveType movety
 		for (int type = QUEEN; type >= PAWN; type--)
 			getPlaceMoveList(data, type * color);
 		break;
-	case MoveType::CAPTURE:
-	case MoveType::MOVE:
+	case MoveClass::CAPTURE:
+	case MoveClass::MOVE:
 		getMoveList(data, color, movetype);
 		break;
 	}
@@ -1202,7 +1202,7 @@ int Board<RegMove>::eval() const
 }
 
 template<>
-void Board<RegMove>::getMoveList(RegMoveList *data, const int8 color, const MoveType movetype)
+void Board<RegMove>::getMoveList(RegMoveList *data, const int8 color, const MoveClass movetype)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
@@ -1213,14 +1213,14 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int8 color, const Move
 
 		int8 *loc;
 		switch (movetype) {
-		case MoveType::ALL:
+		case MoveClass::ALL:
 		default:
 			loc = genAll(piece[idx]);
 			break;
-		case MoveType::CAPTURE:
+		case MoveClass::CAPTURE:
 			loc = genCapture(piece[idx]);
 			break;
-		case MoveType::MOVE:
+		case MoveClass::MOVE:
 			loc = genMove(piece[idx]);
 			break;
 		}
@@ -1359,23 +1359,23 @@ void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int8 color)
 }
 
 template<>
-RegMoveList* Board<RegMove>::getMoveList(const int8 color, const MoveType movetype)
+RegMoveList* Board<RegMove>::getMoveList(const int8 color, const MoveClass movetype)
 {
 	RegMoveList *data = new RegMoveList;
 	data->size = 0;
 
 	switch (movetype) {
-	case MoveType::ALL:
+	case MoveClass::ALL:
 	default:
 		getMoveList(data, color, movetype);
 		getCastleMoveList(data, color);
 		getEnPassantMoveList(data, color);
 		break;
-	case MoveType::CAPTURE:
+	case MoveClass::CAPTURE:
 		getMoveList(data, color, movetype);
 		getEnPassantMoveList(data, color);
 		break;
-	case MoveType::MOVE:
+	case MoveClass::MOVE:
 		getMoveList(data, color, movetype);
 		getCastleMoveList(data, color);
 		break;

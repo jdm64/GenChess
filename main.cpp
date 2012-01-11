@@ -33,7 +33,7 @@ uint64 perft(int depth)
 	uint64 nodes;
 
 	if (depth == 1) {
-		list = board.getMoveList(board.getStm(), MoveType::ALL);
+		list = board.getMoveList(board.getStm(), MoveClass::ALL);
 		nodes = list->size;
 		delete list;
 		return nodes;
@@ -41,7 +41,7 @@ uint64 perft(int depth)
 	nodes = 0;
 
 	// Placement Moves
-	list = board.getMoveList(board.getStm(), MoveType::PLACE);
+	list = board.getMoveList(board.getStm(), MoveClass::PLACE);
 	if (list->size == 0)
 		goto moves;
 	for (int i = 0; i < list->size; i++) {
@@ -52,7 +52,7 @@ uint64 perft(int depth)
 moves:
 	delete list;
 	// Movement Moves
-	list = board.getMoveList(board.getStm(), MoveType::MOVE);
+	list = board.getMoveList(board.getStm(), MoveClass::MOVE);
 	if (list->size == 0)
 		goto captures;
 	for (int i = 0; i < list->size; i++) {
@@ -63,7 +63,7 @@ moves:
 captures:
 	delete list;
 	// Capture Moves
-	list = board.getMoveList(board.getStm(), MoveType::CAPTURE);
+	list = board.getMoveList(board.getStm(), MoveClass::CAPTURE);
 	if (list->size == 0)
 		goto done;
 	for (int i = 0; i < list->size; i++) {

@@ -27,7 +27,7 @@
 
 using namespace std;
 
-template<class Type>
+template<class MoveType>
 class MoveLookup : public BaseBoard
 {
 protected:

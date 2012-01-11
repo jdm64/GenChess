@@ -31,8 +31,8 @@ extern const int regPieceValue[7];
 
 extern const int regLocValue[7][64];
 
-template<class Type>
-class Board : public Position<Type>
+template<class MoveType>
+class Board : public Position<MoveType>
 {
 private:
 	uint64 key;
@@ -79,19 +79,19 @@ public:
 
 	void reset();
 
-	void setBoard(const Position<Type> &pos);
+	void setBoard(const Position<MoveType> &pos);
 
-	void make(const Type &move);
+	void make(const MoveType &move);
 
-	void unmake(const Type &move);
+	void unmake(const MoveType &move);
 
 	void unmake(const RegMove &move, const MoveFlags &undoFlags);
 
 	int isMate();
 
-	bool validMove(const Type &moveIn, Type &move);
+	bool validMove(const MoveType &moveIn, MoveType &move);
 
-	int validMove(const string &smove, const int8 color, Type &move);
+	int validMove(const string &smove, const int8 color, MoveType &move);
 
 	int eval() const;
 
@@ -103,16 +103,16 @@ public:
 
 	void getEnPassantMoveList(RegMoveList *data, const int8 color);
 
-	void getMoveList(MoveList<Type>* const data, const int8 color, const MoveType movetype);
+	void getMoveList(MoveList<MoveType>* const data, const int8 color, const MoveClass movetype);
 
-	MoveList<Type>* getMoveList(const int8 color, const MoveType movetype);
+	MoveList<MoveType>* getMoveList(const int8 color, const MoveClass movetype);
 
 	string printPieceList() const;
 
 	void dumpDebug() const;
 };
 
-template<class Type>
+template<class MoveType>
 struct HistoryNode
 {
 };

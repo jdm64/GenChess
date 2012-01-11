@@ -28,32 +28,32 @@
 #define CHECKMATE_SCORE		-(INT_MAX - 4)
 #define STALEMATE_SCORE		0
 
-template<class Type>
+template<class MoveType>
 class Engine
 {
 private:
-	MoveList<Type> *curr;
+	MoveList<MoveType> *curr;
 
-	Board<Type> *board;
-	TransTable<Type> *tt;
+	Board<MoveType> *board;
+	TransTable<MoveType> *tt;
 
-	Array<Type> captureKiller;
-	Array<Type> moveKiller;
-	Array<Type> placeKiller;
-	Array<Type> pvMove;
+	Array<MoveType> captureKiller;
+	Array<MoveType> moveKiller;
+	Array<MoveType> placeKiller;
+	Array<MoveType> pvMove;
 
 	int maxNg;
 
 	Array<bool> tactical;
 	Array<bool> ismate;
 
-	ScoreSort<Type> cmpScore;
+	ScoreSort<MoveType> cmpScore;
 
 	void pickRandomMove();
 
 	int Quiescence(int alpha, int beta, int depth);
 
-	bool NegaMoveType(int &alpha, const int beta, int &best, const int depth, const int limit, Array<Type> &killer, const MoveType type);
+	bool NegaMoveType(int &alpha, const int beta, int &best, const int depth, const int limit, Array<MoveType> &killer, const MoveClass type);
 
 	int NegaScout(int alpha, int beta, int depth, int limit);
 
@@ -62,7 +62,7 @@ private:
 	void debugTree();
 
 public:
-	Engine(Board<Type> *_Board, TransTable<Type> *TT) : curr(NULL), board(_Board), tt(TT)
+	Engine(Board<MoveType> *_Board, TransTable<MoveType> *TT) : curr(NULL), board(_Board), tt(TT)
 	{
 		maxNg = 5;
 	}
@@ -71,7 +71,7 @@ public:
 	{
 	}
 
-	Type think();
+	MoveType think();
 };
 
 typedef Engine<GenMove> GenEngine;
