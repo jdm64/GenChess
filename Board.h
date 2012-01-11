@@ -27,75 +27,13 @@ extern const int genPieceValue[16];
 
 extern const int genLocValue[7][64];
 
-class GenBoard : public GenPosition
-{
-private:
-	uint64 key;
-
-	int pieceIndex(const int8 loc, const int8 type) const;
-
-	void rebuildHash();
-
-public:
-	GenBoard();
-
-	inline uint64 hash() const
-	{
-		return key;
-	}
-
-	inline int getPly() const
-	{
-		return ply;
-	}
-
-	inline int8 getStm() const
-	{
-		return stm;
-	}
-
-	void reset();
-
-	void setBoard(const GenPosition &pos);
-
-	void make(const GenMove &move);
-
-	void unmake(const GenMove &move);
-
-	int isMate();
-
-	bool validMove(const GenMove &moveIn, GenMove &move);
-
-	int validMove(const string &smove, const int8 color, GenMove &move);
-
-	int eval() const;
-
-	bool anyMoves(const int8 color);
-
-	void getPlaceMoveList(GenMoveList* const data, const int8 pieceType);
-
-	void getMoveList(GenMoveList* const data, const int8 color, const MoveType movetype);
-
-	GenMoveList* getMoveList(const int8 color, const MoveType movetype);
-
-	string printPieceList() const;
-
-	void dumpDebug() const;
-};
-
-// --- Start Regular Chess --
-
 extern const int regPieceValue[7];
 
 extern const int regLocValue[7][64];
 
-struct HistoryNode
+template<class Type>
+class Board : public Position<Type>
 {
-	RegMove move;
-	MoveFlags flags;
-};
-
-class RegBoard : public RegPosition {
 private:
 	uint64 key;
 
@@ -117,66 +55,70 @@ private:
 	void rebuildHash();
 
 public:
-	RegBoard();
+	Board();
 
-	inline uint64 hash() const
+	uint64 hash() const
 	{
 		return key;
 	}
 
-	inline int getPly() const
+	int getPly() const
 	{
-		return ply;
+		return BaseBoard::ply;
 	}
 
-	inline int8 getStm() const
+	int8 getStm() const
 	{
-		return stm;
+		return BaseBoard::stm;
 	}
 
-	inline MoveFlags getMoveFlags() const
+	MoveFlags getMoveFlags() const
 	{
-		return flags;
+		return BaseBoard::flags;
 	}
 
 	void reset();
 
-	void setBoard(RegPosition pos);
+	void setBoard(const Position<Type> &pos);
 
-	void make(const RegMove &move);
+	void make(const Type &move);
+
+	void unmake(const Type &move);
 
 	void unmake(const RegMove &move, const MoveFlags &undoFlags);
 
 	int isMate();
 
-	bool validMove(const RegMove &moveIn, RegMove &move);
+	bool validMove(const Type &moveIn, Type &move);
 
-	int validMove(const string &smove, const int8 color, RegMove &move);
+	int validMove(const string &smove, const int8 color, Type &move);
 
 	int eval() const;
 
 	bool anyMoves(const int8 color);
 
-	void getMoveList(RegMoveList *data, const int8 color, const MoveType movetype);
+	void getPlaceMoveList(GenMoveList* const data, const int8 pieceType);
 
 	void getCastleMoveList(RegMoveList *data, const int8 color);
 
 	void getEnPassantMoveList(RegMoveList *data, const int8 color);
 
-	RegMoveList* getMoveList(const int8 color, const MoveType movetype);
+	void getMoveList(MoveList<Type>* const data, const int8 color, const MoveType movetype);
+
+	MoveList<Type>* getMoveList(const int8 color, const MoveType movetype);
 
 	string printPieceList() const;
 
 	void dumpDebug() const;
 };
 
-template<class MoveType>
-struct Board;
+struct HistoryNode
+{
+	RegMove move;
+	MoveFlags flags;
+};
 
-template<>
-struct Board<GenMove> { typedef GenBoard type; };
-
-template<>
-struct Board<RegMove> { typedef RegBoard type; };
+typedef Board<GenMove> GenBoard;
+typedef Board<RegMove> RegBoard;
 
 #endif

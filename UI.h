@@ -27,7 +27,7 @@ class UI
 protected:
 	static const string moveError[NUM_MOVE_ERRORS];
 
-	typename Board<MoveType>::type board;
+	Board<MoveType> board;
 	
 	typename Engine<MoveType>::type *engine;
 

@@ -82,7 +82,8 @@ const int genLocValue[7][64] = {
 		-10,  0,  0,  0,  0,  0,  0, -10}
 	};
 
-void GenBoard::reset()
+template<>
+void Board<GenMove>::reset()
 {
 	memset(square, EMPTY, 64);
 	memset(piece, PLACEABLE, 32);
@@ -97,12 +98,14 @@ void GenBoard::reset()
 	ply = 0;
 }
 
-GenBoard::GenBoard()
+template<>
+Board<GenMove>::Board()
 {
 	reset();
 }
 
-void GenBoard::rebuildHash()
+template<>
+void Board<GenMove>::rebuildHash()
 {
 #ifdef TT_ENABLED
 	key = startHash;
@@ -124,7 +127,8 @@ void GenBoard::rebuildHash()
 #endif
 }
 
-void GenBoard::setBoard(const GenPosition &pos)
+template<>
+void Board<GenMove>::setBoard(const GenPosition &pos)
 {
 	copy(pos.square, pos.square + 64, square);
 	copy(pos.piece, pos.piece + 32, piece);
@@ -135,7 +139,8 @@ void GenBoard::setBoard(const GenPosition &pos)
 	rebuildHash();
 }
 
-int GenBoard::pieceIndex(const int8 loc, const int8 type) const
+template<>
+int Board<GenMove>::pieceIndex(const int8 loc, const int8 type) const
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
@@ -147,7 +152,8 @@ int GenBoard::pieceIndex(const int8 loc, const int8 type) const
 	return NONE;
 }
 
-void GenBoard::make(const GenMove &move)
+template<>
+void Board<GenMove>::make(const GenMove &move)
 {
 #ifdef DEBUG_MAKE_MOVE
 	assert(pieceType[move.index] * stm > 0);
@@ -195,7 +201,8 @@ void GenBoard::make(const GenMove &move)
 #endif
 }
 
-void GenBoard::unmake(const GenMove &move)
+template<>
+void Board<GenMove>::unmake(const GenMove &move)
 {
 #ifdef DEBUG_MAKE_MOVE
 	assert(pieceType[move.index] * stm < 0);
@@ -245,7 +252,8 @@ void GenBoard::unmake(const GenMove &move)
 #endif
 }
 
-bool GenBoard::anyMoves(const int8 color)
+template<>
+bool Board<GenMove>::anyMoves(const int8 color)
 {
 	GenMove move;
 
@@ -301,7 +309,8 @@ bool GenBoard::anyMoves(const int8 color)
 	return false;
 }
 
-int GenBoard::isMate()
+template<>
+int Board<GenMove>::isMate()
 {
 	if (anyMoves(stm))
 		return NOTMATE;
@@ -311,7 +320,8 @@ int GenBoard::isMate()
 		return STALEMATE;
 }
 
-bool GenBoard::validMove(const GenMove &moveIn, GenMove &move)
+template<>
+bool Board<GenMove>::validMove(const GenMove &moveIn, GenMove &move)
 {
 	move = moveIn;
 
@@ -343,7 +353,8 @@ bool GenBoard::validMove(const GenMove &moveIn, GenMove &move)
 	return ret;
 }
 
-int GenBoard::validMove(const string &smove, const int8 color, GenMove &move)
+template<>
+int Board<GenMove>::validMove(const string &smove, const int8 color, GenMove &move)
 {
 	// pre-setup move
 	if (!move.parse(smove))
@@ -385,7 +396,8 @@ int GenBoard::validMove(const string &smove, const int8 color, GenMove &move)
 	return ret;
 }
 
-int GenBoard::eval() const
+template<>
+int Board<GenMove>::eval() const
 {
 	int white = 0, black = 0;
 	for (int b = 0, w = 16; b < 16; b++, w++) {
@@ -414,7 +426,8 @@ int GenBoard::eval() const
 	return (stm == WHITE)? -white : white;
 }
 
-void GenBoard::getPlaceMoveList(GenMoveList* const data, const int8 pieceType)
+template<>
+void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int8 pieceType)
 {
 	const int idx = pieceIndex(PLACEABLE, pieceType);
 	const int8 color = pieceType / ABS(pieceType);
@@ -441,7 +454,8 @@ void GenBoard::getPlaceMoveList(GenMoveList* const data, const int8 pieceType)
 	}
 }
 
-void GenBoard::getMoveList(GenMoveList* const data, const int8 color, const MoveType movetype)
+template<>
+void Board<GenMove>::getMoveList(GenMoveList* const data, const int8 color, const MoveType movetype)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	GenMoveNode item;
@@ -482,7 +496,8 @@ void GenBoard::getMoveList(GenMoveList* const data, const int8 color, const Move
 	}
 }
 
-GenMoveList* GenBoard::getMoveList(const int8 color, const MoveType movetype)
+template<>
+GenMoveList* Board<GenMove>::getMoveList(const int8 color, const MoveType movetype)
 {
 	GenMoveList* const data = new GenMoveList;
 	data->size = 0;
@@ -513,7 +528,8 @@ GenMoveList* GenBoard::getMoveList(const int8 color, const MoveType movetype)
 	return data;
 }
 
-string GenBoard::printPieceList() const
+template<>
+string Board<GenMove>::printPieceList() const
 {
 	stringstream buff;
 	string tmp;
@@ -545,7 +561,8 @@ string GenBoard::printPieceList() const
 	return buff.str();
 }
 
-void GenBoard::dumpDebug() const
+template<>
+void Board<GenMove>::dumpDebug() const
 {
 	cout << "hash:" << key << " stm:" << (int)stm << " ply:" << ply << endl;
 	cout << printBoard();
@@ -631,7 +648,8 @@ const int regLocValue[7][64] = {
 		  0,  5,  10,  15,  20,  15,  10,  5}
 	};
 
-void RegBoard::reset()
+template<>
+void Board<RegMove>::reset()
 {
 	copy(InitRegBoard, InitRegBoard + 64, square);
 	copy(InitRegPiece, InitRegPiece + 32, piece);
@@ -644,12 +662,14 @@ void RegBoard::reset()
 	flags.reset();
 }
 
-RegBoard::RegBoard()
+template<>
+Board<RegMove>::Board()
 {
 	reset();
 }
 
-void RegBoard::rebuildHash()
+template<>
+void Board<RegMove>::rebuildHash()
 {
 #ifdef TT_ENABLED
 	key = startHash;
@@ -667,7 +687,8 @@ void RegBoard::rebuildHash()
 #endif
 }
 
-void RegBoard::setBoard(RegPosition pos)
+template<>
+void Board<RegMove>::setBoard(const RegPosition &pos)
 {
 	copy(pos.square, pos.square + 64, square);
 	copy(pos.piece, pos.piece + 32, piece);
@@ -680,7 +701,8 @@ void RegBoard::setBoard(RegPosition pos)
 #endif
 }
 
-int RegBoard::pieceIndex(const int8 loc, const int8 type) const
+template<>
+int Board<RegMove>::pieceIndex(const int8 loc, const int8 type) const
 {
 	const int start = (type > 0)? 16:0, end = (type > 0)? 32:16;
 
@@ -690,7 +712,8 @@ int RegBoard::pieceIndex(const int8 loc, const int8 type) const
 	return NONE;
 }
 
-void RegBoard::validateBoard(const RegMove &move) const
+template<>
+void Board<RegMove>::validateBoard(const RegMove &move) const
 {
 	int cpt = 0;
 
@@ -734,7 +757,8 @@ error:
 	assert(0);
 }
 
-void RegBoard::make(const RegMove &move)
+template<>
+void Board<RegMove>::make(const RegMove &move)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
 #ifdef TT_ENABLED
@@ -815,7 +839,8 @@ void RegBoard::make(const RegMove &move)
 	ply++;
 }
 
-void RegBoard::unmake(const RegMove &move, const MoveFlags &undoFlags)
+template<>
+void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
 
@@ -870,7 +895,8 @@ void RegBoard::unmake(const RegMove &move, const MoveFlags &undoFlags)
 	ply--;
 }
 
-bool RegBoard::anyMoves(const int8 color)
+template<>
+bool Board<RegMove>::anyMoves(const int8 color)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
@@ -978,7 +1004,8 @@ bool RegBoard::anyMoves(const int8 color)
 	return false;
 }
 
-int RegBoard::isMate()
+template<>
+int Board<RegMove>::isMate()
 {
 	if (anyMoves(stm))
 		return NOTMATE;
@@ -988,7 +1015,8 @@ int RegBoard::isMate()
 		return STALEMATE;
 }
 
-int RegBoard::validCastle(RegMove &move, const int8 color)
+template<>
+int Board<RegMove>::validCastle(RegMove &move, const int8 color)
 {
 	// can we castle on that side
 	if (!(flags.canCastle(color) && move.getCastle()))
@@ -1021,7 +1049,8 @@ int RegBoard::validCastle(RegMove &move, const int8 color)
 }
 
 // Board flag must have enpassant enabled
-int RegBoard::validEnPassant(RegMove &move, const int8 color)
+template<>
+int Board<RegMove>::validEnPassant(RegMove &move, const int8 color)
 {
 	const MoveFlags undoFlags = flags;
 	const int8 ep = flags.enPassantFile() + ((color == WHITE)? A5 : A4),
@@ -1044,7 +1073,8 @@ int RegBoard::validEnPassant(RegMove &move, const int8 color)
 	return INVALID_MOVEMENT;
 }
 
-bool RegBoard::validMove(const RegMove &moveIn, RegMove &move)
+template<>
+bool Board<RegMove>::validMove(const RegMove &moveIn, RegMove &move)
 {
 	if (moveIn.from == moveIn.to)
 		return false;
@@ -1086,7 +1116,8 @@ bool RegBoard::validMove(const RegMove &moveIn, RegMove &move)
 	return ret;
 }
 
-int RegBoard::validMove(const string &smove, const int8 color, RegMove &move)
+template<>
+int Board<RegMove>::validMove(const string &smove, const int8 color, RegMove &move)
 {
 	const MoveFlags undoFlags = flags;
 
@@ -1147,7 +1178,8 @@ int RegBoard::validMove(const string &smove, const int8 color, RegMove &move)
 	return ret;
 }
 
-int RegBoard::eval() const
+template<>
+int Board<RegMove>::eval() const
 {
 	int white = 0, black = 0;
 	for (int b = 0, w = 16; b < 16; b++, w++) {
@@ -1169,7 +1201,8 @@ int RegBoard::eval() const
 	return (stm == WHITE)? -white : white;
 }
 
-void RegBoard::getMoveList(RegMoveList *data, const int8 color, const MoveType movetype)
+template<>
+void Board<RegMove>::getMoveList(RegMoveList *data, const int8 color, const MoveType movetype)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
@@ -1237,7 +1270,8 @@ void RegBoard::getMoveList(RegMoveList *data, const int8 color, const MoveType m
 	}
 }
 
-void RegBoard::getCastleMoveList(RegMoveList *data, const int8 color)
+template<>
+void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int8 color)
 {
 	// can't castle while in check
 	if (incheck(color))
@@ -1277,7 +1311,8 @@ void RegBoard::getCastleMoveList(RegMoveList *data, const int8 color)
 	}
 }
 
-void RegBoard::getEnPassantMoveList(RegMoveList *data, const int8 color)
+template<>
+void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int8 color)
 {
 	if (!flags.canEnPassant())
 		return;
@@ -1323,7 +1358,8 @@ void RegBoard::getEnPassantMoveList(RegMoveList *data, const int8 color)
 	}
 }
 
-RegMoveList* RegBoard::getMoveList(const int8 color, const MoveType movetype)
+template<>
+RegMoveList* Board<RegMove>::getMoveList(const int8 color, const MoveType movetype)
 {
 	RegMoveList *data = new RegMoveList;
 	data->size = 0;
@@ -1347,7 +1383,8 @@ RegMoveList* RegBoard::getMoveList(const int8 color, const MoveType movetype)
 	return data;
 }
 
-string RegBoard::printPieceList() const
+template<>
+string Board<RegMove>::printPieceList() const
 {
 	stringstream buff;
 	string tmp;
