@@ -29,7 +29,7 @@ class BaseBoard
 public:
 	int8 square[64];
 	int8 piece[32];
-	int8 pieceType[32];
+	int8 piecetype[32];
 	int ply;
 	int8 stm;
 	MoveFlags flags;

@@ -267,11 +267,11 @@ string Position<GenMove>::printFen() const
 
 	for (int i = 0; i < 16; i++) {
 		if (piece[i] == PLACEABLE)
-			fen += tolower(pieceSymbol[-pieceType[i]]);
+			fen += tolower(pieceSymbol[-piecetype[i]]);
 	}
 	for (int i = 16; i < 32; i++) {
 		if (piece[i] == PLACEABLE)
-			fen += pieceSymbol[pieceType[i]];
+			fen += pieceSymbol[piecetype[i]];
 	}
 	fen += ' ';
 	fen += '0';
@@ -310,11 +310,11 @@ string Position<GenMove>::printZfen() const
 
 	for (int i = 0; i < 16; i++) {
 		if (piece[i] == PLACEABLE)
-			fen += tolower(pieceSymbol[-pieceType[i]]);
+			fen += tolower(pieceSymbol[-piecetype[i]]);
 	}
 	for (int i = 16; i < 32; i++) {
 		if (piece[i] == PLACEABLE)
-			fen += pieceSymbol[pieceType[i]];
+			fen += pieceSymbol[piecetype[i]];
 	}
 	fen += ':';
 
@@ -332,7 +332,7 @@ void Position<RegMove>::parseReset()
 {
 	memset(square, EMPTY, 64);
 	memset(piece, DEAD, 32);
-	copy(InitPieceType, InitPieceType + 32, pieceType);
+	copy(InitPieceType, InitPieceType + 32, piecetype);
 	flags.reset();
 }
 
@@ -360,7 +360,7 @@ bool Position<RegMove>::setPiece(const int8 loc, const int8 type)
 	for (int i = pstart; i < pend; i++) {
 		if (piece[i] == DEAD) {
 			piece[i] = loc;
-			pieceType[i] = type;
+			piecetype[i] = type;
 			square[loc] = type;
 			return true;
 		}
