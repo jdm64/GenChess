@@ -25,18 +25,22 @@ void GenGame::newGame()
 
 void GenGame::doMove(const GenMove &move)
 {
+	const HistoryNode<GenMove> item = {move};
+
 	board->make(move);
-	history.push_back(move);
+	history.push_back(item);
 }
 
 bool GenGame::undoMove()
 {
 	if (history.empty())
 		return false;
-	board->unmake(history.back());
-        history.pop_back();
 
-        return true;
+	HistoryNode<GenMove> node = history.back();
+	board->unmake(node.move);
+	history.pop_back();
+
+	return true;
 }
 
 // --- Start Regular Chess ---
@@ -49,7 +53,7 @@ void RegGame::newGame()
 
 void RegGame::doMove(const RegMove &move)
 {
-	const HistoryNode item = {move, board->getMoveFlags()};
+	const HistoryNode<RegMove> item = {move, board->getMoveFlags()};
 
 	board->make(move);
 	history.push_back(item);
@@ -59,9 +63,10 @@ bool RegGame::undoMove()
 {
 	if (history.empty())
 		return false;
-	HistoryNode node = history.back();
-	board->unmake(node.move, node.flags);
-        history.pop_back();
 
-        return true;
+	HistoryNode<RegMove> node = history.back();
+	board->unmake(node.move, node.flags);
+	history.pop_back();
+
+	return true;
 }

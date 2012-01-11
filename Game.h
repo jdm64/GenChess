@@ -25,7 +25,7 @@ class GenGame {
 private:
 	GenBoard *board;
 
-	vector<GenMove> history;
+	vector<HistoryNode<GenMove> > history;
 
 public:
 	GenGame(GenBoard *Board) : board(Board) {}
@@ -43,7 +43,7 @@ class RegGame {
 private:
 	RegBoard *board;
 
-	vector<HistoryNode> history;
+	vector<HistoryNode<RegMove> > history;
 
 public:
 	RegGame(RegBoard *Board) : board(Board) {}

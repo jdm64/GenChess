@@ -112,7 +112,19 @@ public:
 	void dumpDebug() const;
 };
 
+template<class Type>
 struct HistoryNode
+{
+};
+
+template<>
+struct HistoryNode<GenMove>
+{
+	GenMove move;
+};
+
+template<>
+struct HistoryNode<RegMove>
 {
 	RegMove move;
 	MoveFlags flags;
