@@ -29,7 +29,7 @@ protected:
 
 	Board<MoveType> board;
 	
-	typename Engine<MoveType>::type *engine;
+	Engine<MoveType> *engine;
 
 	TransTable<MoveType> *tt;
 
@@ -44,7 +44,7 @@ public:
 
 		game = new typename Game<MoveType>::type(&board);
 		tt = new TransTable<MoveType>(32);
-		engine = new typename Engine<MoveType>::type(&board, tt);
+		engine = new Engine<MoveType>(&board, tt);
 	}
 
 	virtual ~UI()

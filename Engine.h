@@ -28,30 +28,32 @@
 #define CHECKMATE_SCORE		-(INT_MAX - 4)
 #define STALEMATE_SCORE		0
 
-class GenEngine {
+template<class Type>
+class Engine
+{
 private:
-	GenMoveList *curr;
+	MoveList<Type> *curr;
 
-	GenBoard *board;
-	GenTransTable *tt;
+	Board<Type> *board;
+	TransTable<Type> *tt;
 
-	Array<GenMove> captureKiller;
-	Array<GenMove> moveKiller;
-	Array<GenMove> placeKiller;
-	Array<GenMove> pvMove;
+	Array<Type> captureKiller;
+	Array<Type> moveKiller;
+	Array<Type> placeKiller;
+	Array<Type> pvMove;
 
 	int maxNg;
 
 	Array<bool> tactical;
 	Array<bool> ismate;
 
-	GenScoreSort cmpScore;
+	ScoreSort<Type> cmpScore;
 
 	void pickRandomMove();
 
 	int Quiescence(int alpha, int beta, int depth);
 
-	bool NegaMoveType(int &alpha, const int beta, int &best, int depth, int limit, Array<GenMove> &killer, const MoveType type);
+	bool NegaMoveType(int &alpha, const int beta, int &best, const int depth, const int limit, Array<Type> &killer, const MoveType type);
 
 	int NegaScout(int alpha, int beta, int depth, int limit);
 
@@ -60,70 +62,19 @@ private:
 	void debugTree();
 
 public:
-	GenEngine(GenBoard *GenBoard, GenTransTable *TT) : curr(NULL), board(GenBoard), tt(TT)
+	Engine(Board<Type> *_Board, TransTable<Type> *TT) : curr(NULL), board(_Board), tt(TT)
 	{
 		maxNg = 5;
 	}
 
-	~GenEngine()
+	~Engine()
 	{
 	}
 
-	GenMove think();
+	Type think();
 };
 
-// --- Start Regular Chess ---
-
-class RegEngine {
-private:
-	RegMoveList *curr;
-
-	RegBoard *board;
-	RegTransTable *tt;
-
-	Array<RegMove> captureKiller;
-	Array<RegMove> moveKiller;
-	Array<RegMove> pvMove;
-
-	int maxNg;
-
-	Array<bool> tactical;
-	Array<bool> ismate;
-
-	RegScoreSort cmpScore;
-
-	void pickRandomMove();
-
-	int Quiescence(int alpha, int beta, int depth);
-
-	bool NegaMoveType(int &alpha, const int beta, int &best, const int depth, const int limit, Array<RegMove> &killer, const MoveType type);
-
-	int NegaScout(int alpha, int beta, int depth, int limit);
-
-	void search(int alpha, int beta, int depth, int limit);
-
-	void debugTree();
-
-public:
-	RegEngine(RegBoard *Board, RegTransTable *TT) : curr(NULL), board(Board), tt(TT)
-	{
-		maxNg = 7;
-	}
-
-	~RegEngine()
-	{
-	}
-
-	RegMove think();
-};
-
-template<class MoveType>
-struct Engine;
-
-template<>
-struct Engine<GenMove> { typedef GenEngine type; };
-
-template<>
-struct Engine<RegMove> { typedef RegEngine type; };
+typedef Engine<GenMove> GenEngine;
+typedef Engine<RegMove> RegEngine;
 
 #endif

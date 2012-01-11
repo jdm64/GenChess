@@ -23,7 +23,8 @@
 //#define DEBUG_SCORES
 #define PRINT_HASH_STATS
 
-void GenEngine::pickRandomMove()
+template<>
+void Engine<GenMove>::pickRandomMove()
 {
 	const int score = curr->list[0].score;
 	int end = 1;
@@ -37,7 +38,8 @@ void GenEngine::pickRandomMove()
 	pvMove[0] = curr->list[rand() % end].move;
 }
 
-int GenEngine::Quiescence(int alpha, int beta, int depth)
+template<>
+int Engine<GenMove>::Quiescence(int alpha, int beta, int depth)
 {
 	GenMoveList* const ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveType::ALL : MoveType::CAPTURE);
 
@@ -75,7 +77,12 @@ int GenEngine::Quiescence(int alpha, int beta, int depth)
 	return best;
 }
 
-bool GenEngine::NegaMoveType(int &alpha, const int beta, int &best,
+// forward declaration
+template<>
+int Engine<GenMove>::NegaScout(int alpha, const int beta, const int depth, int limit);
+
+template<>
+bool Engine<GenMove>::NegaMoveType(int &alpha, const int beta, int &best,
 		const int depth, const int limit, Array<GenMove> &killer, const MoveType type)
 {
 	GenMove move;
@@ -140,7 +147,8 @@ bool GenEngine::NegaMoveType(int &alpha, const int beta, int &best,
 	return false;
 }
 
-int GenEngine::NegaScout(int alpha, const int beta, const int depth, int limit)
+template<>
+int Engine<GenMove>::NegaScout(int alpha, const int beta, const int depth, int limit)
 {
 	if (depth >= limit) {
 		if (!tactical[depth])
@@ -202,7 +210,8 @@ hashMiss:
 	return best;
 }
 
-void GenEngine::search(int alpha, const int beta, const int depth, const int limit)
+template<>
+void Engine<GenMove>::search(int alpha, const int beta, const int depth, const int limit)
 {
 	curr = curr? curr : board->getMoveList(board->getStm(), MoveType::ALL);
 
@@ -226,7 +235,8 @@ void GenEngine::search(int alpha, const int beta, const int depth, const int lim
 	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
 }
 
-GenMove GenEngine::think()
+template<>
+GenMove Engine<GenMove>::think()
 {
 	timeval t1, t2;
 
@@ -258,7 +268,8 @@ GenMove GenEngine::think()
 	return pvMove[0];
 }
 
-void GenEngine::debugTree()
+template<>
+void Engine<GenMove>::debugTree()
 {
 	GenMoveList *ptr = new GenMoveList(*curr);
 	string cmd;
@@ -308,7 +319,8 @@ void GenEngine::debugTree()
 
 // -- Start Regular Chess ---
 
-void RegEngine::pickRandomMove()
+template<>
+void Engine<RegMove>::pickRandomMove()
 {
 	int score = curr->list[0].score, end = 1;
 
@@ -321,7 +333,8 @@ void RegEngine::pickRandomMove()
 	pvMove[0] = curr->list[rand() % end].move;
 }
 
-int RegEngine::Quiescence(int alpha, int beta, int depth)
+template<>
+int Engine<RegMove>::Quiescence(int alpha, int beta, int depth)
 {
 	RegMoveList *ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveType::ALL : MoveType::CAPTURE);
 	const MoveFlags undoFlags = board->getMoveFlags();
@@ -360,7 +373,12 @@ int RegEngine::Quiescence(int alpha, int beta, int depth)
 	return best;
 }
 
-bool RegEngine::NegaMoveType(int &alpha, const int beta, int &best,
+// forward declaration
+template<>
+int Engine<RegMove>::NegaScout(int alpha, int beta, int depth, int limit);
+
+template<>
+bool Engine<RegMove>::NegaMoveType(int &alpha, const int beta, int &best,
 		const int depth, const int limit, Array<RegMove> &killer, const MoveType type)
 {
 	const MoveFlags undoFlags = board->getMoveFlags();
@@ -426,7 +444,8 @@ bool RegEngine::NegaMoveType(int &alpha, const int beta, int &best,
 	return false;
 }
 
-int RegEngine::NegaScout(int alpha, int beta, int depth, int limit)
+template<>
+int Engine<RegMove>::NegaScout(int alpha, int beta, int depth, int limit)
 {
 	const MoveFlags undoFlags = board->getMoveFlags();
 
@@ -487,7 +506,8 @@ hashMiss:
 	return best;
 }
 
-void RegEngine::search(int alpha, int beta, int depth, int limit)
+template<>
+void Engine<RegMove>::search(int alpha, int beta, int depth, int limit)
 {
 	const MoveFlags undoFlags = board->getMoveFlags();
 	curr = curr? curr : board->getMoveList(board->getStm(), MoveType::ALL);
@@ -512,7 +532,8 @@ void RegEngine::search(int alpha, int beta, int depth, int limit)
 	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
 }
 
-RegMove RegEngine::think()
+template<>
+RegMove Engine<RegMove>::think()
 {
 	timeval t1, t2;
 
@@ -544,7 +565,8 @@ RegMove RegEngine::think()
 	return pvMove[0];
 }
 
-void RegEngine::debugTree()
+template<>
+void Engine<RegMove>::debugTree()
 {
 	RegMoveList *ptr = new RegMoveList(*curr);
 	string cmd;
