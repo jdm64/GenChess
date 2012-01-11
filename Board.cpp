@@ -82,11 +82,6 @@ const int genLocValue[7][64] = {
 		-10,  0,  0,  0,  0,  0,  0, -10}
 	};
 
-GenBoard::GenBoard()
-{
-	reset();
-}
-
 void GenBoard::reset()
 {
 	memset(square, EMPTY, 64);
@@ -100,6 +95,11 @@ void GenBoard::reset()
 #endif
 	stm = WHITE;
 	ply = 0;
+}
+
+GenBoard::GenBoard()
+{
+	reset();
 }
 
 void GenBoard::rebuildHash()
@@ -245,6 +245,62 @@ void GenBoard::unmake(const GenMove &move)
 #endif
 }
 
+bool GenBoard::anyMoves(const int8 color)
+{
+	GenMove move;
+
+	// shortest games takes 5 half-moves
+	if (ply < 4)
+		return true;
+
+	// generate piece moves
+	const int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
+	for (int idx = start; idx < end; idx++) {
+		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
+			continue;
+
+		const int8* const loc = genAll(piece[idx]);
+		for (int n = 0; loc[n] != -1; n++) {
+			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
+			move.to = loc[n];
+			move.from = piece[idx];
+			move.index = idx;
+
+			make(move);
+			if (!incheck(color)) {
+				delete[] loc;
+				unmake(move);
+				return true;
+			}
+			unmake(move);
+		}
+		delete[] loc;
+	}
+	// generate piece place moves
+	for (int type = PAWN; type <= KING; type++) {
+		const int idx = pieceIndex(PLACEABLE, type * color);
+		if (idx == NONE)
+			continue;
+		for (int loc = 0; loc < 64; loc++) {
+			if (square[loc] != EMPTY)
+				continue;
+			move.index = idx;
+			move.to = loc;
+			move.xindex = NONE;
+			move.from = PLACEABLE;
+
+			make(move);
+			// place moves are only valid if neither side is inCheck
+			if (!incheck(color) && !incheck(color ^ -2)) {
+				unmake(move);
+				return true;
+			}
+			unmake(move);
+		}
+	}
+	return false;
+}
+
 int GenBoard::isMate()
 {
 	if (anyMoves(stm))
@@ -356,62 +412,6 @@ int GenBoard::eval() const
 	}
 	white -= black;
 	return (stm == WHITE)? -white : white;
-}
-
-bool GenBoard::anyMoves(const int8 color)
-{
-	GenMove move;
-
-	// shortest games takes 5 half-moves
-	if (ply < 4)
-		return true;
-
-	// generate piece moves
-	const int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
-	for (int idx = start; idx < end; idx++) {
-		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
-			continue;
-
-		const int8* const loc = genAll(piece[idx]);
-		for (int n = 0; loc[n] != -1; n++) {
-			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
-			move.to = loc[n];
-			move.from = piece[idx];
-			move.index = idx;
-
-			make(move);
-			if (!incheck(color)) {
-				delete[] loc;
-				unmake(move);
-				return true;
-			}
-			unmake(move);
-		}
-		delete[] loc;
-	}
-	// generate piece place moves
-	for (int type = PAWN; type <= KING; type++) {
-		const int idx = pieceIndex(PLACEABLE, type * color);
-		if (idx == NONE)
-			continue;
-		for (int loc = 0; loc < 64; loc++) {
-			if (square[loc] != EMPTY)
-				continue;
-			move.index = idx;
-			move.to = loc;
-			move.xindex = NONE;
-			move.from = PLACEABLE;
-
-			make(move);
-			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2)) {
-				unmake(move);
-				return true;
-			}
-			unmake(move);
-		}
-	}
-	return false;
 }
 
 void GenBoard::getPlaceMoveList(GenMoveList* const data, const int8 pieceType)
@@ -631,11 +631,6 @@ const int regLocValue[7][64] = {
 		  0,  5,  10,  15,  20,  15,  10,  5}
 	};
 
-RegBoard::RegBoard()
-{
-	reset();
-}
-
 void RegBoard::reset()
 {
 	copy(InitRegBoard, InitRegBoard + 64, square);
@@ -647,6 +642,11 @@ void RegBoard::reset()
 	stm = WHITE;
 	ply = 0;
 	flags.reset();
+}
+
+RegBoard::RegBoard()
+{
+	reset();
 }
 
 void RegBoard::rebuildHash()
@@ -870,197 +870,6 @@ void RegBoard::unmake(const RegMove &move, const MoveFlags &undoFlags)
 	ply--;
 }
 
-int RegBoard::isMate()
-{
-	if (anyMoves(stm))
-		return NOTMATE;
-	else if (incheck(stm))
-		return (stm == WHITE)? BLACK_CHECKMATE : WHITE_CHECKMATE;
-	else
-		return STALEMATE;
-}
-
-bool RegBoard::validMove(const RegMove &moveIn, RegMove &move)
-{
-	if (moveIn.from == moveIn.to)
-		return false;
-
-	const MoveFlags undoFlags = flags;
-	move = moveIn;
-
-	move.index = pieceIndex(move.from, square[move.from]);
-	if (move.index == NONE)
-		return false;
-	else if (square[move.from] * stm < 0)
-		return false;
-	move.xindex = pieceIndex(move.to, square[move.to]);
-	if (move.xindex != NONE && square[move.to] * stm > 0)
-		return false;
-
-	if (move.getCastle()) {
-		return validCastle(move, stm) == VALID_MOVE;
-	} else if (move.getEnPassant() && flags.canEnPassant()) {
-		return validEnPassant(move, stm) == VALID_MOVE;
-	} else if (isPromote(move, stm) && ABS(square[move.from]) == PAWN) {
-		if  (!move.getPromote())
-			move.setPromote(QUEEN);
-	} else {
-		move.flags = 0;
-	}
-
-	if (!fromto(move.from, move.to))
-		return false;
-
-	int ret = true;
-
-	make(move);
-	// stm is opponent after make
-	if (incheck(stm ^ -2))
-		ret = false;
-	unmake(move, undoFlags);
-
-	return ret;
-}
-
-int RegBoard::validCastle(RegMove &move, const int8 color)
-{
-	// can we castle on that side
-	if (!(flags.canCastle(color) && move.getCastle()))
-		return CANT_CASTLE;
-	// can't castle while in check
-	if (incheck(color))
-		return CANT_CASTLE;
-
-	const int king = (color == WHITE)? E1 : E8;
-
-	// king side
-	if (move.getCastle() == 0x10 && square[king + 1] == EMPTY && square[king + 2] == EMPTY &&
-	!isAttacked(king + 1, color) && !isAttacked(king + 2, color) &&
-	ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
-		move.index = (color == WHITE)? 31 : 15;
-		move.xindex = NONE;
-		move.from = king;
-		move.to = king + 2;
-		return VALID_MOVE;
-	} else if (move.getCastle() == 0x20 && square[king - 1] == EMPTY && square[king - 2] == EMPTY &&
-	square[king - 3] == EMPTY && !isAttacked(king - 1, color) && !isAttacked(king - 2, color) &&
-	ABS(square[((color == WHITE)? A1:A8)]) == ROOK) {
-		move.index = (color == WHITE)? 31 : 15;
-		move.xindex = NONE;
-		move.from = king;
-		move.to = king - 2;
-		return VALID_MOVE;
-	}
-	return CANT_CASTLE;
-}
-
-// Board flag must have enpassant enabled
-int RegBoard::validEnPassant(RegMove &move, const int8 color)
-{
-	const MoveFlags undoFlags = flags;
-	const int8 ep = flags.enPassantFile() + ((color == WHITE)? A5 : A4),
-		ep_to = ep + ((color == WHITE)? -8 : 8);
-
-	if (move.to == ep_to && ABS(ep - move.from) == 1) {
-		move.index = pieceIndex(move.from, square[move.from]);
-		move.xindex = pieceIndex(ep, square[ep]);
-		move.setEnPassant();
-
-		int ret = VALID_MOVE;
-
-		make(move);
-		// stm is opponent after make
-		if (incheck(stm ^ -2))
-			ret = IN_CHECK;
-		unmake(move, undoFlags);
-		return ret;
-	}
-	return INVALID_MOVEMENT;
-}
-
-int RegBoard::validMove(const string &smove, const int8 color, RegMove &move)
-{
-	const MoveFlags undoFlags = flags;
-
-	// pre-setup move
-	if (!move.parse(smove))
-		return INVALID_FORMAT;
-
-	// if castle flag is set, move must a castle to be valid
-	if (move.getCastle())
-		return validCastle(move, color);
-
-	move.index = pieceIndex(move.from, square[move.from]);
-
-	switch (ABS(pieceType[move.index])) {
-	case PAWN:
-		// en passant
-		if (flags.canEnPassant() && validEnPassant(move, color) == VALID_MOVE)
-			return VALID_MOVE;
-
-		if (!isPromote(move, color)) {
-			move.flags = 0;
-			break;
-		} else if (!move.getPromote()) {
-			// manualy set to queen if not specified
-			move.setPromote(QUEEN);
-		}
-		break;
-	case KING:
-		// manual castling without proper O-O/O-O-O notation
-		if (ABS(move.from - move.to) == 2) {
-			move.setCastle((move.from > move.to)? 0x20 : 0x10);
-			return validCastle(move, color);
-		}
-	default:
-		// move can't be special, so clear flags
-		move.flags = 0;
-	}
-
-	if (move.index == NONE)
-		return NOPIECE_ERROR;
-	else if (square[move.from] * color < 0)
-		return DONT_OWN;
-	move.xindex = pieceIndex(move.to, square[move.to]);
-	if (move.xindex != NONE && square[move.to] * color > 0)
-		return CAPTURE_OWN;
-
-	if (!fromto(move.from, move.to))
-		return INVALID_MOVEMENT;
-
-	int ret = VALID_MOVE;
-
-	make(move);
-	// stm is opponent after make
-	if (incheck(stm ^ -2))
-		ret = IN_CHECK;
-	unmake(move, undoFlags);
-
-	return ret;
-}
-
-int RegBoard::eval() const
-{
-	int white = 0, black = 0;
-	for (int b = 0, w = 16; b < 16; b++, w++) {
-		if (piece[b] != DEAD) {
-			int mod = (pieceType[b] == BLACK_PAWN || pieceType[b] == BLACK_KING)? -1:1;
-			black += mod * regLocValue[-pieceType[b]][piece[b]];
-			black += regPieceValue[-pieceType[b]];
-		} else {
-			black -= regPieceValue[-pieceType[b]];
-		}
-		if (piece[w] != DEAD) {
-			white += regLocValue[pieceType[w]][piece[w]];
-			white += regPieceValue[pieceType[w]];
-		} else {
-			white -= regPieceValue[pieceType[w]];
-		}
-	}
-	white -= black;
-	return (stm == WHITE)? -white : white;
-}
-
 bool RegBoard::anyMoves(const int8 color)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
@@ -1167,6 +976,197 @@ bool RegBoard::anyMoves(const int8 color)
 		unmake(item.move, undoFlags);
 	}
 	return false;
+}
+
+int RegBoard::isMate()
+{
+	if (anyMoves(stm))
+		return NOTMATE;
+	else if (incheck(stm))
+		return (stm == WHITE)? BLACK_CHECKMATE : WHITE_CHECKMATE;
+	else
+		return STALEMATE;
+}
+
+int RegBoard::validCastle(RegMove &move, const int8 color)
+{
+	// can we castle on that side
+	if (!(flags.canCastle(color) && move.getCastle()))
+		return CANT_CASTLE;
+	// can't castle while in check
+	if (incheck(color))
+		return CANT_CASTLE;
+
+	const int king = (color == WHITE)? E1 : E8;
+
+	// king side
+	if (move.getCastle() == 0x10 && square[king + 1] == EMPTY && square[king + 2] == EMPTY &&
+	!isAttacked(king + 1, color) && !isAttacked(king + 2, color) &&
+	ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
+		move.index = (color == WHITE)? 31 : 15;
+		move.xindex = NONE;
+		move.from = king;
+		move.to = king + 2;
+		return VALID_MOVE;
+	} else if (move.getCastle() == 0x20 && square[king - 1] == EMPTY && square[king - 2] == EMPTY &&
+	square[king - 3] == EMPTY && !isAttacked(king - 1, color) && !isAttacked(king - 2, color) &&
+	ABS(square[((color == WHITE)? A1:A8)]) == ROOK) {
+		move.index = (color == WHITE)? 31 : 15;
+		move.xindex = NONE;
+		move.from = king;
+		move.to = king - 2;
+		return VALID_MOVE;
+	}
+	return CANT_CASTLE;
+}
+
+// Board flag must have enpassant enabled
+int RegBoard::validEnPassant(RegMove &move, const int8 color)
+{
+	const MoveFlags undoFlags = flags;
+	const int8 ep = flags.enPassantFile() + ((color == WHITE)? A5 : A4),
+		ep_to = ep + ((color == WHITE)? -8 : 8);
+
+	if (move.to == ep_to && ABS(ep - move.from) == 1) {
+		move.index = pieceIndex(move.from, square[move.from]);
+		move.xindex = pieceIndex(ep, square[ep]);
+		move.setEnPassant();
+
+		int ret = VALID_MOVE;
+
+		make(move);
+		// stm is opponent after make
+		if (incheck(stm ^ -2))
+			ret = IN_CHECK;
+		unmake(move, undoFlags);
+		return ret;
+	}
+	return INVALID_MOVEMENT;
+}
+
+bool RegBoard::validMove(const RegMove &moveIn, RegMove &move)
+{
+	if (moveIn.from == moveIn.to)
+		return false;
+
+	const MoveFlags undoFlags = flags;
+	move = moveIn;
+
+	move.index = pieceIndex(move.from, square[move.from]);
+	if (move.index == NONE)
+		return false;
+	else if (square[move.from] * stm < 0)
+		return false;
+	move.xindex = pieceIndex(move.to, square[move.to]);
+	if (move.xindex != NONE && square[move.to] * stm > 0)
+		return false;
+
+	if (move.getCastle()) {
+		return validCastle(move, stm) == VALID_MOVE;
+	} else if (move.getEnPassant() && flags.canEnPassant()) {
+		return validEnPassant(move, stm) == VALID_MOVE;
+	} else if (isPromote(move, stm) && ABS(square[move.from]) == PAWN) {
+		if  (!move.getPromote())
+			move.setPromote(QUEEN);
+	} else {
+		move.flags = 0;
+	}
+
+	if (!fromto(move.from, move.to))
+		return false;
+
+	int ret = true;
+
+	make(move);
+	// stm is opponent after make
+	if (incheck(stm ^ -2))
+		ret = false;
+	unmake(move, undoFlags);
+
+	return ret;
+}
+
+int RegBoard::validMove(const string &smove, const int8 color, RegMove &move)
+{
+	const MoveFlags undoFlags = flags;
+
+	// pre-setup move
+	if (!move.parse(smove))
+		return INVALID_FORMAT;
+
+	// if castle flag is set, move must a castle to be valid
+	if (move.getCastle())
+		return validCastle(move, color);
+
+	move.index = pieceIndex(move.from, square[move.from]);
+
+	switch (ABS(pieceType[move.index])) {
+	case PAWN:
+		// en passant
+		if (flags.canEnPassant() && validEnPassant(move, color) == VALID_MOVE)
+			return VALID_MOVE;
+
+		if (!isPromote(move, color)) {
+			move.flags = 0;
+			break;
+		} else if (!move.getPromote()) {
+			// manualy set to queen if not specified
+			move.setPromote(QUEEN);
+		}
+		break;
+	case KING:
+		// manual castling without proper O-O/O-O-O notation
+		if (ABS(move.from - move.to) == 2) {
+			move.setCastle((move.from > move.to)? 0x20 : 0x10);
+			return validCastle(move, color);
+		}
+	default:
+		// move can't be special, so clear flags
+		move.flags = 0;
+	}
+
+	if (move.index == NONE)
+		return NOPIECE_ERROR;
+	else if (square[move.from] * color < 0)
+		return DONT_OWN;
+	move.xindex = pieceIndex(move.to, square[move.to]);
+	if (move.xindex != NONE && square[move.to] * color > 0)
+		return CAPTURE_OWN;
+
+	if (!fromto(move.from, move.to))
+		return INVALID_MOVEMENT;
+
+	int ret = VALID_MOVE;
+
+	make(move);
+	// stm is opponent after make
+	if (incheck(stm ^ -2))
+		ret = IN_CHECK;
+	unmake(move, undoFlags);
+
+	return ret;
+}
+
+int RegBoard::eval() const
+{
+	int white = 0, black = 0;
+	for (int b = 0, w = 16; b < 16; b++, w++) {
+		if (piece[b] != DEAD) {
+			int mod = (pieceType[b] == BLACK_PAWN || pieceType[b] == BLACK_KING)? -1:1;
+			black += mod * regLocValue[-pieceType[b]][piece[b]];
+			black += regPieceValue[-pieceType[b]];
+		} else {
+			black -= regPieceValue[-pieceType[b]];
+		}
+		if (piece[w] != DEAD) {
+			white += regLocValue[pieceType[w]][piece[w]];
+			white += regPieceValue[pieceType[w]];
+		} else {
+			white -= regPieceValue[pieceType[w]];
+		}
+	}
+	white -= black;
+	return (stm == WHITE)? -white : white;
 }
 
 void RegBoard::getMoveList(RegMoveList *data, const int8 color, const MoveType movetype)
