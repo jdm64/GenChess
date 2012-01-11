@@ -17,13 +17,15 @@
 
 #include "Game.h"
 
-void GenGame::newGame()
+template<>
+void Game<GenMove>::newGame()
 {
 	board->reset();
 	history.clear();
 }
 
-void GenGame::doMove(const GenMove &move)
+template<>
+void Game<GenMove>::doMove(const GenMove &move)
 {
 	const HistoryNode<GenMove> item = {move};
 
@@ -31,7 +33,8 @@ void GenGame::doMove(const GenMove &move)
 	history.push_back(item);
 }
 
-bool GenGame::undoMove()
+template<>
+bool Game<GenMove>::undoMove()
 {
 	if (history.empty())
 		return false;
@@ -45,13 +48,15 @@ bool GenGame::undoMove()
 
 // --- Start Regular Chess ---
 
-void RegGame::newGame()
+template<>
+void Game<RegMove>::newGame()
 {
 	board->reset();
 	history.clear();
 }
 
-void RegGame::doMove(const RegMove &move)
+template<>
+void Game<RegMove>::doMove(const RegMove &move)
 {
 	const HistoryNode<RegMove> item = {move, board->getMoveFlags()};
 
@@ -59,7 +64,8 @@ void RegGame::doMove(const RegMove &move)
 	history.push_back(item);
 }
 
-bool RegGame::undoMove()
+template<>
+bool Game<RegMove>::undoMove()
 {
 	if (history.empty())
 		return false;

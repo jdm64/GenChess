@@ -21,47 +21,25 @@
 #include <vector>
 #include "Board.h"
 
-class GenGame {
+template<class Type>
+class Game
+{
 private:
-	GenBoard *board;
+	Board<Type> *board;
 
-	vector<HistoryNode<GenMove> > history;
+	vector<HistoryNode<Type> > history;
 
 public:
-	GenGame(GenBoard *Board) : board(Board) {}
+	Game(Board<Type> *Board) : board(Board) {}
 
 	void newGame();
 
-	void doMove(const GenMove &move);
+	void doMove(const Type &move);
 
 	bool undoMove();
 };
 
-// --- Start Regular Chess ---
-
-class RegGame {
-private:
-	RegBoard *board;
-
-	vector<HistoryNode<RegMove> > history;
-
-public:
-	RegGame(RegBoard *Board) : board(Board) {}
-
-	void newGame();
-
-	void doMove(const RegMove &move);
-
-	bool undoMove();
-};
-
-template<class MoveType>
-struct Game;
-
-template<>
-struct Game<GenMove> { typedef GenGame type; };
-
-template<>
-struct Game<RegMove> { typedef RegGame type; };
+typedef Game<GenMove> GenGame;
+typedef Game<RegMove> RegGame;
 
 #endif

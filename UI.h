@@ -33,7 +33,7 @@ protected:
 
 	TransTable<MoveType> *tt;
 
-	typename Game<MoveType>::type *game;
+	Game<MoveType> *game;
 
 	bool again;
 
@@ -42,7 +42,7 @@ public:
 	{
 		again = true;
 
-		game = new typename Game<MoveType>::type(&board);
+		game = new Game<MoveType>(&board);
 		tt = new TransTable<MoveType>(32);
 		engine = new Engine<MoveType>(&board, tt);
 	}
