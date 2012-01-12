@@ -24,7 +24,7 @@
 
 using namespace std;
 
-class BaseBoard
+class BB
 {
 public:
 	int8 square[64];

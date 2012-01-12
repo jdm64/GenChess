@@ -64,17 +64,17 @@ public:
 
 	int getPly() const
 	{
-		return BaseBoard::ply;
+		return BB::ply;
 	}
 
 	int8 getStm() const
 	{
-		return BaseBoard::stm;
+		return BB::stm;
 	}
 
 	MoveFlags getMoveFlags() const
 	{
-		return BaseBoard::flags;
+		return BB::flags;
 	}
 
 	void reset();

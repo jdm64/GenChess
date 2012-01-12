@@ -19,7 +19,7 @@
 #include "BaseBoard.h"
 #include "Move.h"
 
-string BaseBoard::printSquare(const int index) const
+string BB::printSquare(const int index) const
 {
 	string tmp;
 
@@ -30,7 +30,7 @@ string BaseBoard::printSquare(const int index) const
 	return tmp;
 }
 
-string BaseBoard::printBoard() const
+string BB::printBoard() const
 {
 	ostringstream buf;
 

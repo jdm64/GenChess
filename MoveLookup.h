@@ -28,7 +28,7 @@
 using namespace std;
 
 template<class MoveType>
-class MoveLookup : public BaseBoard
+class MoveLookup : public BB
 {
 protected:
 	int8* genAll(const int8 From) const;
