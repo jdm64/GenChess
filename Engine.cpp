@@ -15,10 +15,7 @@
 	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
-#include <climits>
 #include "Engine.h"
-#include "Util.h"
 
 //#define DEBUG_SCORES
 #define PRINT_HASH_STATS
@@ -233,39 +230,6 @@ void Engine<GenMove>::search(int alpha, const int beta, const int depth, const i
 		b = alpha + 1;
 	}
 	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
-}
-
-template<>
-GenMove Engine<GenMove>::think()
-{
-	timeval t1, t2;
-
-	srand(time(NULL));
-	curr = NULL;
-
-	gettimeofday(&t1, NULL);
-	for (int depth = 1; depth <= maxNg; depth++) {
-		search(MIN_SCORE, MAX_SCORE, 0, depth);
-		gettimeofday(&t2, NULL);
-		cout << "stats depth " << depth << " time " << time_in_msec(t2 - t1) << endl;
-	}
-
-#ifdef PRINT_HASH_STATS
-	sixInt st = tt->stats();
-	cout << "stats total=" << st.one + st.two << " hits=" << 100 * st.one / double(st.one + st.two)
-		<< "% scorehits=" << 100 * st.three / double(st.three + st.four)
-		<< "% movehits=" << 100 * st.five / double(st.five + st.six) << "%" << endl;
-	tt->clearStats();
-#endif
-
-	// Randomize opening
-	if (board->getPly() < 7)
-		pickRandomMove();
-#ifdef DEBUG_SCORES
-	debugTree();
-#endif
-	delete curr;
-	return pvMove[0];
 }
 
 template<>
@@ -530,39 +494,6 @@ void Engine<RegMove>::search(int alpha, int beta, int depth, int limit)
 		b = alpha + 1;
 	}
 	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
-}
-
-template<>
-RegMove Engine<RegMove>::think()
-{
-	timeval t1, t2;
-
-	srand(time(NULL));
-	curr = NULL;
-
-	gettimeofday(&t1, NULL);
-	for (int depth = 1; depth <= maxNg; depth++) {
-		search(MIN_SCORE, MAX_SCORE, 0, depth);
-		gettimeofday(&t2, NULL);
-		cout << "stats depth " << depth << " time " << time_in_msec(t2 - t1) << endl;
-	}
-
-#ifdef PRINT_HASH_STATS
-	sixInt st = tt->stats();
-	cout << "stats total=" << st.one + st.two << " hits=" << 100 * st.one / double(st.one + st.two)
-		<< "% scorehits=" << 100 * st.three / double(st.three + st.four)
-		<< "% movehits=" << 100 * st.five / double(st.five + st.six) << "%" << endl;
-	tt->clearStats();
-#endif
-
-	// Randomize opening
-	if (board->getPly() < 7)
-		pickRandomMove();
-#ifdef DEBUG_SCORES
-	debugTree();
-#endif
-	delete curr;
-	return pvMove[0];
 }
 
 template<>

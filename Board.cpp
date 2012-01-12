@@ -17,7 +17,6 @@
 
 #include <iostream>
 #include <cstring>
-#include <sstream>
 #include "Board.h"
 #include "TransTable.h"
 
@@ -526,39 +525,6 @@ GenMoveList* Board<GenMove>::getMoveList(const int8 color, const MoveClass movet
 		break;
 	}
 	return data;
-}
-
-template<>
-string Board<GenMove>::printPieceList() const
-{
-	stringstream buff;
-	string tmp;
-
-	buff << "White:\t";
-	for (int i = 16; i < 32; i++) {
-		if (i != 16 && !(i % 8))
-			buff << "\n\t";
-		buff << pieceSymbol[piecetype[i]] << "(";
-		tmp = printLoc(piece[i]);
-		if (tmp.length() == 2)
-			buff << ' ' << tmp << ' ';
-		else
-			buff << tmp;
-		buff << ") ";
-	}
-	buff << "\nBlack:\t";
-	for (int i = 0; i < 16; i++) {
-		if (i && !(i % 8))
-			buff << "\n\t";
-		buff << pieceSymbol[-piecetype[i]] << "(";
-		tmp = printLoc(piece[i]);
-		if (tmp.length() == 2)
-			buff << ' ' << tmp << ' ';
-		else
-			buff << tmp;
-		buff << ") ";
-	}
-	return buff.str();
 }
 
 template<>
@@ -1381,37 +1347,4 @@ RegMoveList* Board<RegMove>::getMoveList(const int8 color, const MoveClass movet
 		break;
 	}
 	return data;
-}
-
-template<>
-string Board<RegMove>::printPieceList() const
-{
-	stringstream buff;
-	string tmp;
-
-	buff << "White:\t";
-	for (int i = 16; i < 32; i++) {
-		if (i != 16 && !(i % 8))
-			buff << "\n\t";
-		buff << pieceSymbol[piecetype[i]] << "(";
-		tmp = printLoc(piece[i]);
-		if (tmp.length() == 2)
-			buff << ' ' << tmp << ' ';
-		else
-			buff << tmp;
-		buff << ") ";
-	}
-	buff << "\nBlack:\t";
-	for (int i = 0; i < 16; i++) {
-		if (i && !(i % 8))
-			buff << "\n\t";
-		buff << pieceSymbol[-piecetype[i]] << "(";
-		tmp = printLoc(piece[i]);
-		if (tmp.length() == 2)
-			buff << ' ' << tmp << ' ';
-		else
-			buff << tmp;
-		buff << ") ";
-	}
-	return buff.str();
 }

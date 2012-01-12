@@ -33,11 +33,19 @@ protected:
 public:
 	bool incheck(const int8 color) const;
 
+	int parseFen_BoardStm(const string &st);
+
 	bool parseFen(const string &st);
+
+	int parseZfen_Board(const string &st);
 
 	bool parseZfen(const string &st);
 
+	void printFen_BoardStm(ostringstream &buf, string &fen) const;
+
 	string printFen() const;
+
+	void printZfen_Board(ostringstream &buf, string &fen) const;
 
 	string printZfen() const;
 };

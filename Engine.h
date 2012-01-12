@@ -18,8 +18,11 @@
 #ifndef __ENGINE_H__
 #define __ENGINE_H__
 
+#include <iostream>
+#include <climits>
 #include <vector>
 #include "Array.h"
+#include "Util.h"
 #include "TransTable.h"
 
 #define MAX_DEPTH		10
@@ -71,7 +74,37 @@ public:
 	{
 	}
 
-	MoveType think();
+	MoveType think()
+	{
+		timeval t1, t2;
+
+		srand(time(NULL));
+		curr = NULL;
+
+		gettimeofday(&t1, NULL);
+		for (int depth = 1; depth <= maxNg; depth++) {
+			search(MIN_SCORE, MAX_SCORE, 0, depth);
+			gettimeofday(&t2, NULL);
+			cout << "stats depth " << depth << " time " << time_in_msec(t2 - t1) << endl;
+		}
+
+#ifdef PRINT_HASH_STATS
+		sixInt st = tt->stats();
+		cout << "stats total=" << st.one + st.two << " hits=" << 100 * st.one / double(st.one + st.two)
+			<< "% scorehits=" << 100 * st.three / double(st.three + st.four)
+			<< "% movehits=" << 100 * st.five / double(st.five + st.six) << "%" << endl;
+		tt->clearStats();
+#endif
+
+		// Randomize opening
+		if (board->getPly() < 7)
+			pickRandomMove();
+#ifdef DEBUG_SCORES
+		debugTree();
+#endif
+		delete curr;
+		return pvMove[0];
+	}
 };
 
 typedef Engine<GenMove> GenEngine;

@@ -62,41 +62,11 @@ bool Position<GenMove>::incheck(const int8 color) const
 template<>
 bool Position<GenMove>::parseFen(const string &st)
 {
-	parseReset();
+	int n = parseFen_BoardStm(st);
 
-	// index counter for st
-	int n = 0;
-	while (isspace(st[n]))
-		n++;
-
-	// parse board
-	for (int loc = 0, cont = true; cont; n++) {
-		switch (st[n]) {
-		case 'p':	case 'b':	case 'r':
-		case 'n':	case 'q':	case 'k':
-		case 'P':	case 'B':	case 'R':
-		case 'N':	case 'Q':	case 'K':
-			if (!setPiece(loc, stype[st[n] % 21]))
-				return false;
-			loc++;
-			break;
-		case '1':	case '2':	case '3':
-		case '4':	case '5':	case '6':
-		case '7':	case '8':
-			loc += st[n] - '0';
-			break;
-		case '/':
-			break;
-		case ' ':
-			cont = false;
-			break;
-		default:
-			return false;
-		}
-	}
-	// pick up color-to-move
-	stm = (st[n] == 'w')? WHITE : BLACK;
-	n += 2;
+	// check if board parsing failed
+	if (n <= 0)
+		return false;
 
 	// parse placeable pieces
 	for (;; n++) {
@@ -156,33 +126,11 @@ bool Position<GenMove>::parseFen(const string &st)
 template<>
 bool Position<GenMove>::parseZfen(const string &st)
 {
-	parseReset();
+	int n = parseZfen_Board(st);
 
-	// index counter for st
-	int n = 0;
-
-	// parse board
-	string num = "";
-	for (int loc = 0, act = false; true; n++) {
-		if (isdigit(st[n])) {
-			num += st[n];
-			act = true;
-		} else if (isalpha(st[n])) {
-			if (act) {
-				loc += atoi(num.c_str());
-				num = "";
-				act = false;
-			}
-			if (!setPiece(loc, stype[st[n] % 21]))
-				return false;
-			loc++;
-		} else if (st[n] == ':') {
-			n++;
-			break;
-		} else {
-			return false;
-		}
-	}
+	// check if board parsing failed
+	if (n <= 0)
+		return false;
 
 	// parse placeable pieces
 	for (;; n++) {
@@ -197,7 +145,7 @@ bool Position<GenMove>::parseZfen(const string &st)
 	}
 
 	// parse half-ply
-	num = "";
+	string num = "";
 	while (isdigit(st[n])) {
 		num += st[n];
 		n++;
@@ -234,36 +182,7 @@ string Position<GenMove>::printFen() const
 	ostringstream buf;
 	string fen;
 
-	for (int i = 0, empty = 0; i < 65; i++) {
-		if (i && i % 8 == 0) {
-			if (empty) {
-				buf.str(string());
-				buf << empty;
-				fen += buf.str();
-			}
-			if (i == 64)
-				break;
-			empty = 0;
-			fen += '/';
-		}
-		if (square[i] == EMPTY) {
-			empty++;
-			continue;
-		}
-		if (empty) {
-			buf.str(string());
-			buf << empty;
-			fen += buf.str();
-			empty = 0;
-		}
-		if (square[i] > EMPTY)
-			fen += pieceSymbol[square[i]];
-		else
-			fen += tolower(pieceSymbol[-square[i]]);
-	}
-	fen += ' ';
-	fen += (ply % 2)? 'b':'w';
-	fen += ' ';
+	printFen_BoardStm(buf, fen);
 
 	for (int i = 0; i < 16; i++) {
 		if (piece[i] == PLACEABLE)
@@ -287,26 +206,10 @@ string Position<GenMove>::printFen() const
 template<>
 string Position<GenMove>::printZfen() const
 {
-	stringstream buf;
+	ostringstream buf;
 	string fen;
 
-	for (int i = 0, empty = 0; i < 64; i++) {
-		if (square[i] == EMPTY) {
-			empty++;
-			continue;
-		}
-		if (empty) {
-			buf.str(string());
-			buf << empty;
-			fen += buf.str();
-		}
-		if (square[i] > EMPTY)
-			fen += pieceSymbol[square[i]];
-		else
-			fen += tolower(pieceSymbol[-square[i]]);
-		empty = 0;
-	}
-	fen += ':';
+	printZfen_Board(buf, fen);
 
 	for (int i = 0; i < 16; i++) {
 		if (piece[i] == PLACEABLE)
@@ -379,41 +282,11 @@ bool Position<RegMove>::incheck(const int8 color) const
 template<>
 bool Position<RegMove>::parseFen(const string &st)
 {
-	parseReset();
+	int n = parseFen_BoardStm(st);
 
-	// index counter for st
-	int n = 0;
-	while (isspace(st[n]))
-		n++;
-
-	// parse board
-	for (int loc = 0, cont = true; cont; n++) {
-		switch (st[n]) {
-		case 'p':	case 'b':	case 'r':
-		case 'n':	case 'q':	case 'k':
-		case 'P':	case 'B':	case 'R':
-		case 'N':	case 'Q':	case 'K':
-			if (!setPiece(loc, stype[st[n] % 21]))
-				return false;
-			loc++;
-			break;
-		case '1':	case '2':	case '3':
-		case '4':	case '5':	case '6':
-		case '7':	case '8':
-			loc += st[n] - '0';
-			break;
-		case '/':
-			break;
-		case ' ':
-			cont = false;
-			break;
-		default:
-			return false;
-		}
-	}
-	// pick up color-to-move
-	stm = (st[n] == 'w')? WHITE : BLACK;
-	n += 2;
+	// check if board parsing failed
+	if (n <= 0)
+		return false;
 
 	// castle rights
 	int8 castle = 0;
@@ -475,33 +348,11 @@ bool Position<RegMove>::parseFen(const string &st)
 template<>
 bool Position<RegMove>::parseZfen(const string &st)
 {
-	parseReset();
+	int n = parseZfen_Board(st);
 
-	// index counter for st
-	int n = 0;
-
-	// parse board
-	string num = "";
-	for (int loc = 0, act = false; true; n++) {
-		if (isdigit(st[n])) {
-			num += st[n];
-			act = true;
-		} else if (isalpha(st[n])) {
-			if (act) {
-				loc += atoi(num.c_str());
-				num = "";
-				act = false;
-			}
-			if (!setPiece(loc, stype[st[n] % 21]))
-				return false;
-			loc++;
-		} else if (st[n] == ':') {
-			n++;
-			break;
-		} else {
-			return false;
-		}
-	}
+	// check if board parsing failed
+	if (n <= 0)
+		return false;
 
 	// parse castle rights
 	int8 castle = 0;
@@ -533,7 +384,7 @@ bool Position<RegMove>::parseZfen(const string &st)
 	n++;
 
 	// parse half-ply
-	num = "";
+	string num = "";
 	while (isdigit(st[n])) {
 		num += st[n];
 		n++;
@@ -554,36 +405,7 @@ string Position<RegMove>::printFen() const
 	ostringstream buf;
 	string fen;
 
-	for (int i = 0, empty = 0; i < 65; i++) {
-		if (i && i % 8 == 0) {
-			if (empty) {
-				buf.str(string());
-				buf << empty;
-				fen += buf.str();
-			}
-			if (i == 64)
-				break;
-			empty = 0;
-			fen += '/';
-		}
-		if (square[i] == EMPTY) {
-			empty++;
-			continue;
-		}
-		if (empty) {
-			buf.str(string());
-			buf << empty;
-			fen += buf.str();
-			empty = 0;
-		}
-		if (square[i] > EMPTY)
-			fen += pieceSymbol[square[i]];
-		else
-			fen += tolower(pieceSymbol[-square[i]]);
-	}
-	fen += ' ';
-	fen += (ply % 2)? 'b':'w';
-	fen += ' ';
+	printFen_BoardStm(buf, fen);
 
 	// print castle rights
 	if (flags.bits & 0xf0) {
@@ -621,26 +443,10 @@ string Position<RegMove>::printFen() const
 template<>
 string Position<RegMove>::printZfen() const
 {
-	stringstream buf;
+	ostringstream buf;
 	string fen;
 
-	for (int i = 0, empty = 0; i < 64; i++) {
-		if (square[i] == EMPTY) {
-			empty++;
-			continue;
-		}
-		if (empty) {
-			buf.str(string());
-			buf << empty;
-			fen += buf.str();
-		}
-		if (square[i] > EMPTY)
-			fen += pieceSymbol[square[i]];
-		else
-			fen += tolower(pieceSymbol[-square[i]]);
-		empty = 0;
-	}
-	fen += ':';
+	printZfen_Board(buf, fen);
 
 	// print castle rights
 	if (flags.bits & 0xf0) {
@@ -666,4 +472,136 @@ string Position<RegMove>::printZfen() const
 	fen += buf.str();
 
 	return fen;
+}
+
+template<class MoveType>
+int Position<MoveType>::parseFen_BoardStm(const string &st)
+{
+	parseReset();
+
+	// index counter for st
+	int n = 0;
+	while (isspace(st[n]))
+		n++;
+
+	// parse board
+	for (int loc = 0, cont = true; cont; n++) {
+		switch (st[n]) {
+		case 'p':	case 'b':	case 'r':
+		case 'n':	case 'q':	case 'k':
+		case 'P':	case 'B':	case 'R':
+		case 'N':	case 'Q':	case 'K':
+			if (!setPiece(loc, stype[st[n] % 21]))
+				return -1;
+			loc++;
+			break;
+		case '1':	case '2':	case '3':
+		case '4':	case '5':	case '6':
+		case '7':	case '8':
+			loc += st[n] - '0';
+			break;
+		case '/':
+			break;
+		case ' ':
+			cont = false;
+			break;
+		default:
+			return -1;
+		}
+	}
+	// pick up color-to-move
+	BB::stm = (st[n] == 'w')? WHITE : BLACK;
+	n += 2;
+
+	return n;
+}
+
+template<class MoveType>
+int Position<MoveType>::parseZfen_Board(const string &st)
+{
+	parseReset();
+
+	// index counter for st
+	int n = 0;
+
+	// parse board
+	string num = "";
+	for (int loc = 0, act = false; true; n++) {
+		if (isdigit(st[n])) {
+			num += st[n];
+			act = true;
+		} else if (isalpha(st[n])) {
+			if (act) {
+				loc += atoi(num.c_str());
+				num = "";
+				act = false;
+			}
+			if (!setPiece(loc, stype[st[n] % 21]))
+				return -1;
+			loc++;
+		} else if (st[n] == ':') {
+			n++;
+			break;
+		} else {
+			return -1;
+		}
+	}
+	return n;
+}
+
+template<class MoveType>
+void Position<MoveType>::printFen_BoardStm(ostringstream &buf, string &fen) const
+{
+	for (int i = 0, empty = 0; i < 65; i++) {
+		if (i && i % 8 == 0) {
+			if (empty) {
+				buf.str(string());
+				buf << empty;
+				fen += buf.str();
+			}
+			if (i == 64)
+				break;
+			empty = 0;
+			fen += '/';
+		}
+		if (BB::square[i] == EMPTY) {
+			empty++;
+			continue;
+		}
+		if (empty) {
+			buf.str(string());
+			buf << empty;
+			fen += buf.str();
+			empty = 0;
+		}
+		if (BB::square[i] > EMPTY)
+			fen += pieceSymbol[BB::square[i]];
+		else
+			fen += tolower(pieceSymbol[-BB::square[i]]);
+	}
+	fen += ' ';
+	fen += (BB::ply % 2)? 'b':'w';
+	fen += ' ';
+}
+
+template<class MoveType>
+void Position<MoveType>::printZfen_Board(ostringstream &buf, string &fen) const
+{
+	for (int i = 0, empty = 0; i < 64; i++) {
+		if (BB::square[i] == EMPTY) {
+			empty++;
+			continue;
+		}
+		if (empty) {
+			buf.str(string());
+			buf << empty;
+			fen += buf.str();
+		}
+		if (BB::square[i] > EMPTY)
+			fen += pieceSymbol[BB::square[i]];
+		else
+			fen += tolower(pieceSymbol[-BB::square[i]]);
+		empty = 0;
+	}
+	fen += ':';
 }

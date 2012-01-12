@@ -18,6 +18,7 @@
 #ifndef __BOARD_H__
 #define __BOARD_H__
 
+#include <sstream>
 #include "Position.h"
 
 //#define DEBUG_MAKE_MOVE
@@ -107,7 +108,37 @@ public:
 
 	MoveList<MoveType>* getMoveList(const int8 color, const MoveClass movetype);
 
-	string printPieceList() const;
+	string printPieceList() const
+	{
+		stringstream buff;
+		string tmp;
+
+		buff << "White:\t";
+		for (int i = 16; i < 32; i++) {
+			if (i != 16 && !(i % 8))
+				buff << "\n\t";
+			buff << pieceSymbol[BB::piecetype[i]] << "(";
+			tmp = printLoc(BB::piece[i]);
+			if (tmp.length() == 2)
+				buff << ' ' << tmp << ' ';
+			else
+				buff << tmp;
+			buff << ") ";
+		}
+		buff << "\nBlack:\t";
+		for (int i = 0; i < 16; i++) {
+			if (i && !(i % 8))
+				buff << "\n\t";
+			buff << pieceSymbol[-BB::piecetype[i]] << "(";
+			tmp = printLoc(BB::piece[i]);
+			if (tmp.length() == 2)
+				buff << ' ' << tmp << ' ';
+			else
+				buff << tmp;
+			buff << ") ";
+		}
+		return buff.str();
+	}
 
 	void dumpDebug() const;
 };
