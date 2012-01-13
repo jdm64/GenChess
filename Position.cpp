@@ -591,16 +591,14 @@ void Position<MoveType>::printZfen_Board(ostringstream &buf, string &fen) const
 		if (BB::square[i] == EMPTY) {
 			empty++;
 			continue;
-		}
-		if (empty) {
+		} else if (empty) {
 			buf.str(string());
 			buf << empty;
 			fen += buf.str();
 		}
-		if (BB::square[i] > EMPTY)
-			fen += pieceSymbol[BB::square[i]];
-		else
-			fen += tolower(pieceSymbol[-BB::square[i]]);
+		fen += (BB::square[i] > EMPTY)?
+				pieceSymbol[BB::square[i]] :
+				tolower(pieceSymbol[-BB::square[i]]);
 		empty = 0;
 	}
 	fen += ':';
