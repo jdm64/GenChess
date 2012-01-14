@@ -34,7 +34,7 @@ void Position<GenMove>::parseReset()
 }
 
 template<>
-bool Position<GenMove>::setPiece(const int8 loc, const int8 type)
+bool Position<GenMove>::setPiece(const int loc, const int type)
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
@@ -52,7 +52,7 @@ bool Position<GenMove>::setPiece(const int8 loc, const int8 type)
 }
 
 template<>
-bool Position<GenMove>::incheck(const int8 color) const
+bool Position<GenMove>::incheck(const int color) const
 {
 	const int king = (color == WHITE)? 31:15;
 
@@ -240,7 +240,7 @@ void Position<RegMove>::parseReset()
 }
 
 template<>
-bool Position<RegMove>::setPiece(const int8 loc, const int8 type)
+bool Position<RegMove>::setPiece(const int loc, const int type)
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
@@ -272,7 +272,7 @@ bool Position<RegMove>::setPiece(const int8 loc, const int8 type)
 }
 
 template<>
-bool Position<RegMove>::incheck(const int8 color) const
+bool Position<RegMove>::incheck(const int color) const
 {
 	const int king = (color == WHITE)? 31:15;
 
@@ -289,7 +289,7 @@ bool Position<RegMove>::parseFen(const string &st)
 		return false;
 
 	// castle rights
-	int8 castle = 0;
+	int castle = 0;
 	for (; st[n] != ' '; n++) {
 		switch (st[n]) {
 		case 'K':
@@ -355,7 +355,7 @@ bool Position<RegMove>::parseZfen(const string &st)
 		return false;
 
 	// parse castle rights
-	int8 castle = 0;
+	int castle = 0;
 	for (; st[n] != ':'; n++) {
 		switch (st[n]) {
 		case 'K':

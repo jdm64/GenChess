@@ -139,7 +139,7 @@ void Board<GenMove>::setBoard(const GenPosition &pos)
 }
 
 template<>
-int Board<GenMove>::pieceIndex(const int8 loc, const int8 type) const
+int Board<GenMove>::pieceIndex(const int loc, const int type) const
 {
 	static const int offset[] = {-1, 0, 8, 10, 12, 14, 15, 16};
 	const int start = ((type < 0)? 0 : 16) + offset[ABS(type)],
@@ -252,7 +252,7 @@ void Board<GenMove>::unmake(const GenMove &move)
 }
 
 template<>
-bool Board<GenMove>::anyMoves(const int8 color)
+bool Board<GenMove>::anyMoves(const int color)
 {
 	GenMove move;
 
@@ -353,7 +353,7 @@ bool Board<GenMove>::validMove(const GenMove &moveIn, GenMove &move)
 }
 
 template<>
-int Board<GenMove>::validMove(const string &smove, const int8 color, GenMove &move)
+int Board<GenMove>::validMove(const string &smove, const int color, GenMove &move)
 {
 	// pre-setup move
 	if (!move.parse(smove))
@@ -426,10 +426,10 @@ int Board<GenMove>::eval() const
 }
 
 template<>
-void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int8 pieceType)
+void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int pieceType)
 {
 	const int idx = pieceIndex(PLACEABLE, pieceType);
-	const int8 color = pieceType / ABS(pieceType);
+	const int color = pieceType / ABS(pieceType);
 	GenMoveNode item;
 
 	if (idx == NONE)
@@ -454,7 +454,7 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int8 pieceT
 }
 
 template<>
-void Board<GenMove>::getMoveList(GenMoveList* const data, const int8 color, const MoveClass movetype)
+void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const MoveClass movetype)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	GenMoveNode item;
@@ -496,7 +496,7 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int8 color, cons
 }
 
 template<>
-GenMoveList* Board<GenMove>::getMoveList(const int8 color, const MoveClass movetype)
+GenMoveList* Board<GenMove>::getMoveList(const int color, const MoveClass movetype)
 {
 	GenMoveList* const data = new GenMoveList;
 	data->size = 0;
@@ -668,7 +668,7 @@ void Board<RegMove>::setBoard(const RegPosition &pos)
 }
 
 template<>
-int Board<RegMove>::pieceIndex(const int8 loc, const int8 type) const
+int Board<RegMove>::pieceIndex(const int loc, const int type) const
 {
 	const int start = (type > 0)? 16:0, end = (type > 0)? 32:16;
 
@@ -811,7 +811,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
 
 #ifdef TT_ENABLED
-	const int8 bits = flags.bits ^ undoFlags.bits;
+	const int bits = flags.bits ^ undoFlags.bits;
 	key ^= (bits & ((color == WHITE)? 0x10 : 0x40))? hashBox[CASTLE_HASH + color] : 0;
 	key ^= (bits & ((color == WHITE)? 0x20 : 0x80))? hashBox[CASTLE_HASH + 2 * color] : 0;
 	key ^= (bits & 0x8)? hashBox[ENPASSANT_HASH] : 0;
@@ -862,7 +862,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 }
 
 template<>
-bool Board<RegMove>::anyMoves(const int8 color)
+bool Board<RegMove>::anyMoves(const int color)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
@@ -933,7 +933,7 @@ bool Board<RegMove>::anyMoves(const int8 color)
 		return false;
 
 	const int eps_file = flags.enPassantFile();
-	const int8 eps = eps_file + ((color == WHITE)? A5 : A4),
+	const int eps = eps_file + ((color == WHITE)? A5 : A4),
 		your_pawn = (color == WHITE)? WHITE_PAWN : BLACK_PAWN,
 		opp_pawn = your_pawn * -1;
 
@@ -982,7 +982,7 @@ int Board<RegMove>::isMate()
 }
 
 template<>
-int Board<RegMove>::validCastle(RegMove &move, const int8 color)
+int Board<RegMove>::validCastle(RegMove &move, const int color)
 {
 	// can we castle on that side
 	if (!(flags.canCastle(color) && move.getCastle()))
@@ -1016,10 +1016,10 @@ int Board<RegMove>::validCastle(RegMove &move, const int8 color)
 
 // Board flag must have enpassant enabled
 template<>
-int Board<RegMove>::validEnPassant(RegMove &move, const int8 color)
+int Board<RegMove>::validEnPassant(RegMove &move, const int color)
 {
 	const MoveFlags undoFlags = flags;
-	const int8 ep = flags.enPassantFile() + ((color == WHITE)? A5 : A4),
+	const int ep = flags.enPassantFile() + ((color == WHITE)? A5 : A4),
 		ep_to = ep + ((color == WHITE)? -8 : 8);
 
 	if (move.to == ep_to && ABS(ep - move.from) == 1) {
@@ -1083,7 +1083,7 @@ bool Board<RegMove>::validMove(const RegMove &moveIn, RegMove &move)
 }
 
 template<>
-int Board<RegMove>::validMove(const string &smove, const int8 color, RegMove &move)
+int Board<RegMove>::validMove(const string &smove, const int color, RegMove &move)
 {
 	const MoveFlags undoFlags = flags;
 
@@ -1168,7 +1168,7 @@ int Board<RegMove>::eval() const
 }
 
 template<>
-void Board<RegMove>::getMoveList(RegMoveList *data, const int8 color, const MoveClass movetype)
+void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveClass movetype)
 {
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
@@ -1237,14 +1237,14 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int8 color, const Move
 }
 
 template<>
-void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int8 color)
+void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int color)
 {
 	// can't castle while in check
 	if (incheck(color))
 		return;
 
 	const int king = (color == WHITE)? E1 : E8;
-	const int8 kindex = (color == WHITE)? 31 : 15;
+	const int kindex = (color == WHITE)? 31 : 15;
 	RegMoveNode item;
 
 	// King Side
@@ -1278,13 +1278,13 @@ void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int8 color)
 }
 
 template<>
-void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int8 color)
+void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int color)
 {
 	if (!flags.canEnPassant())
 		return;
 
 	const int eps_file = flags.enPassantFile();
-	const int8 eps = eps_file + ((color == WHITE)? A5 : A4),
+	const int eps = eps_file + ((color == WHITE)? A5 : A4),
 		your_pawn = (color == WHITE)? WHITE_PAWN : BLACK_PAWN,
 		opp_pawn = -your_pawn;
 	const MoveFlags undoFlags = flags;
@@ -1325,7 +1325,7 @@ void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int8 color)
 }
 
 template<>
-RegMoveList* Board<RegMove>::getMoveList(const int8 color, const MoveClass movetype)
+RegMoveList* Board<RegMove>::getMoveList(const int color, const MoveClass movetype)
 {
 	RegMoveList *data = new RegMoveList;
 	data->size = 0;

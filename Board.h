@@ -38,18 +38,18 @@ class Board : public Position<MoveType>
 private:
 	uint64 key;
 
-	int pieceIndex(const int8 loc, const int8 type) const;
+	int pieceIndex(const int loc, const int type) const;
 
-	inline bool isPromote(const RegMove &move, int8 color) const
+	inline bool isPromote(const RegMove &move, int color) const
 	{
 		return (color == WHITE)?
 			(move.to <= H8 && move.from <= H7) :
 			(move.to >= A1 && move.from >= A2);
 	}
 
-	int validCastle(RegMove &move, const int8 color);
+	int validCastle(RegMove &move, const int color);
 
-	int validEnPassant(RegMove &move, const int8 color);
+	int validEnPassant(RegMove &move, const int color);
 
 	void validateBoard(const RegMove &move) const;
 
@@ -68,7 +68,7 @@ public:
 		return BB::ply;
 	}
 
-	int8 getStm() const
+	int getStm() const
 	{
 		return BB::stm;
 	}
@@ -92,21 +92,21 @@ public:
 
 	bool validMove(const MoveType &moveIn, MoveType &move);
 
-	int validMove(const string &smove, const int8 color, MoveType &move);
+	int validMove(const string &smove, const int color, MoveType &move);
 
 	int eval() const;
 
-	bool anyMoves(const int8 color);
+	bool anyMoves(const int color);
 
-	void getPlaceMoveList(GenMoveList* const data, const int8 pieceType);
+	void getPlaceMoveList(GenMoveList* const data, const int pieceType);
 
-	void getCastleMoveList(RegMoveList *data, const int8 color);
+	void getCastleMoveList(RegMoveList *data, const int color);
 
-	void getEnPassantMoveList(RegMoveList *data, const int8 color);
+	void getEnPassantMoveList(RegMoveList *data, const int color);
 
-	void getMoveList(MoveList<MoveType>* const data, const int8 color, const MoveClass movetype);
+	void getMoveList(MoveList<MoveType>* const data, const int color, const MoveClass movetype);
 
-	MoveList<MoveType>* getMoveList(const int8 color, const MoveClass movetype);
+	MoveList<MoveType>* getMoveList(const int color, const MoveClass movetype);
 
 	string printPieceList() const
 	{

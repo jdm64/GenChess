@@ -53,7 +53,7 @@ const int8 offsets[7][8] = {
 	{-11, -10,  -9, -1,   1,  9, 10, 11} };
 
 template<>
-int8* MoveLookup<GenMove>::genAll(const int8 From) const
+int8* MoveLookup<GenMove>::genAll(const int From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -123,7 +123,7 @@ int8* MoveLookup<GenMove>::genAll(const int8 From) const
 }
 
 template<>
-int8* MoveLookup<GenMove>::genCapture(const int8 From) const
+int8* MoveLookup<GenMove>::genCapture(const int From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -183,7 +183,7 @@ int8* MoveLookup<GenMove>::genCapture(const int8 From) const
 }
 
 template<>
-int8* MoveLookup<GenMove>::genMove(const int8 From) const
+int8* MoveLookup<GenMove>::genMove(const int From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -243,7 +243,7 @@ int8* MoveLookup<GenMove>::genMove(const int8 From) const
 }
 
 template<>
-bool MoveLookup<GenMove>::fromto(const int8 From, const int8 To) const
+bool MoveLookup<GenMove>::fromto(const int From, const int To) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -311,7 +311,7 @@ bool MoveLookup<GenMove>::fromto(const int8 From, const int8 To) const
 }
 
 template<>
-bool MoveLookup<GenMove>::isAttacked(const int8 From) const
+bool MoveLookup<GenMove>::isAttacked(const int From) const
 {
 	const int mfrom = mailbox64[From];
 
@@ -363,7 +363,7 @@ bool MoveLookup<GenMove>::isAttacked(const int8 From) const
 // --- Start Regular Chess ---
 
 template<>
-int8* MoveLookup<RegMove>::genAll(const int8 From) const
+int8* MoveLookup<RegMove>::genAll(const int From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -398,7 +398,7 @@ int8* MoveLookup<RegMove>::genAll(const int8 From) const
 	case KNIGHT:
 	case KING:
 		for (int dir = 0; dir < 8; dir++) {
-			const int8 to = mailbox[mfrom + offset[dir]];
+			const int to = mailbox[mfrom + offset[dir]];
 			if (to != -1 && ANY_MOVE(square[From], square[to]))
 				list[next++] = to;
 		}
@@ -407,7 +407,7 @@ int8* MoveLookup<RegMove>::genAll(const int8 From) const
 	case ROOK:
 		for (int dir = 0; dir < 4; dir++) {
 			for (int k = 1; k < 8; k++) {
-				const int8 to = mailbox[mfrom + k * offset[dir]];
+				const int to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (square[to] == EMPTY) {
@@ -423,7 +423,7 @@ int8* MoveLookup<RegMove>::genAll(const int8 From) const
 	case QUEEN:
 		for (int dir = 0; dir < 8; dir++) {
 			for (int k = 1; k < 8; k++) {
-				const int8 to = mailbox[mfrom + k * offset[dir]];
+				const int to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (square[to] == EMPTY) {
@@ -444,7 +444,7 @@ int8* MoveLookup<RegMove>::genAll(const int8 From) const
 }
 
 template<>
-int8* MoveLookup<RegMove>::genCapture(const int8 From) const
+int8* MoveLookup<RegMove>::genCapture(const int From) const
 {
 	const int type = ABS(square[From]),  mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -469,7 +469,7 @@ int8* MoveLookup<RegMove>::genCapture(const int8 From) const
 	case KNIGHT:
 	case KING:
 		for (int dir = 0; dir < 8; dir++) {
-			const int8 to = mailbox[mfrom + offset[dir]];
+			const int to = mailbox[mfrom + offset[dir]];
 			if (to != -1 && CAPTURE_MOVE(square[From], square[to]))
 				list[next++] = to;
 		}
@@ -478,7 +478,7 @@ int8* MoveLookup<RegMove>::genCapture(const int8 From) const
 	case ROOK:
 		for (int dir = 0; dir < 4; dir++) {
 			for (int k = 1; k < 8; k++) {
-				const int8 to = mailbox[mfrom + k * offset[dir]];
+				const int to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1)
 					break;
 				else if (square[to] == EMPTY)
@@ -492,7 +492,7 @@ int8* MoveLookup<RegMove>::genCapture(const int8 From) const
 	case QUEEN:
 		for (int dir = 0; dir < 8; dir++) {
 			for (int k = 1; k < 8; k++) {
-				const int8 to = mailbox[mfrom + k * offset[dir]];
+				const int to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1)
 					break;
 				else if (square[to] == EMPTY)
@@ -511,7 +511,7 @@ int8* MoveLookup<RegMove>::genCapture(const int8 From) const
 }
 
 template<>
-int8* MoveLookup<RegMove>::genMove(const int8 From) const
+int8* MoveLookup<RegMove>::genMove(const int From) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -538,7 +538,7 @@ int8* MoveLookup<RegMove>::genMove(const int8 From) const
 	case KNIGHT:
 	case KING:
 		for (int dir = 0; dir < 8; dir++) {
-			const int8 to = mailbox[mfrom + offset[dir]];
+			const int to = mailbox[mfrom + offset[dir]];
 			if (to != -1 && square[to] == EMPTY)
 				list[next++] = to;
 		}
@@ -547,7 +547,7 @@ int8* MoveLookup<RegMove>::genMove(const int8 From) const
 	case ROOK:
 		for (int dir = 0; dir < 4; dir++) {
 			for (int k = 1; k < 8; k++) {
-				const int8 to = mailbox[mfrom + k * offset[dir]];
+				const int to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (square[to] == EMPTY) {
@@ -561,7 +561,7 @@ int8* MoveLookup<RegMove>::genMove(const int8 From) const
 	case QUEEN:
 		for (int dir = 0; dir < 8; dir++) {
 			for (int k = 1; k < 8; k++) {
-				const int8 to = mailbox[mfrom + k * offset[dir]];
+				const int to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (square[to] == EMPTY) {
@@ -580,7 +580,7 @@ int8* MoveLookup<RegMove>::genMove(const int8 From) const
 }
 
 template<>
-bool MoveLookup<RegMove>::fromto(const int8 From, const int8 To) const
+bool MoveLookup<RegMove>::fromto(const int From, const int To) const
 {
 	const int type = ABS(square[From]), mfrom = mailbox64[From];
 	const int8* const offset = offsets[type];
@@ -614,7 +614,7 @@ bool MoveLookup<RegMove>::fromto(const int8 From, const int8 To) const
 	case KNIGHT:
 	case KING:
 		for (int dir = 0; dir < 8; dir++) {
-			const int8 to = mailbox[mfrom + offset[dir]];
+			const int to = mailbox[mfrom + offset[dir]];
 			if (to != -1 && to == To && ANY_MOVE(square[From], square[to]))
 				return true;
 		}
@@ -623,7 +623,7 @@ bool MoveLookup<RegMove>::fromto(const int8 From, const int8 To) const
 	case ROOK:
 		for (int dir = 0; dir < 4; dir++) {
 			for (int k = 1; k < 8; k++) {
-				const int8 to = mailbox[mfrom + k * offset[dir]];
+				const int to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (square[to] == EMPTY) {
@@ -640,7 +640,7 @@ bool MoveLookup<RegMove>::fromto(const int8 From, const int8 To) const
 	case QUEEN:
 		for (int dir = 0; dir < 8; dir++) {
 			for (int k = 1; k < 8; k++) {
-				const int8 to = mailbox[mfrom + k * offset[dir]];
+				const int to = mailbox[mfrom + k * offset[dir]];
 				if (to == -1) {
 					break;
 				} else if (square[to] == EMPTY) {
@@ -661,13 +661,13 @@ bool MoveLookup<RegMove>::fromto(const int8 From, const int8 To) const
 }
 
 template<>
-bool MoveLookup<RegMove>::isAttacked(const int8 From, const int8 Bycolor) const
+bool MoveLookup<RegMove>::isAttacked(const int From, const int Bycolor) const
 {
 	const int mfrom = mailbox64[From];
 
 	for (int dir = 0; dir < 4; dir++) {
 		for (int k = 1; k < 8; k++) {
-			const int8 to = mailbox[mfrom + k * offsets[ROOK][dir]];
+			const int to = mailbox[mfrom + k * offsets[ROOK][dir]];
 			if (to == -1)
 				break;
 			else if (square[to] == EMPTY)
@@ -684,7 +684,7 @@ bool MoveLookup<RegMove>::isAttacked(const int8 From, const int8 Bycolor) const
 
 	for (int dir = 0; dir < 4; dir++) {
 		for (int k = 1; k < 8; k++) {
-			const int8 to = mailbox[mfrom + k * offsets[BISHOP][dir]];
+			const int to = mailbox[mfrom + k * offsets[BISHOP][dir]];
 			if (to == -1) {
 				break;
 			} else if (square[to] == EMPTY) {
@@ -704,7 +704,7 @@ bool MoveLookup<RegMove>::isAttacked(const int8 From, const int8 Bycolor) const
 	}
 
 	for (int dir = 0; dir < 8; dir++) {
-		const int8 to = mailbox[mfrom + offsets[KNIGHT][dir]];
+		const int to = mailbox[mfrom + offsets[KNIGHT][dir]];
 		if (to == -1 || NOT_CAPTURE(square[to], Bycolor))
 			continue;
 		else if (ABS(square[to]) == KNIGHT)

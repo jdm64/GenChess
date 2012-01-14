@@ -60,9 +60,9 @@ class TransItem
 public:
 	uint64 hash;
 	int score;
-	MoveType move;
 	int8 depth;
 	int8 type;
+	MoveType move;
 
 	TransItem()
 	{
@@ -173,7 +173,7 @@ public:
 		}
 	}
 
-	void setItem(const uint64 hash, const int score, const MoveType &move, const int8 depth, const int8 type) const
+	void setItem(const uint64 hash, const int score, const MoveType &move, const int depth, const int type) const
 	{
 		TransItem<MoveType>* const item = &table[hash % size];
 

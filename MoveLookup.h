@@ -31,17 +31,17 @@ template<class MoveType>
 class MoveLookup : public BB
 {
 protected:
-	int8* genAll(const int8 From) const;
+	int8* genAll(const int From) const;
 
-	int8* genCapture(const int8 From) const;
+	int8* genCapture(const int From) const;
 
-	int8* genMove(const int8 From) const;
+	int8* genMove(const int From) const;
 
-	bool fromto(const int8 From, const int8 To) const;
+	bool fromto(const int From, const int To) const;
 
-	bool isAttacked(const int8 From) const;
+	bool isAttacked(const int From) const;
 
-	bool isAttacked(const int8 From, const int8 Bycolor) const;
+	bool isAttacked(const int From, const int Bycolor) const;
 };
 
 #endif

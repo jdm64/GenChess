@@ -31,17 +31,17 @@ struct MoveFlags {
 		bits = 0xf0;
 	}
 
-	int8 canEnPassant() const
+	int canEnPassant() const
 	{
 		return bits & 0x8;
 	}
 
-	int8 enPassantFile() const
+	int enPassantFile() const
 	{
 		return bits & 0x7;
 	}
 
-	void setEnPassant(int8 file)
+	void setEnPassant(int file)
 	{
 		bits = (bits & ~0xf) | (file | 0x8);
 	}
@@ -51,37 +51,37 @@ struct MoveFlags {
 		bits &= ~0xf;
 	}
 
-	int8 canCastle(const int8 color) const
+	int canCastle(const int color) const
 	{
-		return bits & ((color == WHITE)? 0x30 : 0xc0);
+		return bits & ((color == WHITE)? W_CASTLE : B_CASTLE);
 	}
 
-	int8 canKingCastle(const int8 color) const
+	int canKingCastle(const int color) const
 	{
-		return bits & ((color == WHITE)? 0x10 : 0x40);
+		return bits & ((color == WHITE)? WK_CASTLE : BK_CASTLE);
 	}
 
-	int8 canQueenCastle(const int8 color) const
+	int canQueenCastle(const int color) const
 	{
-		return bits & ((color == WHITE)? 0x20 : 0x80);
+		return bits & ((color == WHITE)? WQ_CASTLE : BQ_CASTLE);
 	}
 
-	void clearCastle(int8 color)
+	void clearCastle(int color)
 	{
-		bits &= ((color == WHITE)? ~0x30 : ~0xc0);
+		bits &= ((color == WHITE)? ~W_CASTLE : ~B_CASTLE);
 	}
 
-	void clearKingCastle(int8 color)
+	void clearKingCastle(int color)
 	{
-		bits &= ((color == WHITE)? ~0x10 : ~0x40);
+		bits &= ((color == WHITE)? ~WK_CASTLE : ~BK_CASTLE);
 	}
 
-	void clearQueenCastle(int8 color)
+	void clearQueenCastle(int color)
 	{
-		bits &= ((color == WHITE)? ~0x20 : ~0x80);
+		bits &= ((color == WHITE)? ~WQ_CASTLE : ~BQ_CASTLE);
 	}
 
-	void setCastle(int8 value)
+	void setCastle(int value)
 	{
 		bits &= (0xff & value);
 	}

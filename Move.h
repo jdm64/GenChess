@@ -27,7 +27,7 @@ using namespace std;
 extern const int8 InitPieceType[32];
 extern const char pieceSymbol[7];
 
-string printLoc(const int8 loc);
+string printLoc(const int loc);
 
 template<char Type>
 struct Move
@@ -80,17 +80,17 @@ struct Move<'R'>
 
 	string dump() const;
 
-	int8 getCastle() const;
+	int getCastle() const;
 
-	void setCastle(int8 side);
+	void setCastle(int side);
 
 	void setEnPassant();
 
 	bool getEnPassant() const;
 
-	void setPromote(int8 type);
+	void setPromote(int type);
 
-	int8 getPromote() const;
+	int getPromote() const;
 };
 
 typedef Move<'G'> GenMove;

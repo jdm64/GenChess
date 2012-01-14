@@ -28,10 +28,10 @@ class Position : public MoveLookup<MoveType>
 protected:
 	void parseReset();
 
-	bool setPiece(const int8 loc, const int8 type);
+	bool setPiece(const int loc, const int type);
 
 public:
-	bool incheck(const int8 color) const;
+	bool incheck(const int color) const;
 
 	int parseFen_BoardStm(const string &st);
 

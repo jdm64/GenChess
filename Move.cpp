@@ -30,7 +30,7 @@ const int8 InitPieceType[32] = {
 
 const char pieceSymbol[7] = {' ', 'P', 'N', 'B', 'R', 'Q', 'K'};
 
-string printLoc(const int8 loc)
+string printLoc(const int loc)
 {
 	string s;
 
@@ -141,7 +141,7 @@ string Move<'R'>::toString() const
 template<>
 bool Move<'G'>::parse(const string &s)
 {
-	int8 piece;
+	int piece;
 	bool place = true;
 
 	switch (s[0]) {
@@ -265,12 +265,12 @@ string Move<'R'>::dump() const
 	return string(data);
 }
 
-int8 Move<'R'>::getCastle() const
+int Move<'R'>::getCastle() const
 {
 	return flags & 0x30;
 }
 
-void Move<'R'>::setCastle(int8 side) // 0x10 =kingside, 0x20=queensize
+void Move<'R'>::setCastle(int side) // 0x10 =kingside, 0x20=queensize
 {
 	flags = side & 0x30;
 }
@@ -285,12 +285,12 @@ bool Move<'R'>::getEnPassant() const
 	return flags & 0x8;
 }
 
-void Move<'R'>::setPromote(int8 type)
+void Move<'R'>::setPromote(int type)
 {
 	flags = 0x7 & type;
 }
 
-int8 Move<'R'>::getPromote() const
+int Move<'R'>::getPromote() const
 {
 	return flags & 0x7;
 }
