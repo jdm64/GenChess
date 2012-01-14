@@ -293,16 +293,16 @@ bool Position<RegMove>::parseFen(const string &st)
 	for (; st[n] != ' '; n++) {
 		switch (st[n]) {
 		case 'K':
-			castle |= 0x10;
+			castle |= WK_CASTLE;
 			break;
 		case 'Q':
-			castle |= 0x20;
+			castle |= WQ_CASTLE;
 			break;
 		case 'k':
-			castle |= 0x40;
+			castle |= BK_CASTLE;
 			break;
 		case 'q':
-			castle |= 0x80;
+			castle |= BQ_CASTLE;
 			break;
 		case '-':
 			break;
@@ -315,7 +315,7 @@ bool Position<RegMove>::parseFen(const string &st)
 	if (st[n] != '-') {
 		int eps = st[n++] - 'a';
 		eps += 8 * (8 - (st[n++] - '0'));
-		flags.setEnPassant(eps & 0x7);
+		flags.setEnPassant(eps & EP_FILE);
 	}
 	n++;
 
@@ -359,16 +359,16 @@ bool Position<RegMove>::parseZfen(const string &st)
 	for (; st[n] != ':'; n++) {
 		switch (st[n]) {
 		case 'K':
-			castle |= 0x10;
+			castle |= WK_CASTLE;
 			break;
 		case 'Q':
-			castle |= 0x20;
+			castle |= WQ_CASTLE;
 			break;
 		case 'k':
-			castle |= 0x40;
+			castle |= BK_CASTLE;
 			break;
 		case 'q':
-			castle |= 0x80;
+			castle |= BQ_CASTLE;
 			break;
 		}
 	}
@@ -379,7 +379,7 @@ bool Position<RegMove>::parseZfen(const string &st)
 	if (st[n] != ':') {
 		int eps = st[n++] - 'a';
 		eps += 8 * (8 - (st[n++] - '0'));
-		flags.setEnPassant(eps & 0x7);
+		flags.setEnPassant(eps & EP_FILE);
 	}
 	n++;
 

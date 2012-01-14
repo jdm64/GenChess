@@ -111,9 +111,9 @@ string Move<'G'>::toString() const
 
 string Move<'R'>::toString() const
 {
-	if (getCastle() == 0x10)
+	if (getCastle() & K_CASTLE)
 		return "O-O";
-	else if (getCastle() == 0x10)
+	else if (getCastle() & Q_CASTLE)
 		return "O-O-O";
 
 	string out;
@@ -205,14 +205,14 @@ bool Move<'R'>::parse(const string &s)
 		if (s[2] != 'O' && s[2] != 'o' && s[2] != '0')
 			return false;
 		if (s.length() == 3) {
-			setCastle(0x10);
+			setCastle(CASTLE_KS);
 			return true;
 		}
 		if (s[3] != '-')
 			return false;
 		if (s[4] != 'O' && s[4] != 'o' && s[4] != '0')
 			return false;
-		setCastle(0x20);
+		setCastle(CASTLE_QS);
 		return true;
 	}
 
@@ -267,27 +267,27 @@ string Move<'R'>::dump() const
 
 int Move<'R'>::getCastle() const
 {
-	return flags & 0x30;
+	return flags & (CASTLE_KS | CASTLE_QS);
 }
 
 void Move<'R'>::setCastle(int side) // 0x10 =kingside, 0x20=queensize
 {
-	flags = side & 0x30;
+	flags = side & (CASTLE_KS | CASTLE_QS);
 }
 
 void Move<'R'>::setEnPassant()
 {
-	flags = 0x8;
+	flags = CAN_EP;
 }
 
 bool Move<'R'>::getEnPassant() const
 {
-	return flags & 0x8;
+	return flags & CAN_EP;
 }
 
 void Move<'R'>::setPromote(int type)
 {
-	flags = 0x7 & type;
+	flags = type & 0x7;
 }
 
 int Move<'R'>::getPromote() const

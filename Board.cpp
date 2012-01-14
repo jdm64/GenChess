@@ -645,11 +645,11 @@ void Board<RegMove>::rebuildHash()
 		if (piece[i] != DEAD)
 			key ^= hashBox[12 * piece[i] + piecetype[i]];
 	}
-	key ^= (flags.bits & 0x08)? hashBox[ENPASSANT_HASH] : 0;
-	key ^= (flags.bits & 0x10)? hashBox[CASTLE_HASH + WHITE] : 0;
-	key ^= (flags.bits & 0x40)? hashBox[CASTLE_HASH + BLACK] : 0;
-	key ^= (flags.bits & 0x20)? hashBox[CASTLE_HASH + 2 * WHITE] : 0;
-	key ^= (flags.bits & 0x80)? hashBox[CASTLE_HASH + 2 * BLACK] : 0;
+	key ^= (flags.bits & CAN_EP)? hashBox[ENPASSANT_HASH] : 0;
+	key ^= (flags.bits & WK_CASTLE)? hashBox[CASTLE_HASH + WHITE] : 0;
+	key ^= (flags.bits & BK_CASTLE)? hashBox[CASTLE_HASH + BLACK] : 0;
+	key ^= (flags.bits & WQ_CASTLE)? hashBox[CASTLE_HASH + 2 * WHITE] : 0;
+	key ^= (flags.bits & BQ_CASTLE)? hashBox[CASTLE_HASH + 2 * BLACK] : 0;
 #endif
 }
 
@@ -731,9 +731,9 @@ void Board<RegMove>::make(const RegMove &move)
 	key ^= hashBox[13 * move.from + piecetype[move.index] + 6];
 #endif
 	if (move.getCastle()) {
-		bool left = (move.getCastle() == 0x20);
+		bool left = (move.getCastle() == CASTLE_QS);
 		int castleTo = move.to + (left? 1 : -1);
-		int castleI = pieceIndex(move.to - (move.to & 0x7) + (left? 0 : 7), color * ROOK);
+		int castleI = pieceIndex(move.to - (move.to & EP_FILE) + (left? 0 : 7), color * ROOK);
 #ifdef TT_ENABLED
 		key ^= hashBox[13 * piece[castleI] + piecetype[castleI] + 6];
 		key ^= hashBox[13 * castleTo + piecetype[castleI] + 6];
@@ -793,7 +793,7 @@ void Board<RegMove>::make(const RegMove &move)
 			square[piece[move.xindex]] = EMPTY;
 		piece[move.xindex] = DEAD;
 	} else if (ABS(piecetype[move.index]) == PAWN && ABS(move.to - move.from) == 16) {
-		flags.setEnPassant(move.to & 0x7);
+		flags.setEnPassant(move.to & EP_FILE);
 #ifdef TT_ENABLED
 		key ^= hashBox[ENPASSANT_HASH];
 #endif
@@ -812,15 +812,15 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 
 #ifdef TT_ENABLED
 	const int bits = flags.bits ^ undoFlags.bits;
-	key ^= (bits & ((color == WHITE)? 0x10 : 0x40))? hashBox[CASTLE_HASH + color] : 0;
-	key ^= (bits & ((color == WHITE)? 0x20 : 0x80))? hashBox[CASTLE_HASH + 2 * color] : 0;
-	key ^= (bits & 0x8)? hashBox[ENPASSANT_HASH] : 0;
+	key ^= (bits & ((color == WHITE)? WK_CASTLE : BK_CASTLE))? hashBox[CASTLE_HASH + color] : 0;
+	key ^= (bits & ((color == WHITE)? WQ_CASTLE : BQ_CASTLE))? hashBox[CASTLE_HASH + 2 * color] : 0;
+	key ^= (bits & CAN_EP)? hashBox[ENPASSANT_HASH] : 0;
 	key ^= hashBox[13 * move.to + piecetype[move.index] + 6];
 #endif
 
 	if (move.getCastle()) {
 		bool left = (move.from - move.to > 0);
-		int castleFrom = move.to - (move.to & 0x7) + (left? 0 : 7);
+		int castleFrom = move.to - (move.to & EP_FILE) + (left? 0 : 7);
 		int castleI = pieceIndex(move.to + (left? 1 : -1), isWhite? WHITE_ROOK : BLACK_ROOK);
 #ifdef TT_ENABLED
 		key ^= hashBox[13 * piece[castleI] + piecetype[castleI] + 6];
@@ -994,7 +994,7 @@ int Board<RegMove>::validCastle(RegMove &move, const int color)
 	const int king = (color == WHITE)? E1 : E8;
 
 	// king side
-	if (move.getCastle() == 0x10 && square[king + 1] == EMPTY && square[king + 2] == EMPTY &&
+	if (move.getCastle() == CASTLE_KS && square[king + 1] == EMPTY && square[king + 2] == EMPTY &&
 	!isAttacked(king + 1, color) && !isAttacked(king + 2, color) &&
 	ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
 		move.index = (color == WHITE)? 31 : 15;
@@ -1002,7 +1002,7 @@ int Board<RegMove>::validCastle(RegMove &move, const int color)
 		move.from = king;
 		move.to = king + 2;
 		return VALID_MOVE;
-	} else if (move.getCastle() == 0x20 && square[king - 1] == EMPTY && square[king - 2] == EMPTY &&
+	} else if (move.getCastle() == CASTLE_QS && square[king - 1] == EMPTY && square[king - 2] == EMPTY &&
 	square[king - 3] == EMPTY && !isAttacked(king - 1, color) && !isAttacked(king - 2, color) &&
 	ABS(square[((color == WHITE)? A1:A8)]) == ROOK) {
 		move.index = (color == WHITE)? 31 : 15;
@@ -1114,7 +1114,7 @@ int Board<RegMove>::validMove(const string &smove, const int color, RegMove &mov
 	case KING:
 		// manual castling without proper O-O/O-O-O notation
 		if (ABS(move.from - move.to) == 2) {
-			move.setCastle((move.from > move.to)? 0x20 : 0x10);
+			move.setCastle((move.from > move.to)? CASTLE_QS : CASTLE_KS);
 			return validCastle(move, color);
 		}
 	default:
@@ -1255,7 +1255,7 @@ void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int color)
 		item.move.to = king + 2;
 		item.move.from = king;
 		item.move.index = kindex;
-		item.move.setCastle(0x10);
+		item.move.setCastle(CASTLE_KS);
 		item.score = eval();
 		item.check = incheck(color ^ -2);
 
@@ -1269,7 +1269,7 @@ void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int color)
 		item.move.to = king - 2;
 		item.move.from = king;
 		item.move.index = kindex;
-		item.move.setCastle(0x20);
+		item.move.setCastle(CASTLE_QS);
 		item.score = eval();
 		item.check = incheck(color ^ -2);
 

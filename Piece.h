@@ -33,17 +33,17 @@ struct MoveFlags {
 
 	int canEnPassant() const
 	{
-		return bits & 0x8;
+		return bits & CAN_EP;
 	}
 
 	int enPassantFile() const
 	{
-		return bits & 0x7;
+		return bits & EP_FILE;
 	}
 
 	void setEnPassant(int file)
 	{
-		bits = (bits & ~0xf) | (file | 0x8);
+		bits = (bits & ~0xf) | (file | CAN_EP);
 	}
 
 	void clearEnPassant()
