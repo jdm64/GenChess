@@ -42,9 +42,7 @@ private:
 
 	inline bool isPromote(const RegMove &move, int color) const
 	{
-		return (color == WHITE)?
-			(move.to <= H8 && move.from <= H7) :
-			(move.to >= A1 && move.from >= A2);
+		return (color == WHITE)? (move.to >= A8) : (move.to <= H1);
 	}
 
 	int validCastle(RegMove &move, const int color);

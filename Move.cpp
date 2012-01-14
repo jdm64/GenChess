@@ -35,8 +35,8 @@ string printLoc(const int loc)
 	string s;
 
 	if (loc > PLACEABLE) {
-		s += ('a' + (loc % 8));
-		s += ('8' - (loc / 8));
+		s += ('a' + (loc & 7));
+		s += ('1' + (loc >> 4));
 		return s;
 	} else if (loc == PLACEABLE) {
 		return "aval";
@@ -176,8 +176,7 @@ bool Move<'G'>::parse(const string &s)
 		// parse placement move
 		if (s[1] < 'a' || s[1] > 'h' || s[2] < '1' || s[2] > '8')
 			return false;
-		to = s[1] - 'a';
-		to += 8 * (8 - (s[2] - '0'));
+		to = 16 * (s[2] - '1') + (s[1] - 'a');
 		from = PLACEABLE;
 		index = piece;
 	} else {
@@ -185,10 +184,8 @@ bool Move<'G'>::parse(const string &s)
 		if (s[0] < 'a' || s[0] > 'h' || s[1] < '1' || s[1] > '8' ||
 				s[2] < 'a' || s[2] > 'h' || s[3] < '1' || s[3] > '8')
 			return false;
-		from = s[0] - 'a';
-		from += 8 * (8 - (s[1] - '0'));
-		to = s[2] - 'a';
-		to += 8 * (8 - (s[3] - '0'));
+		from = 16 * (s[1] - '1') + (s[0] - 'a');
+		to = 16 * (s[3] - '1') + (s[2] - 'a');
 	}
 	return true;
 }
@@ -220,10 +217,8 @@ bool Move<'R'>::parse(const string &s)
 			s[2] < 'a' || s[2] > 'h' || s[3] < '1' || s[3] > '8')
 		return false;
 
-	from = s[0] - 'a';
-	from += 8 * (8 - (s[1] - '0'));
-	to = s[2] - 'a';
-	to += 8 * (8 - (s[3] - '0'));
+	from = 16 * (s[1] - '1') + (s[0] - 'a');
+	to = 16 * (s[3] - '1') + (s[2] - 'a');
 
 	if (s.length() == 5) {
 		switch (s[4]) {

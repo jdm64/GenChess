@@ -22,6 +22,11 @@
 #include "Piece.h"
 #include "MoveLookup.h"
 
+#define EE64(x) (((x) >> 1) | ((x) & 7))
+#define EE64F(x) (((x) & 7) + ((7 - ((x) >> 4)) << 3))
+#define SF88(x) (((x) & ~7) + (x))
+#define SFF88(x) (((x) & 7) + ((7 - ((x) >> 3)) << 4))
+
 template<class MoveType>
 class Position : public MoveLookup<MoveType>
 {

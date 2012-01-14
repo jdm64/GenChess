@@ -29,7 +29,7 @@ const int8 stype[] = {
 template<>
 void Position<GenMove>::parseReset()
 {
-	memset(square, EMPTY, 64);
+	memset(square, EMPTY, 128);
 	memset(piece, DEAD, 32);
 }
 
@@ -233,7 +233,7 @@ string Position<GenMove>::printZfen() const
 template<>
 void Position<RegMove>::parseReset()
 {
-	memset(square, EMPTY, 64);
+	memset(square, EMPTY, 128);
 	memset(piece, DEAD, 32);
 	copy(InitPieceType, InitPieceType + 32, piecetype);
 	flags.reset();
@@ -313,8 +313,8 @@ bool Position<RegMove>::parseFen(const string &st)
 	// en passant square
 	n++;
 	if (st[n] != '-') {
-		int eps = st[n++] - 'a';
-		eps += 8 * (8 - (st[n++] - '0'));
+		int eps = (st[n++] - 'a');
+		eps += 16 * (st[n++] - '1');
 		flags.setEnPassant(eps & EP_FILE);
 	}
 	n++;
@@ -377,8 +377,8 @@ bool Position<RegMove>::parseZfen(const string &st)
 	// parse en passant
 	n++;
 	if (st[n] != ':') {
-		int eps = st[n++] - 'a';
-		eps += 8 * (8 - (st[n++] - '0'));
+		int eps = (st[n++] - 'a');
+		eps += 16 * (st[n++] - '1');
 		flags.setEnPassant(eps & EP_FILE);
 	}
 	n++;
@@ -491,7 +491,7 @@ int Position<MoveType>::parseFen_BoardStm(const string &st)
 		case 'n':	case 'q':	case 'k':
 		case 'P':	case 'B':	case 'R':
 		case 'N':	case 'Q':	case 'K':
-			if (!setPiece(loc, stype[st[n] % 21]))
+			if (!setPiece(SFF88(loc), stype[st[n] % 21]))
 				return -1;
 			loc++;
 			break;
@@ -536,7 +536,7 @@ int Position<MoveType>::parseZfen_Board(const string &st)
 				num = "";
 				act = false;
 			}
-			if (!setPiece(loc, stype[st[n] % 21]))
+			if (!setPiece(SFF88(loc), stype[st[n] % 21]))
 				return -1;
 			loc++;
 		} else if (st[n] == ':') {
@@ -552,7 +552,9 @@ int Position<MoveType>::parseZfen_Board(const string &st)
 template<class MoveType>
 void Position<MoveType>::printFen_BoardStm(ostringstream &buf, string &fen) const
 {
-	for (int i = 0, empty = 0; i < 65; i++) {
+	for (int i = 0, empty = 0; i < 64; i++) {
+		// convert cordinate system
+		int n = SFF88(i);
 		if (i && i % 8 == 0) {
 			if (empty) {
 				buf.str(string());
@@ -564,7 +566,7 @@ void Position<MoveType>::printFen_BoardStm(ostringstream &buf, string &fen) cons
 			empty = 0;
 			fen += '/';
 		}
-		if (BB::square[i] == EMPTY) {
+		if (BB::square[n] == EMPTY) {
 			empty++;
 			continue;
 		}
@@ -574,10 +576,10 @@ void Position<MoveType>::printFen_BoardStm(ostringstream &buf, string &fen) cons
 			fen += buf.str();
 			empty = 0;
 		}
-		if (BB::square[i] > EMPTY)
-			fen += pieceSymbol[BB::square[i]];
+		if (BB::square[n] > EMPTY)
+			fen += pieceSymbol[BB::square[n]];
 		else
-			fen += tolower(pieceSymbol[-BB::square[i]]);
+			fen += tolower(pieceSymbol[-BB::square[n]]);
 	}
 	fen += ' ';
 	fen += (BB::ply % 2)? 'b':'w';
@@ -588,7 +590,9 @@ template<class MoveType>
 void Position<MoveType>::printZfen_Board(ostringstream &buf, string &fen) const
 {
 	for (int i = 0, empty = 0; i < 64; i++) {
-		if (BB::square[i] == EMPTY) {
+		// convert cordinate system
+		int n = SFF88(i);
+		if (BB::square[n] == EMPTY) {
 			empty++;
 			continue;
 		} else if (empty) {
@@ -596,9 +600,9 @@ void Position<MoveType>::printZfen_Board(ostringstream &buf, string &fen) const
 			buf << empty;
 			fen += buf.str();
 		}
-		fen += (BB::square[i] > EMPTY)?
-				pieceSymbol[BB::square[i]] :
-				tolower(pieceSymbol[-BB::square[i]]);
+		fen += (BB::square[n] > EMPTY)?
+				pieceSymbol[BB::square[n]] :
+				tolower(pieceSymbol[-BB::square[n]]);
 		empty = 0;
 	}
 	fen += ':';

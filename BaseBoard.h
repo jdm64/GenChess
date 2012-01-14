@@ -27,7 +27,7 @@ using namespace std;
 class BB
 {
 public:
-	int8 square[64];
+	int8 square[128];
 	int8 piece[32];
 	int8 piecetype[32];
 	int ply;

@@ -31,6 +31,16 @@ template<class MoveType>
 class MoveLookup : public BB
 {
 protected:
+	int genAll_xPawn(int8* const list, int8* const offset, const int From, const int type) const;
+
+	int genCapture_xPawn(int8* const list, int8* const offset, const int From, const int type) const;
+
+	int genMove_xPawn(int8* const list, int8* const offset, const int From, const int type) const;
+
+	bool fromto_xPawn(const int From, const int To, const int type, int8* const offset) const;
+
+	bool isAttacked_xBishop(const int From, const int FromColor) const;
+
 	int8* genAll(const int From) const;
 
 	int8* genCapture(const int From) const;

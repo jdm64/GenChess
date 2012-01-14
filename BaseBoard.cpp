@@ -34,12 +34,14 @@ string BB::printBoard() const
 {
 	ostringstream buf;
 
+	int arr[] = {A8, A7, A6, A5, A4, A3, A2, A1};
+
 	buf << "  / - + - + - + - + - + - + - + - \\\n";
-	for (int i = 0, rank = 8; ;) {
+	for (int i = 0, rank = 8; i < 8; i++) {
 		buf << rank-- << " |";
 		for (int j = 0; j < 8; j++)
-			buf << " " << printSquare(i++) << "|";
-		if (i == 64)
+			buf << " " << printSquare(arr[i] + j) << "|";
+		if (i == 7)
 			break;
 		buf << "\n  + - + - + - + - + - + - + - + - +\n";
 	}

@@ -84,7 +84,7 @@ const int genLocValue[7][64] = {
 template<>
 void Board<GenMove>::reset()
 {
-	memset(square, EMPTY, 64);
+	memset(square, EMPTY, 128);
 	memset(piece, PLACEABLE, 32);
 	copy(InitPieceType, InitPieceType + 32, piecetype);
 #ifdef TT_ENABLED
@@ -114,7 +114,7 @@ void Board<GenMove>::rebuildHash()
 		switch (piece[i]) {
 		default:
 			key -= hashBox[HOLD_START + typeLookup[i]];
-			key += hashBox[12 * piece[i] + typeLookup[i]];
+			key += hashBox[12 * EE64(piece[i]) + typeLookup[i]];
 			break;
 		case DEAD:
 			key -= hashBox[HOLD_START + typeLookup[i]];
@@ -129,7 +129,7 @@ void Board<GenMove>::rebuildHash()
 template<>
 void Board<GenMove>::setBoard(const GenPosition &pos)
 {
-	copy(pos.square, pos.square + 64, square);
+	copy(pos.square, pos.square + 128, square);
 	copy(pos.piece, pos.piece + 32, piece);
 
 	ply = pos.ply;
@@ -177,14 +177,17 @@ void Board<GenMove>::make(const GenMove &move)
 		piece[move.xindex] = DEAD;
 
 #ifdef TT_ENABLED
+	int to = EE64(move.to);
+	int from = EE64(move.from);
+
 	key += (stm == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
-	key += hashBox[12 * move.to + typeLookup[move.index]];
+	key += hashBox[12 * to + typeLookup[move.index]];
 	if (move.from != PLACEABLE)
-		key -= hashBox[12 * move.from + typeLookup[move.index]];
+		key -= hashBox[12 * from + typeLookup[move.index]];
 	else
 		key -= hashBox[HOLD_START + typeLookup[move.index]];
 	if (move.xindex != NONE)
-		key -= hashBox[12 * move.to + typeLookup[move.xindex]];
+		key -= hashBox[12 * to + typeLookup[move.xindex]];
 #endif
 	stm ^= -2;
 	ply++;
@@ -225,14 +228,17 @@ void Board<GenMove>::unmake(const GenMove &move)
 		square[move.from] = piecetype[move.index];
 
 #ifdef TT_ENABLED
+	int to = EE64(move.to);
+	int from = EE64(move.from);
+
 	key += (stm == WHITE)? -hashBox[WTM_HASH] : hashBox[WTM_HASH];
-	key -= hashBox[12 * move.to + typeLookup[move.index]];
+	key -= hashBox[12 * to + typeLookup[move.index]];
 	if (move.from != PLACEABLE)
-		key += hashBox[12 * move.from + typeLookup[move.index]];
+		key += hashBox[12 * from + typeLookup[move.index]];
 	else
 		key += hashBox[HOLD_START + typeLookup[move.index]];
 	if (move.xindex != NONE)
-		key += hashBox[12 * move.to + typeLookup[move.xindex]];
+		key += hashBox[12 * to + typeLookup[move.xindex]];
 #endif
 	stm ^= -2;
 	ply--;
@@ -400,9 +406,12 @@ int Board<GenMove>::eval() const
 {
 	int white = 0, black = 0;
 	for (int b = 0, w = 16; b < 16; b++, w++) {
+		int bloc = EE64F(piece[b]);
+		int wloc = EE64F(piece[b]);
+
 		switch (piece[b]) {
 		default:
-			black += genLocValue[piecetype[w]][piece[b]];
+			black += genLocValue[piecetype[w]][bloc];
 		case PLACEABLE:
 			black += genPieceValue[b];
 			break;
@@ -412,7 +421,7 @@ int Board<GenMove>::eval() const
 		}
 		switch (piece[w]) {
 		default:
-			white += genLocValue[piecetype[w]][piece[w]];
+			white += genLocValue[piecetype[w]][wloc];
 		case PLACEABLE:
 			white += genPieceValue[b];
 			break;
@@ -434,9 +443,13 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int pieceTy
 
 	if (idx == NONE)
 		return;
-	for (int loc = 0; loc < 64; loc++) {
-		if (square[loc] != EMPTY)
+	for (int loc = 0x77; loc >= 0; loc--) {
+		if (loc & 0x88) {
+			loc -= 7;
 			continue;
+		} else if (square[loc] != EMPTY) {
+			continue;
+		}
 		item.move.index = idx;
 		item.move.to = loc;
 		item.move.xindex = NONE;
@@ -539,16 +552,6 @@ void Board<GenMove>::dumpDebug() const
 
 const int regPieceValue[7] = {0, 224, 336, 560, 896, 1456, 0};
 
-const int8 InitRegBoard[64] = {
-	BLACK_ROOK, BLACK_KNIGHT, BLACK_BISHOP, BLACK_QUEEN, BLACK_KING, BLACK_BISHOP, BLACK_KNIGHT, BLACK_ROOK,
-	BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN, BLACK_PAWN,
-	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-	EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY, EMPTY,
-	WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN, WHITE_PAWN,
-	WHITE_ROOK, WHITE_KNIGHT, WHITE_BISHOP, WHITE_QUEEN, WHITE_KING, WHITE_BISHOP, WHITE_KNIGHT, WHITE_ROOK};
-
 const int8 InitRegPiece[32] = {
 	A7, B7, C7, D7, E7, F7, G7, H7,
 	B8, G8, C8, F8, A8, H8, D8, E8,
@@ -617,9 +620,12 @@ const int regLocValue[7][64] = {
 template<>
 void Board<RegMove>::reset()
 {
-	copy(InitRegBoard, InitRegBoard + 64, square);
 	copy(InitRegPiece, InitRegPiece + 32, piece);
 	copy(InitPieceType, InitPieceType + 32, piecetype);
+	memset(square, EMPTY, 128);
+
+	for (int i = 0; i < 32; i++)
+		square[piece[i]] = piecetype[i];
 #ifdef TT_ENABLED
 	key = startHash;
 #endif
@@ -643,7 +649,7 @@ void Board<RegMove>::rebuildHash()
 
 	for (int i = 0; i < 32; i++) {
 		if (piece[i] != DEAD)
-			key ^= hashBox[12 * piece[i] + piecetype[i]];
+			key ^= hashBox[12 * EE64(piece[i]) + piecetype[i]];
 	}
 	key ^= (flags.bits & CAN_EP)? hashBox[ENPASSANT_HASH] : 0;
 	key ^= (flags.bits & WK_CASTLE)? hashBox[CASTLE_HASH + WHITE] : 0;
@@ -656,8 +662,9 @@ void Board<RegMove>::rebuildHash()
 template<>
 void Board<RegMove>::setBoard(const RegPosition &pos)
 {
-	copy(pos.square, pos.square + 64, square);
+	copy(pos.square, pos.square + 128, square);
 	copy(pos.piece, pos.piece + 32, piece);
+	copy(pos.piecetype, pos.piecetype + 32, piecetype);
 
 	flags = pos.flags;
 	ply = pos.ply;
@@ -728,15 +735,15 @@ void Board<RegMove>::make(const RegMove &move)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
 #ifdef TT_ENABLED
-	key ^= hashBox[13 * move.from + piecetype[move.index] + 6];
+	key ^= hashBox[13 * EE64(move.from) + piecetype[move.index] + 6];
 #endif
 	if (move.getCastle()) {
 		bool left = (move.getCastle() == CASTLE_QS);
 		int castleTo = move.to + (left? 1 : -1);
 		int castleI = pieceIndex(move.to - (move.to & EP_FILE) + (left? 0 : 7), color * ROOK);
 #ifdef TT_ENABLED
-		key ^= hashBox[13 * piece[castleI] + piecetype[castleI] + 6];
-		key ^= hashBox[13 * castleTo + piecetype[castleI] + 6];
+		key ^= hashBox[13 * EE64(piece[castleI]) + piecetype[castleI] + 6];
+		key ^= hashBox[13 * EE64(castleTo) + piecetype[castleI] + 6];
 		if (flags.canKingCastle(color))
 			key ^= hashBox[CASTLE_HASH + color];
 		if (flags.canQueenCastle(color))
@@ -770,7 +777,7 @@ void Board<RegMove>::make(const RegMove &move)
 		piecetype[move.index] = move.getPromote() * color;
 	}
 #ifdef TT_ENABLED
-	key ^= hashBox[13 * move.to + piecetype[move.index] + 6];
+	key ^= hashBox[13 * EE64(move.to) + piecetype[move.index] + 6];
 #endif
 
 	if (flags.canEnPassant()) {
@@ -787,12 +794,12 @@ void Board<RegMove>::make(const RegMove &move)
 	piece[move.index] = move.to;
 	if (move.xindex != NONE) {
 #ifdef TT_ENABLED
-		key ^= hashBox[13 * piece[move.xindex] + piecetype[move.xindex] + 6];
+		key ^= hashBox[13 * EE64(piece[move.xindex]) + piecetype[move.xindex] + 6];
 #endif
 		if (move.getEnPassant())
 			square[piece[move.xindex]] = EMPTY;
 		piece[move.xindex] = DEAD;
-	} else if (ABS(piecetype[move.index]) == PAWN && ABS(move.to - move.from) == 16) {
+	} else if (ABS(piecetype[move.index]) == PAWN && ABS(move.to - move.from) == 32) {
 		flags.setEnPassant(move.to & EP_FILE);
 #ifdef TT_ENABLED
 		key ^= hashBox[ENPASSANT_HASH];
@@ -815,7 +822,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 	key ^= (bits & ((color == WHITE)? WK_CASTLE : BK_CASTLE))? hashBox[CASTLE_HASH + color] : 0;
 	key ^= (bits & ((color == WHITE)? WQ_CASTLE : BQ_CASTLE))? hashBox[CASTLE_HASH + 2 * color] : 0;
 	key ^= (bits & CAN_EP)? hashBox[ENPASSANT_HASH] : 0;
-	key ^= hashBox[13 * move.to + piecetype[move.index] + 6];
+	key ^= hashBox[13 * EE64(move.to) + piecetype[move.index] + 6];
 #endif
 
 	if (move.getCastle()) {
@@ -823,8 +830,8 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 		int castleFrom = move.to - (move.to & EP_FILE) + (left? 0 : 7);
 		int castleI = pieceIndex(move.to + (left? 1 : -1), isWhite? WHITE_ROOK : BLACK_ROOK);
 #ifdef TT_ENABLED
-		key ^= hashBox[13 * piece[castleI] + piecetype[castleI] + 6];
-		key ^= hashBox[13 * castleFrom + piecetype[castleI] + 6];
+		key ^= hashBox[13 * EE64(piece[castleI]) + piecetype[castleI] + 6];
+		key ^= hashBox[13 * EE64(castleFrom) + piecetype[castleI] + 6];
 #endif
 		square[piece[castleI]] = EMPTY;
 		square[castleFrom] = piecetype[castleI];
@@ -833,7 +840,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 		piecetype[move.index] = PAWN * color;
 	}
 #ifdef TT_ENABLED
-	key ^= hashBox[13 * move.from + piecetype[move.index] + 6];
+	key ^= hashBox[13 * EE64(move.from) + piecetype[move.index] + 6];
 #endif
 
 	piece[move.index] = move.from;
@@ -841,7 +848,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 		square[move.to] = EMPTY;
 	} else {
 		if (move.getEnPassant()) {
-			piece[move.xindex] = move.to + ((move.from - move.to > 0)? 8 : -8);
+			piece[move.xindex] = move.to + -16 * color;
 			square[piece[move.xindex]] = PAWN * -color;
 			square[move.to] = EMPTY;
 		} else {
@@ -849,7 +856,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 			square[move.to] = piecetype[move.xindex];
 		}
 #ifdef TT_ENABLED
-		key ^= hashBox[13 * piece[move.xindex] + piecetype[move.xindex] + 6];
+		key ^= hashBox[13 * EE64(piece[move.xindex]) + piecetype[move.xindex] + 6];
 #endif
 	}
 	square[move.from] = piecetype[move.index];
@@ -1020,7 +1027,7 @@ int Board<RegMove>::validEnPassant(RegMove &move, const int color)
 {
 	const MoveFlags undoFlags = flags;
 	const int ep = flags.enPassantFile() + ((color == WHITE)? A5 : A4),
-		ep_to = ep + ((color == WHITE)? -8 : 8);
+		ep_to = ep + ((color == WHITE)? 16 : -16);
 
 	if (move.to == ep_to && ABS(ep - move.from) == 1) {
 		move.index = pieceIndex(move.from, square[move.from]);
@@ -1149,14 +1156,17 @@ int Board<RegMove>::eval() const
 {
 	int white = 0, black = 0;
 	for (int b = 0, w = 16; b < 16; b++, w++) {
+		int bloc = EE64F(piece[b]);
+		int wloc = EE64F(piece[w]);
+
 		if (piece[b] != DEAD) {
-			black += regLocValue[-piecetype[b]][piece[b]];
+			black += regLocValue[-piecetype[b]][bloc];
 			black += regPieceValue[-piecetype[b]];
 		} else {
 			black -= regPieceValue[-piecetype[b]];
 		}
 		if (piece[w] != DEAD) {
-			white += regLocValue[piecetype[w]][piece[w]];
+			white += regLocValue[piecetype[w]][wloc];
 			white += regPieceValue[piecetype[w]];
 		} else {
 			white -= regPieceValue[piecetype[w]];
@@ -1290,11 +1300,11 @@ void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int color)
 	RegMoveNode item;
 
 	// en passant to left
-	if (eps_file != 0 && square[eps - 1] == your_pawn) {
+	if (eps_file != 7 && square[eps + 1] == your_pawn) {
 		item.move.xindex = pieceIndex(eps, opp_pawn);
-		item.move.to = eps + 8 * opp_pawn;
-		item.move.from = eps - 1;
-		item.move.index = pieceIndex(eps - 1, your_pawn);
+		item.move.to = eps + 16 * color;
+		item.move.from = eps + 1;
+		item.move.index = pieceIndex(eps + 1, your_pawn);
 		item.move.setEnPassant();
 
 		make(item.move);
@@ -1306,11 +1316,11 @@ void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int color)
 		unmake(item.move, undoFlags);
 	}
 	// en passant to right
-	if (eps_file != 7 && square[eps + 1] == your_pawn) {
+	if (eps_file != 0 && square[eps - 1] == your_pawn) {
 		item.move.xindex = pieceIndex(eps, opp_pawn);
-		item.move.to = eps + 8 * opp_pawn;
-		item.move.from = eps + 1;
-		item.move.index = pieceIndex(eps + 1, your_pawn);
+		item.move.to = eps + 16 * color;
+		item.move.from = eps - 1;
+		item.move.index = pieceIndex(eps - 1, your_pawn);
 		item.move.setEnPassant();
 
 		make(item.move);
