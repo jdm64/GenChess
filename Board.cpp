@@ -402,22 +402,22 @@ int Board<GenMove>::eval() const
 	for (int b = 0, w = 16; b < 16; b++, w++) {
 		switch (piece[b]) {
 		default:
-			black += regLocValue[piecetype[w]][piece[b]];
+			black += genLocValue[piecetype[w]][piece[b]];
 		case PLACEABLE:
-			black += regPieceValue[b];
+			black += genPieceValue[b];
 			break;
 		case DEAD:
-			black -= regPieceValue[b];
+			black -= genPieceValue[b];
 			break;
 		}
 		switch (piece[w]) {
 		default:
-			white += regLocValue[piecetype[w]][piece[w]];
+			white += genLocValue[piecetype[w]][piece[w]];
 		case PLACEABLE:
-			white += regPieceValue[b];
+			white += genPieceValue[b];
 			break;
 		case DEAD:
-			white -= regPieceValue[b];
+			white -= genPieceValue[b];
 			break;
 		}
 	}
@@ -1150,8 +1150,7 @@ int Board<RegMove>::eval() const
 	int white = 0, black = 0;
 	for (int b = 0, w = 16; b < 16; b++, w++) {
 		if (piece[b] != DEAD) {
-			int mod = (piecetype[b] == BLACK_PAWN || piecetype[b] == BLACK_KING)? -1:1;
-			black += mod * regLocValue[-piecetype[b]][piece[b]];
+			black += regLocValue[-piecetype[b]][piece[b]];
 			black += regPieceValue[-piecetype[b]];
 		} else {
 			black -= regPieceValue[-piecetype[b]];
