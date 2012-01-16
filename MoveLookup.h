@@ -41,7 +41,7 @@ protected:
 
 	bool isAttacked(const int From) const;
 
-	bool isAttacked(const int From, const int Bycolor) const;
+	bool isAttacked(const int From, const int FromColor) const;
 };
 
 #endif

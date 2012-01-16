@@ -661,7 +661,7 @@ bool MoveLookup<RegMove>::fromto(const int From, const int To) const
 }
 
 template<>
-bool MoveLookup<RegMove>::isAttacked(const int From, const int Bycolor) const
+bool MoveLookup<RegMove>::isAttacked(const int From, const int FromColor) const
 {
 	const int mfrom = mailbox64[From];
 
@@ -672,7 +672,7 @@ bool MoveLookup<RegMove>::isAttacked(const int From, const int Bycolor) const
 				break;
 			else if (square[to] == EMPTY)
 				continue;
-			else if (OWN_PIECE(square[to], Bycolor))
+			else if (OWN_PIECE(square[to], FromColor))
 				break;
 			else if (ABS(square[to]) == ROOK || ABS(square[to]) == QUEEN)
 				return true;
@@ -689,12 +689,12 @@ bool MoveLookup<RegMove>::isAttacked(const int From, const int Bycolor) const
 				break;
 			} else if (square[to] == EMPTY) {
 				continue;
-			} else if (OWN_PIECE(square[to], Bycolor)) {
+			} else if (OWN_PIECE(square[to], FromColor)) {
 				break;
 			} else if (ABS(square[to]) == BISHOP || ABS(square[to]) == QUEEN) {
 				return true;
 			} else if (k == 1) {
-				if (ABS(square[to]) == PAWN && Bycolor * (From - to) > 0)
+				if (ABS(square[to]) == PAWN && FromColor * (From - to) > 0)
 					return true;
 				else if (ABS(square[to]) == KING)
 					return true;
@@ -705,7 +705,7 @@ bool MoveLookup<RegMove>::isAttacked(const int From, const int Bycolor) const
 
 	for (int dir = 0; dir < 8; dir++) {
 		const int to = mailbox[mfrom + offsets[KNIGHT][dir]];
-		if (to == -1 || NOT_CAPTURE(square[to], Bycolor))
+		if (to == -1 || NOT_CAPTURE(square[to], FromColor))
 			continue;
 		else if (ABS(square[to]) == KNIGHT)
 			return true;
