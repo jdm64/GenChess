@@ -27,6 +27,8 @@
 #define SF88(x) (((x) & ~7) + (x))
 #define SFF88(x) (((x) & 7) + ((7 - ((x) >> 3)) << 4))
 
+extern const int8 InitRegPiece[32];
+
 template<class MoveType>
 class Position : public MoveLookup<MoveType>
 {
@@ -34,6 +36,8 @@ protected:
 	void parseReset();
 
 	bool setPiece(const int loc, const int type);
+
+	void setMaxPly();
 
 public:
 	bool incheck(const int color) const;

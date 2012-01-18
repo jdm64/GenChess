@@ -552,12 +552,6 @@ void Board<GenMove>::dumpDebug() const
 
 const int regPieceValue[7] = {0, 224, 336, 560, 896, 1456, 0};
 
-const int8 InitRegPiece[32] = {
-	A7, B7, C7, D7, E7, F7, G7, H7,
-	B8, G8, C8, F8, A8, H8, D8, E8,
-	A2, B2, C2, D2, E2, F2, G2, H2,
-	B1, G1, C1, F1, A1, H1, D1, E1};
-
 const int regLocValue[7][64] = {
 	{	0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0,

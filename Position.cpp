@@ -26,11 +26,37 @@ const int8 stype[] = {
 	EMPTY,		EMPTY,		WHITE_KING,	EMPTY,		BLACK_BISHOP,
 	WHITE_KNIGHT,	EMPTY,		WHITE_PAWN,	WHITE_QUEEN,	WHITE_ROOK};
 
+const int8 InitRegPiece[32] = {
+	A7, B7, C7, D7, E7, F7, G7, H7,
+	B8, G8, C8, F8, A8, H8, D8, E8,
+	A2, B2, C2, D2, E2, F2, G2, H2,
+	B1, G1, C1, F1, A1, H1, D1, E1};
+
 template<>
 void Position<GenMove>::parseReset()
 {
 	memset(square, EMPTY, 128);
 	memset(piece, DEAD, 32);
+}
+
+template<>
+void Position<GenMove>::setMaxPly()
+{
+	int tply = 0;
+	for (int i = 0; i < 32; i++) {
+		if (piece[i] == DEAD)
+			tply += 2;
+		else if (piece[i] != PLACEABLE)
+			tply++;
+	}
+	ply = max(ply, tply);
+
+	if (stm == WHITE) {
+		if (ply % 2)
+			ply++;
+	} else if (ply % 2 == 0) {
+		ply++;
+	}
 }
 
 template<>
@@ -98,24 +124,10 @@ bool Position<GenMove>::parseFen(const string &st)
 		num += st[n];
 		n++;
 	}
-	ply = 2 * atoi(num.c_str()) - 2 + ((stm == BLACK)? 1:0);
+	ply = atoi(num.c_str());
+	ply = 2 * ply - 2 + ((stm == BLACK)? 1:0);
 
-	// verify if ply is reasonable
-	int mply = 0;
-	for (int i = 0; i < 32; i++) {
-		switch (piece[i]) {
-		case DEAD:
-			mply += 2;
-			break;
-		case PLACEABLE:
-			break;
-		default:
-			mply += 1;
-			break;
-		}
-	}
-	if (ply < mply)
-		return false;
+	setMaxPly();
 
 	// check if color not on move is in check
 	if (incheck(stm ^ -2))
@@ -151,24 +163,9 @@ bool Position<GenMove>::parseZfen(const string &st)
 		n++;
 	}
 	ply = atoi(num.c_str());
-
-	int mply = 0;
-	for (int i = 0; i < 32; i++) {
-		switch (piece[i]) {
-		case DEAD:
-			mply += 2;
-			break;
-		case PLACEABLE:
-			break;
-		default:
-			mply += 1;
-			break;
-		}
-	}
-	if (ply < mply)
-		return false;
-
 	stm = (ply % 2)? BLACK : WHITE;
+
+	setMaxPly();
 
 	// check if color not on move is in check
 	if (incheck(stm ^ -2))
@@ -237,6 +234,26 @@ void Position<RegMove>::parseReset()
 	memset(piece, DEAD, 32);
 	copy(InitPieceType, InitPieceType + 32, piecetype);
 	flags.reset();
+}
+
+template<>
+void Position<RegMove>::setMaxPly()
+{
+	int tply = 0;
+	for (int i = 0; i < 32; i++) {
+		if (piece[i] == DEAD)
+			tply += 2;
+		else if (piece[i] != InitRegPiece[i])
+			tply++;
+	}
+	ply = max(ply, tply);
+
+	if (stm == WHITE) {
+		if (ply % 2)
+			ply++;
+	} else if (ply % 2 == 0) {
+		ply++;
+	}
 }
 
 template<>
@@ -334,10 +351,10 @@ bool Position<RegMove>::parseFen(const string &st)
 		num += st[n];
 		n++;
 	}
-	int tply = atoi(num.c_str());
-	if (tply < 1)
-		tply = 1;
-	ply = 2 * tply - 2 + ((stm == BLACK)? 1:0);
+	ply = atoi(num.c_str());
+	ply = 2 * ply - 2 + ((stm == BLACK)? 1:0);
+
+	setMaxPly();
 
 	// check if color not on move is in check
 	if (incheck(stm ^ -2))
@@ -389,11 +406,12 @@ bool Position<RegMove>::parseZfen(const string &st)
 		num += st[n];
 		n++;
 	}
-	int tply = atoi(num.c_str());
-	ply = (tply >= 0)? tply:0;
+	ply = atoi(num.c_str());
+	stm = (ply % 2)? BLACK : WHITE;
+
+	setMaxPly();
 
 	// check if color not on move is in check
-	stm = (ply % 2)? BLACK : WHITE;
 	if (incheck(stm ^ -2))
 		return false;
 	return true;
