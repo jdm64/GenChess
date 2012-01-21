@@ -248,8 +248,8 @@ template<>
 void Terminal<GenMove>::divide(int depth)
 {
 	uint64 nodes = 0, children;
-	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MoveClass::ALL);
 
+	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MoveClass::MOVE);
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
 		children = perft(depth - 1);
@@ -257,8 +257,29 @@ void Terminal<GenMove>::divide(int depth)
 		nodes += children;
 		board.unmake(list->list[i].move);
 	}
-	cout << "total " << nodes << endl;
 	delete list;
+
+	list = board.getMoveList(board.getStm(), MoveClass::CAPTURE);
+	for (int i = 0; i < list->size; i++) {
+		board.make(list->list[i].move);
+		children = perft(depth - 1);
+		cout << list->list[i].move.toString() << " " << children << endl;
+		nodes += children;
+		board.unmake(list->list[i].move);
+	}
+	delete list;
+
+	list = board.getMoveList(board.getStm(), MoveClass::PLACE);
+	for (int i = 0; i < list->size; i++) {
+		board.make(list->list[i].move);
+		children = perft(depth - 1);
+		cout << list->list[i].move.toString() << " " << children << endl;
+		nodes += children;
+		board.unmake(list->list[i].move);
+	}
+	delete list;
+
+	cout << "total " << nodes << endl;
 }
 
 template<>
@@ -266,8 +287,8 @@ void Terminal<RegMove>::divide(int depth)
 {
 	uint64 nodes = 0, children;
 	const MoveFlags undoFlags = board.getMoveFlags();
-	RegMoveList *list = board.getMoveList(board.getStm(), MoveClass::ALL);
 
+	RegMoveList *list = board.getMoveList(board.getStm(), MoveClass::MOVE);
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
 		children = perft(depth - 1);
@@ -275,8 +296,19 @@ void Terminal<RegMove>::divide(int depth)
 		nodes += children;
 		board.unmake(list->list[i].move, undoFlags);
 	}
-	cout << "total " << nodes << endl;
 	delete list;
+
+	list = board.getMoveList(board.getStm(), MoveClass::CAPTURE);
+	for (int i = 0; i < list->size; i++) {
+		board.make(list->list[i].move);
+		children = perft(depth - 1);
+		cout << list->list[i].move.toString() << " " << children << endl;
+		nodes += children;
+		board.unmake(list->list[i].move, undoFlags);
+	}
+	delete list;
+
+	cout << "total " << nodes << endl;
 }
 
 typedef Terminal<GenMove> GenTerminal;
