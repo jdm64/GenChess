@@ -27,6 +27,14 @@
 
 using namespace std;
 
+struct DistDB
+{
+	int8 step;
+	int8 type;
+};
+
+extern DistDB ddb[120];
+
 template<class MoveType>
 class MoveLookup : public BB
 {
@@ -39,6 +47,8 @@ protected:
 
 	bool fromto_xPawn(const int From, const int To, const int type, int8* const offset) const;
 
+	bool attackLine_Bishop(const DistDB &db, const int From, const int To) const;
+
 	bool isAttacked_xBishop(const int From, const int FromColor) const;
 
 	int8* genAll(const int From) const;
@@ -48,6 +58,41 @@ protected:
 	int8* genMove(const int From) const;
 
 	bool fromto(const int From, const int To) const;
+
+	bool attackLine(const int From, const int To) const
+	{
+		if ((From | To) & 0x88)
+			return false;
+
+		int diff = ABS(From - To);
+
+		if (!ddb[diff].step)
+			return false;
+
+		DistDB db = ddb[diff];
+		switch (db.type) {
+		case KNIGHT:
+			return (ABS(square[To]) == KNIGHT && CAPTURE_MOVE(square[From], square[To]));
+		case BISHOP:
+			return attackLine_Bishop(db, From, To);
+		case ROOK:
+			int offset = db.step * ((To > From)? 1:-1);
+			for (int to = From + offset, k = 1; !(to & 0x88); to += offset, k++) {
+				if (square[to] == EMPTY)
+					continue;
+				else if (OWN_PIECE(square[From], square[to]))
+					break;
+				else if (k == 1 && ABS(square[to]) == KING)
+					return true;
+				else if (ABS(square[to]) == ROOK || ABS(square[to]) == QUEEN)
+					return true;
+				else
+					break;
+			}
+			break;
+		}
+		return false;
+	}
 
 	bool isAttacked(const int From) const;
 

@@ -19,14 +19,37 @@
 #include "Move.h"
 #include "MoveLookup.h"
 
-int8 offsets[7][9] = {
-	{ 0,  0,   0,   0,   0,   0,   0,   0, 0},
-	{17, 16,  15,   1, -17, -16, -15,  -1, 0}, // Pawn: even=capture
-	{33, 31,  18,  14, -33, -31, -18, -14, 0}, // Knight
-	{17, 15, -17, -15,   0,   0,   0,   0, 0}, // Bishop
-	{16,  1, -16,  -1,   0,   0,   0,   0, 0}, // Rook
-	{17, 16,  15,   1, -17, -16, -15,  -1, 0}, // Queen
-	{17, 16,  15,   1, -17, -16, -15,  -1, 0} }; // King
+int8 offsets[7][10] = {
+	{ 0,  0,   0,   0,   0,   0,   0,   0, 0, 0},
+	{17, 16,  15,   1, -17, -16, -15,  -1, 0, 0}, // Pawn: even=capture
+	{33, 31,  18,  14, -33, -31, -18, -14, 0, 0}, // Knight
+	{17, 15, -17, -15,   0,   0,   0,   0, 0, 0}, // Bishop
+	{16,  1, -16,  -1,   0,   0,   0,   0, 0, 0}, // Rook
+	{17, 16,  15,   1, -17, -16, -15,  -1, 0, 0}, // Queen
+	{17, 16,  15,   1, -17, -16, -15,  -1, 0, 0} }; // King
+
+DistDB ddb[120] = {
+	{ 0,  EMPTY}, {1,    ROOK}, { 1,   ROOK}, { 1,   ROOK}, { 1,   ROOK}, { 1,   ROOK},
+	{ 1,   ROOK}, {1,    ROOK}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{ 0,  EMPTY}, {0,   EMPTY}, {14, KNIGHT}, {15, BISHOP}, {16,   ROOK}, {17, BISHOP},
+	{18, KNIGHT}, {0,   EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{ 0,  EMPTY}, {0,   EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{15, BISHOP}, {31, KNIGHT}, {16,   ROOK}, {33, KNIGHT}, {17, BISHOP}, { 0,  EMPTY},
+	{ 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{ 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, {15, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY},
+	{16,   ROOK}, { 0,  EMPTY}, { 0,  EMPTY}, {17, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY},
+	{ 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{15, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, {16,   ROOK}, { 0,  EMPTY},
+	{ 0,  EMPTY}, { 0,  EMPTY}, {17, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{ 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, {15, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY},
+	{ 0,  EMPTY}, { 0,  EMPTY}, {16,   ROOK}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{ 0,  EMPTY}, {17, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{15, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{16,   ROOK}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY},
+	{17, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY}, {15, BISHOP}, { 0,  EMPTY}, { 0,  EMPTY},
+	{ 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, {16,   ROOK}, { 0,  EMPTY},
+	{ 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, { 0,  EMPTY}, {17, BISHOP}
+};
 
 // --- Start General Template Code ---
 
@@ -294,6 +317,24 @@ bool MoveLookup<GenMove>::fromto(const int From, const int To) const
 }
 
 template<>
+bool MoveLookup<GenMove>::attackLine_Bishop(const DistDB &db, const int From, const int To) const
+{
+	int offset = db.step * ((To > From)? 1:-1);
+	for (int to = From + offset, k = 1; !(to & 0x88); to += offset, k++) {
+		if (square[to] == EMPTY)
+			continue;
+		else if (OWN_PIECE(square[From], square[to]))
+			return false;
+		else if (k == 1 && (ABS(square[to]) == PAWN || ABS(square[to]) == KING))
+			return true;
+		else if (ABS(square[to]) == BISHOP || ABS(square[to]) == QUEEN)
+			return true;
+		break;
+	}
+	return false;
+}
+
+template<>
 bool MoveLookup<GenMove>::isAttacked(const int From) const
 {
 	// BISHOP
@@ -438,6 +479,28 @@ bool MoveLookup<RegMove>::fromto(const int From, const int To) const
 		}
 	} else {
 		return fromto_xPawn(From, To, type, offsets[type]);
+	}
+	return false;
+}
+
+template<>
+bool MoveLookup<RegMove>::attackLine_Bishop(const DistDB &db, const int From, const int To) const
+{
+	int offset = db.step * ((To > From)? 1:-1);
+	for (int to = From + offset, k = 1; !(to & 0x88); to += offset, k++) {
+		if (square[to] == EMPTY) {
+			continue;
+		} else if (OWN_PIECE(square[From], square[to])) {
+			return false;
+		} else if (ABS(square[to]) == BISHOP || ABS(square[to]) == QUEEN) {
+			return true;
+		} else if (k == 1) {
+			if (ABS(square[to]) == PAWN && square[From] * (to - From) > 0)
+				return true;
+			else if (ABS(square[to]) == KING)
+				return true;
+		}
+		break;
 	}
 	return false;
 }

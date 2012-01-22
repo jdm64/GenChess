@@ -1,6 +1,6 @@
 CXX = g++
 #CXXFLAGS = -Wall -Wextra -pedantic -O3 -std=gnu++0x
-CXXFLAGS = -Wall -Wextra -pedantic -O3 -ggdb -std=gnu++0x
+CXXFLAGS = -Wall -Wextra -pedantic -O3 -std=gnu++0x
 TARGET = genchess
 
 VERSION = $(shell grep "define VERSION" Defines.h | cut -d'"' -f2)

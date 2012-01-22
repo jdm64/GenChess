@@ -258,6 +258,16 @@ void Board<GenMove>::unmake(const GenMove &move)
 }
 
 template<>
+bool Board<GenMove>::incheckMove(const GenMove move, const int color, const bool stmCk) const
+{
+	const int king = (color == WHITE)? 31:15;
+	if (stmCk || move.index == king)
+		return incheck(color);
+	else
+		return (attackLine(piece[king], move.from) || attackLine(piece[king], move.to));
+}
+
+template<>
 bool Board<GenMove>::anyMoves(const int color)
 {
 	GenMove move;
@@ -267,6 +277,7 @@ bool Board<GenMove>::anyMoves(const int color)
 		return true;
 
 	// generate piece moves
+	const bool stmCk = incheck(color);
 	const int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	for (int idx = start; idx < end; idx++) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
@@ -280,7 +291,7 @@ bool Board<GenMove>::anyMoves(const int color)
 			move.index = idx;
 
 			make(move);
-			if (!incheck(color)) {
+			if (!incheckMove(move, color, stmCk)) {
 				delete[] loc;
 				unmake(move);
 				return true;
@@ -304,7 +315,7 @@ bool Board<GenMove>::anyMoves(const int color)
 
 			make(move);
 			// place moves are only valid if neither side is inCheck
-			if (!incheck(color) && !incheck(color ^ -2)) {
+			if (!incheckMove(move, color, stmCk) && !incheckMove(move, color ^ -2, false)) {
 				unmake(move);
 				return true;
 			}
@@ -443,6 +454,8 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int pieceTy
 
 	if (idx == NONE)
 		return;
+
+	bool stmCk = incheck(color);
 	for (int loc = 0x77; loc >= 0; loc--) {
 		if (loc & 0x88) {
 			loc -= 7;
@@ -457,7 +470,7 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int pieceTy
 
 		make(item.move);
 		// place moves are only valid if neither side is inCheck
-		if (!incheck(color) && !incheck(color ^ -2)) {
+		if (!incheckMove(item.move, color, stmCk) && !incheckMove(item.move, color ^ -2, false)) {
 			// item.check initialized to false
 			item.score = eval();
 			data->list[data->size++] = item;
@@ -469,6 +482,7 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int pieceTy
 template<>
 void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const MoveClass movetype)
 {
+	const bool stmCk = incheck(color);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	GenMoveNode item;
 
@@ -497,8 +511,8 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 			item.move.index = idx;
 
 			make(item.move);
-			if (!incheck(color)) {
-				item.check = incheck(color ^ -2);
+			if (!incheckMove(item.move, color, stmCk)) {
+				item.check = incheckMove(item.move, color ^ -2, false);
 				item.score = eval();
 				data->list[data->size++] = item;
 			}
@@ -863,8 +877,19 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 }
 
 template<>
+bool Board<RegMove>::incheckMove(const RegMove move, const int color, const bool stmCk) const
+{
+	const int king = (color == WHITE)? 31:15;
+	if (stmCk || move.index == king)
+		return incheck(color);
+	else
+		return (attackLine(piece[king], move.from) || attackLine(piece[king], move.to));
+}
+
+template<>
 bool Board<RegMove>::anyMoves(const int color)
 {
+	const bool stmCk = incheck(color);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
 	RegMoveNode item;
@@ -883,7 +908,7 @@ bool Board<RegMove>::anyMoves(const int color)
 
 			// nothing special for promotion
 			make(item.move);
-			if (!incheck(color)) {
+			if (!incheckMove(item.move, color, stmCk)) {
 				unmake(item.move, undoFlags);
 				return true;
 			}
@@ -893,41 +918,20 @@ bool Board<RegMove>::anyMoves(const int color)
 	}
 
 	// can't castle while in check
-	const bool inCheck = incheck(color);
 	const int king = (color == WHITE)? E1 : E8;
 
 	// King Side
-	if (!inCheck && flags.canKingCastle(color) && square[king + 1] == EMPTY &&
+	if (!stmCk && flags.canKingCastle(color) && square[king + 1] == EMPTY &&
 	square[king + 2] == EMPTY && !isAttacked(king + 1, color) &&
 	!isAttacked(king + 2, color) && ABS(square[((color == WHITE)? H1:H8)]) == ROOK) {
-		item.move.xindex = NONE;
-		item.move.to = king + 1;
-		item.move.from = king;
-		item.move.index = (color == WHITE)? 31:15;
-
-		make(item.move);
-		if (!incheck(color)) {
-			unmake(item.move, undoFlags);
-			return true;
-		}
-		unmake(item.move, undoFlags);
+		return true;
 	}
 	// Queen Side
-	if (!inCheck && flags.canQueenCastle(color) && square[king - 1] == EMPTY &&
+	if (!stmCk && flags.canQueenCastle(color) && square[king - 1] == EMPTY &&
 	square[king - 2] == EMPTY && square[king - 3] == EMPTY &&
 	!isAttacked(king - 1, color) && !isAttacked(king - 2, color) &&
 	ABS(square[((color == WHITE)? A1:A8)]) == ROOK) {
-		item.move.xindex = NONE;
-		item.move.to = king - 1;
-		item.move.from = king;
-		item.move.index = (color == WHITE)? 31:15;
-
-		make(item.move);
-		if (!incheck(color)) {
-			unmake(item.move, undoFlags);
-			return true;
-		}
-		unmake(item.move, undoFlags);
+		return true;
 	}
 
 	if (!flags.canEnPassant())
@@ -1173,6 +1177,7 @@ int Board<RegMove>::eval() const
 template<>
 void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveClass movetype)
 {
+	const bool stmCk = incheck(color);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
 
@@ -1206,7 +1211,7 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 				item.move.setPromote(QUEEN);
 
 				make(item.move);
-				if (incheck(color)) {
+				if (incheckMove(item.move, color, stmCk)) {
 					unmake(item.move, undoFlags);
 					item.move.flags = 0;
 					continue;
@@ -1218,7 +1223,7 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 					item.move.setPromote(i);
 
 					make(item.move);
-					item.check = incheck(color ^ -2);
+					item.check = incheckMove(item.move, color ^ -2, false);
 					item.score = eval();
 					unmake(item.move, undoFlags);
 
@@ -1227,8 +1232,8 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 				item.move.flags = 0;
 			} else {
 				make(item.move);
-				if (!incheck(color)) {
-					item.check = incheck(color ^ -2);
+				if (!incheckMove(item.move, color, stmCk)) {
+					item.check = incheckMove(item.move, color ^ -2, false);
 					item.score = eval();
 					data->list[data->size++] = item;
 				}
@@ -1260,7 +1265,7 @@ void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int color)
 		item.move.index = kindex;
 		item.move.setCastle(CASTLE_KS);
 		item.score = eval();
-		item.check = incheck(color ^ -2);
+		item.check = false;
 
 		data->list[data->size++] = item;
 	}
@@ -1274,7 +1279,7 @@ void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int color)
 		item.move.index = kindex;
 		item.move.setCastle(CASTLE_QS);
 		item.score = eval();
-		item.check = incheck(color ^ -2);
+		item.check = false;
 
 		data->list[data->size++] = item;
 	}
