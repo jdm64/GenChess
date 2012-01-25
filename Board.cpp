@@ -190,19 +190,6 @@ int Board<GenMove>::pieceIndex(const int loc, const int type) const
 template<>
 void Board<GenMove>::make(const GenMove &move)
 {
-#ifdef DEBUG_MAKE_MOVE
-	assert(piecetype[move.index] * stm > 0);
-	assert(piece[move.index] == move.from);
-	if (move.from != PLACEABLE)
-		assert(square[move.from] == piecetype[move.index]);
-	if (move.xindex == NONE) {
-		assert(square[move.to] == EMPTY);
-	} else {
-		assert(square[move.to] == piecetype[move.xindex]);
-		assert(piece[move.xindex] == move.to);
-	}
-#endif
-
 	// update board information
 	square[move.to] = piecetype[move.index];
 	mscore += stm * genLocValue[ABS(square[move.to])][EE64F(move.to)];
@@ -233,31 +220,11 @@ void Board<GenMove>::make(const GenMove &move)
 #endif
 	stm ^= -2;
 	ply++;
-
-#ifdef DEBUG_MAKE_MOVE
-	assert(piecetype[move.index] * stm < 0);
-	assert(piece[move.index] == move.to);
-	assert(square[move.to] == piecetype[move.index]);
-	if (move.from != PLACEABLE)
-		assert(square[move.from] == EMPTY);
-	if (move.xindex != NONE)
-		assert(piece[move.xindex] == DEAD);
-#endif
 }
 
 template<>
 void Board<GenMove>::unmake(const GenMove &move)
 {
-#ifdef DEBUG_MAKE_MOVE
-	assert(piecetype[move.index] * stm < 0);
-	assert(piece[move.index] == move.to);
-	assert(square[move.to] == piecetype[move.index]);
-	if (move.from != PLACEABLE)
-		assert(square[move.from] == EMPTY);
-	if (move.xindex != NONE)
-		assert(piece[move.xindex] == DEAD);
-#endif
-
 	piece[move.index] = move.from;
 	mscore += stm * genLocValue[ABS(square[move.to])][EE64F(move.to)];
 	if (move.xindex == NONE) {
@@ -288,19 +255,6 @@ void Board<GenMove>::unmake(const GenMove &move)
 #endif
 	stm ^= -2;
 	ply--;
-
-#ifdef DEBUG_MAKE_MOVE
-	assert(piecetype[move.index] * stm > 0);
-	assert(piece[move.index] == move.from);
-	if (move.from != PLACEABLE)
-		assert(square[move.from] == piecetype[move.index]);
-	if (move.xindex == NONE) {
-		assert(square[move.to] == EMPTY);
-	} else {
-		assert(square[move.to] == piecetype[move.xindex]);
-		assert(piece[move.xindex] == move.to);
-	}
-#endif
 }
 
 template<>
