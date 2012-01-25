@@ -24,7 +24,7 @@
 //#define DEBUG_MAKE_MOVE
 #define TT_ENABLED
 
-extern const int genPieceValue[16];
+extern const int genPieceValue[7];
 
 extern const int genLocValue[7][64];
 
@@ -37,6 +37,7 @@ class Board : public Position<MoveType>
 {
 private:
 	uint64 key;
+	int mscore;
 
 	int pieceIndex(const int loc, const int type) const;
 
@@ -54,6 +55,8 @@ private:
 	void validateBoard(const RegMove &move) const;
 
 	void rebuildHash();
+
+	void rebuildScore();
 
 public:
 	Board();

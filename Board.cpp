@@ -20,7 +20,7 @@
 #include "Board.h"
 #include "TransTable.h"
 
-const int genPieceValue[16] = {224, 224, 224, 224, 224, 224, 224, 224, 336, 336, 560, 560, 896, 896, 1456, 0};
+const int genPieceValue[7] = {0, 224, 336, 560, 896, 1456, 0};
 
 const int genLocValue[7][64] = {
 	{	0, 0, 0, 0, 0, 0, 0, 0,
@@ -81,6 +81,40 @@ const int genLocValue[7][64] = {
 		-10,  0,  0,  0,  0,  0,  0, -10}
 	};
 
+// --- Start Genesis Code ---
+
+template<>
+void Board<GenMove>::rebuildScore()
+{
+	int white = 0, black = 0;
+	for (int b = 0, w = 16; b < 16; b++, w++) {
+		int wloc = EE64F(piece[w]);
+		int bloc = EE64F(piece[b]);
+
+		switch (piece[b]) {
+		default:
+			black += genLocValue[-piecetype[b]][bloc];
+		case PLACEABLE:
+			black += genPieceValue[-piecetype[b]];
+			break;
+		case DEAD:
+			black -= genPieceValue[-piecetype[b]];
+			break;
+		}
+		switch (piece[w]) {
+		default:
+			white += genLocValue[piecetype[w]][wloc];
+		case PLACEABLE:
+			white += genPieceValue[piecetype[w]];
+			break;
+		case DEAD:
+			white -= genPieceValue[piecetype[w]];
+			break;
+		}
+	}
+	mscore = white - black;
+}
+
 template<>
 void Board<GenMove>::reset()
 {
@@ -95,6 +129,7 @@ void Board<GenMove>::reset()
 #endif
 	stm = WHITE;
 	ply = 0;
+	rebuildScore();
 }
 
 template<>
@@ -136,6 +171,7 @@ void Board<GenMove>::setBoard(const GenPosition &pos)
 	stm = pos.stm;
 
 	rebuildHash();
+	rebuildScore();
 }
 
 template<>
@@ -169,12 +205,18 @@ void Board<GenMove>::make(const GenMove &move)
 
 	// update board information
 	square[move.to] = piecetype[move.index];
-	if (move.from != PLACEABLE)
+	mscore += stm * genLocValue[ABS(square[move.to])][EE64F(move.to)];
+	if (move.from != PLACEABLE) {
+		mscore -= stm * genLocValue[ABS(square[move.from])][EE64F(move.from)];
 		square[move.from] = EMPTY;
+	}
 	// update piece information
 	piece[move.index] = move.to;
-	if (move.xindex != NONE)
+	if (move.xindex != NONE) {
+		mscore += stm * genLocValue[ABS(piecetype[move.xindex])][EE64F(move.to)];
+		mscore += stm * genPieceValue[ABS(piecetype[move.xindex])];
 		piece[move.xindex] = DEAD;
+	}
 
 #ifdef TT_ENABLED
 	int to = EE64(move.to);
@@ -216,16 +258,20 @@ void Board<GenMove>::unmake(const GenMove &move)
 		assert(piece[move.xindex] == DEAD);
 #endif
 
-	// TODO could this function fail?
 	piece[move.index] = move.from;
+	mscore += stm * genLocValue[ABS(square[move.to])][EE64F(move.to)];
 	if (move.xindex == NONE) {
 		square[move.to] = EMPTY;
 	} else {
 		square[move.to] = piecetype[move.xindex];
 		piece[move.xindex] = move.to;
+		mscore += stm * genLocValue[ABS(piecetype[move.xindex])][EE64F(move.to)];
+		mscore += stm * genPieceValue[ABS(piecetype[move.xindex])];
 	}
-	if (move.from != PLACEABLE)
+	if (move.from != PLACEABLE) {
 		square[move.from] = piecetype[move.index];
+		mscore -= stm * genLocValue[ABS(square[move.from])][EE64F(move.from)];
+	}
 
 #ifdef TT_ENABLED
 	int to = EE64(move.to);
@@ -415,34 +461,7 @@ int Board<GenMove>::validMove(const string &smove, const int color, GenMove &mov
 template<>
 int Board<GenMove>::eval() const
 {
-	int white = 0, black = 0;
-	for (int b = 0, w = 16; b < 16; b++, w++) {
-		int bloc = EE64F(piece[b]);
-		int wloc = EE64F(piece[b]);
-
-		switch (piece[b]) {
-		default:
-			black += genLocValue[piecetype[w]][bloc];
-		case PLACEABLE:
-			black += genPieceValue[b];
-			break;
-		case DEAD:
-			black -= genPieceValue[b];
-			break;
-		}
-		switch (piece[w]) {
-		default:
-			white += genLocValue[piecetype[w]][wloc];
-		case PLACEABLE:
-			white += genPieceValue[b];
-			break;
-		case DEAD:
-			white -= genPieceValue[b];
-			break;
-		}
-	}
-	white -= black;
-	return (stm == WHITE)? -white : white;
+	return (stm == WHITE)? -mscore : mscore;
 }
 
 template<>
@@ -576,12 +595,12 @@ const int regLocValue[7][64] = {
 		0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0},
 	{	  0,   0,   0,   0,   0,   0,   0,   0,
-/* Pawn */	 10,  10,  10,  10,  10,  10,  10,  10,
-		  5,   5,   5,   5,   5,   5,   5,   5,
-		  0,   0,   5,   5,   5,   5,   0,   0,
-		  0,   0,  -5,  -5,  -5,  -5,   0,   0,
+/* Pawn */	  5,   5,   5,   5,   5,   5,   5,   5,
 		 -5,  -5,  -5,  -5,  -5,  -5,  -5,  -5,
-		-10, -10, -10, -10, -10, -10, -10, -10,
+		  5,   5,  10,  10,  10,  10,   5,   5,
+		  5,   5,  10,  10,  10,  10,   5,   5,
+		 -5,  -5,  -5,  -5,  -5,  -5,  -5,  -5,
+		  5,   5,   5,   5,   5,   5,   5,   5,
 		  0,   0,   0,   0,   0,   0,   0,   0},
 	{	-10, -5,  0,  0,  0,  0, -5, -10,
 /* Knight */	 -5,  0, 10, 10, 10, 10,  0,  -5,
@@ -615,15 +634,39 @@ const int regLocValue[7][64] = {
 		-10,   0,  10,  10,  10,  10,   0, -10,
 		-10,   0,   0,   0,   0,   0,   0, -10,
 		-10, -10, -10, -10, -10, -10, -10, -10},
-	{	  0, -5, -10, -15, -20, -15, -10, -5,
-/* King */	  0, -5, -10, -15, -15, -15, -10, -5,
-		  0, -5, -10, -10, -10, -10, -10, -5,
-		  0, -5,  -5,  -5,  -5,  -5,  -5, -5,
-		  0,  5,   5,   5,   5,   5,   5,  5,
-		  0,  5,  10,  10,  10,  10,  10,  5,
-		  0,  5,  10,  15,  15,  15,  10,  5,
-		  0,  5,  10,  15,  20,  15,  10,  5}
+	{	-20, -10,  20,  10,  20,  10,  20, -20,
+/* King */	-10, -10,  -5,  -5,  -5,  -5, -10, -10,
+		-10,  -5,  10,  10,  10,  10,  -5, -10,
+		-10,  -5,  10,  20,  20,  10,  -5, -10,
+		-10,  -5,  10,  20,  20,  10,  -5, -10,
+		-10,  -5,  10,  10,  10,  10,  -5, -10,
+		-10, -10,  -5,  -5,  -5,  -5, -10, -10,
+		-20, -10,  20,  10,  20,  10,  20, -20}
 	};
+
+template<>
+void Board<RegMove>::rebuildScore()
+{
+	int white = 0, black = 0;
+	for (int b = 0, w = 16; b < 16; b++, w++) {
+		int wloc = EE64F(piece[w]);
+		int bloc = EE64F(piece[b]);
+
+		if (piece[b] != DEAD) {
+			black += regLocValue[-piecetype[b]][bloc];
+			black += regPieceValue[-piecetype[b]];
+		} else {
+			black -= regPieceValue[-piecetype[b]];
+		}
+		if (piece[w] != DEAD) {
+			white += regLocValue[piecetype[w]][wloc];
+			white += regPieceValue[piecetype[w]];
+		} else {
+			white -= regPieceValue[piecetype[w]];
+		}
+	}
+	mscore = white - black;
+}
 
 template<>
 void Board<RegMove>::reset()
@@ -640,6 +683,7 @@ void Board<RegMove>::reset()
 	stm = WHITE;
 	ply = 0;
 	flags.reset();
+	rebuildScore();
 }
 
 template<>
@@ -677,6 +721,8 @@ void Board<RegMove>::setBoard(const RegPosition &pos)
 	flags = pos.flags;
 	ply = pos.ply;
 	stm = pos.stm;
+
+	rebuildScore();
 #ifdef TT_ENABLED
 	rebuildHash();
 #endif
@@ -757,6 +803,8 @@ void Board<RegMove>::make(const RegMove &move)
 		if (flags.canQueenCastle(color))
 			key ^= hashBox[CASTLE_HASH + color * 2];
 #endif
+		mscore += stm * regLocValue[ROOK][EE64(castleTo)];
+		mscore -= stm * regLocValue[ROOK][EE64(castleI)];
 		square[castleTo] = piecetype[castleI];
 		square[piece[castleI]] = EMPTY;
 		piece[castleI] = castleTo;
@@ -797,6 +845,8 @@ void Board<RegMove>::make(const RegMove &move)
 
 	// update board information
 	square[move.to] = piecetype[move.index];
+	mscore += stm * regLocValue[ABS(square[move.to])][EE64F(move.to)];
+	mscore -= stm * regLocValue[ABS(square[move.from])][EE64F(move.from)];
 	square[move.from] = EMPTY;
 	// update piece information
 	piece[move.index] = move.to;
@@ -804,6 +854,9 @@ void Board<RegMove>::make(const RegMove &move)
 #ifdef TT_ENABLED
 		key ^= hashBox[13 * EE64(piece[move.xindex]) + piecetype[move.xindex] + 6];
 #endif
+		mscore += stm * regLocValue[ABS(piecetype[move.xindex])][EE64F(piece[move.xindex])];
+		mscore += stm * regPieceValue[ABS(piecetype[move.xindex])];
+
 		if (move.getEnPassant())
 			square[piece[move.xindex]] = EMPTY;
 		piece[move.xindex] = DEAD;
@@ -841,6 +894,8 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 		key ^= hashBox[13 * EE64(piece[castleI]) + piecetype[castleI] + 6];
 		key ^= hashBox[13 * EE64(castleFrom) + piecetype[castleI] + 6];
 #endif
+		mscore += stm * regLocValue[ROOK][EE64(castleFrom)];
+		mscore -= stm * regLocValue[ROOK][EE64(castleI)];
 		square[piece[castleI]] = EMPTY;
 		square[castleFrom] = piecetype[castleI];
 		piece[castleI] = castleFrom;
@@ -852,6 +907,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 #endif
 
 	piece[move.index] = move.from;
+	mscore += stm * regLocValue[ABS(square[move.to])][EE64F(move.to)];
 	if (move.xindex == NONE) {
 		square[move.to] = EMPTY;
 	} else {
@@ -863,11 +919,14 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 			piece[move.xindex] = move.to;
 			square[move.to] = piecetype[move.xindex];
 		}
+		mscore += stm * regLocValue[ABS(piecetype[move.xindex])][EE64F(piece[move.xindex])];
+		mscore += stm * regPieceValue[ABS(piecetype[move.xindex])];
 #ifdef TT_ENABLED
 		key ^= hashBox[13 * EE64(piece[move.xindex]) + piecetype[move.xindex] + 6];
 #endif
 	}
 	square[move.from] = piecetype[move.index];
+	mscore -= stm * regLocValue[ABS(square[move.from])][EE64F(move.from)];
 #ifdef TT_ENABLED
 	key ^= hashBox[WTM_HASH];
 #endif
@@ -1152,26 +1211,7 @@ int Board<RegMove>::validMove(const string &smove, const int color, RegMove &mov
 template<>
 int Board<RegMove>::eval() const
 {
-	int white = 0, black = 0;
-	for (int b = 0, w = 16; b < 16; b++, w++) {
-		int bloc = EE64F(piece[b]);
-		int wloc = EE64F(piece[w]);
-
-		if (piece[b] != DEAD) {
-			black += regLocValue[-piecetype[b]][bloc];
-			black += regPieceValue[-piecetype[b]];
-		} else {
-			black -= regPieceValue[-piecetype[b]];
-		}
-		if (piece[w] != DEAD) {
-			white += regLocValue[piecetype[w]][wloc];
-			white += regPieceValue[piecetype[w]];
-		} else {
-			white -= regPieceValue[piecetype[w]];
-		}
-	}
-	white -= black;
-	return (stm == WHITE)? -white : white;
+	return (stm == WHITE)? -mscore : mscore;
 }
 
 template<>
