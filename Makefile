@@ -15,7 +15,7 @@ genchess : $(objs)
 	$(CXX) $(objs) -o $(TARGET)
 #	strip -s $(TARGET)
 
-enginetester : EngineTester.o
+enginetester : EngineTester.o Util.o
 	$(CXX) EngineTester.o Util.o -o enginetester
 
 %.o : %.cpp
