@@ -18,6 +18,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 #include "Defines.h"
 #include "Util.h"
 
