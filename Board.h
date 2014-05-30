@@ -40,12 +40,12 @@ private:
 
 	int pieceIndex(const int loc, const int type) const;
 
-	inline bool isPromote(const RegMove &move, int color) const
+	static bool isPromote(const RegMove &move, int color)
 	{
 		return (color == WHITE)? (move.to >= A8) : (move.to <= H1);
 	}
 
-	bool incheckMove(const MoveType move, const int color, const bool stmCk) const;
+	bool incheckMove(const MoveType &move, const int color, const bool stmCk) const;
 
 	int validCastle(RegMove &move, const int color);
 

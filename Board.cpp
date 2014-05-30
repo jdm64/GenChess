@@ -258,7 +258,7 @@ void Board<GenMove>::unmake(const GenMove &move)
 }
 
 template<>
-bool Board<GenMove>::incheckMove(const GenMove move, const int color, const bool stmCk) const
+bool Board<GenMove>::incheckMove(const GenMove &move, const int color, const bool stmCk) const
 {
 	const int king = (color == WHITE)? 31:15;
 	if (stmCk || move.index == king)
@@ -890,7 +890,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 }
 
 template<>
-bool Board<RegMove>::incheckMove(const RegMove move, const int color, const bool stmCk) const
+bool Board<RegMove>::incheckMove(const RegMove &move, const int color, const bool stmCk) const
 {
 	const int king = (color == WHITE)? 31:15;
 	if (stmCk || move.index == king)

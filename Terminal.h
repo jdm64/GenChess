@@ -43,7 +43,7 @@ private:
 
 	void divide(int depth);
 
-	void displayHelp() const
+	static void displayHelp()
 	{
 		cout << "Command\t\t\tDescription\n\n"
 			<< "new\t\t\tstarts a new game\n"

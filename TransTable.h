@@ -143,7 +143,7 @@ public:
 		delete[] table;
 	}
 	
-	sixInt stats() const
+	static sixInt stats()
 	{
 		return {TableStats::hit, TableStats::miss, TableStats::scorehit,
 		TableStats::scoremiss, TableStats::movehit, TableStats::movemiss};

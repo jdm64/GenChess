@@ -72,9 +72,8 @@ struct EngineResults {
 	AsColor asblack;
 
 	EngineResults()
+	: aswhite({{0, 0}, 0, 0, 0, 0}), asblack({{0, 0}, 0, 0, 0, 0})
 	{
-		aswhite = {{0, 0}, 0, 0, 0, 0};
-		asblack = {{0, 0}, 0, 0, 0, 0};
 	}
 };
 
@@ -334,7 +333,7 @@ void runMatch()
 	fputs("quit\n", engine2.in);
 }
 
-IOptr connectIO(const string program)
+IOptr connectIO(const string& program)
 {
 	enum {IN, OUT};
 
