@@ -26,3 +26,9 @@ clean :
 
 archive : clean
 	tar -caf ../genchess-$(VERSION).tar.xz ../$(DIR)
+
+cppcheck :
+	cppcheck --enable=all --inconclusive ./ 1> /dev/null
+
+analyze : clean
+	scan-build make all
