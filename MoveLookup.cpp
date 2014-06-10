@@ -56,14 +56,14 @@ DistDB ddb[120] = {
 template<class MoveType>
 int MoveLookup<MoveType>::genAll_xPawn(int8* const list, int8* offset, const int From, const int type) const
 {
-	int next = 0;
+	int next = 0, i = 0;
 
 	switch (type) {
 	case BISHOP:
 	case ROOK:
 	case QUEEN:
-		for (; *offset; offset++) {
-			for (int to = From + *offset; !(to & 0x88); to += *offset) {
+		for (; offset[i]; i++) {
+			for (int to = From + offset[i]; !(to & 0x88); to += offset[i]) {
 				if (square[to] == EMPTY) {
 					list[next++] = to;
 					continue;
@@ -76,8 +76,8 @@ int MoveLookup<MoveType>::genAll_xPawn(int8* const list, int8* offset, const int
 		break;
 	case KNIGHT:
 	case KING:
-		for (; *offset; offset++) {
-			const int to = From + *offset;
+		for (; offset[i]; i++) {
+			const int to = From + offset[i];
 			if (to & 0x88)
 				continue;
 			else if (ANY_MOVE(square[From], square[to]))
@@ -91,13 +91,13 @@ int MoveLookup<MoveType>::genAll_xPawn(int8* const list, int8* offset, const int
 template<class MoveType>
 int MoveLookup<MoveType>::genCapture_xPawn(int8* const list, int8* offset, const int From, const int type) const
 {
-	int next = 0;
+	int next = 0, i = 0;
 
 	switch (type) {
 	case KNIGHT:
 	case KING:
-		for (; *offset; offset++) {
-			const int to = From + *offset;
+		for (; offset[i]; i++) {
+			const int to = From + offset[i];
 			if (to & 0x88)
 				continue;
 			else if (CAPTURE_MOVE(square[From], square[to]))
@@ -107,8 +107,8 @@ int MoveLookup<MoveType>::genCapture_xPawn(int8* const list, int8* offset, const
 	case BISHOP:
 	case ROOK:
 	case QUEEN:
-		for (; *offset; offset++) {
-			for (int to = From + *offset; !(to & 0x88); to += *offset) {
+		for (; offset[i]; i++) {
+			for (int to = From + offset[i]; !(to & 0x88); to += offset[i]) {
 				if (square[to] == EMPTY)
 					continue;
 				else if (CAPTURE_MOVE(square[From], square[to]))
@@ -124,13 +124,13 @@ int MoveLookup<MoveType>::genCapture_xPawn(int8* const list, int8* offset, const
 template<class MoveType>
 int MoveLookup<MoveType>::genMove_xPawn(int8* const list, int8* offset, const int From, const int type) const
 {
-	int next = 0;
+	int next = 0, i = 0;
 
 	switch (type) {
 	case KNIGHT:
 	case KING:
-		for (; *offset; offset++) {
-			const int to = From + *offset;
+		for (; offset[i]; i++) {
+			const int to = From + offset[i];
 			if (to & 0x88)
 				continue;
 			else if (square[to] == EMPTY)
@@ -140,8 +140,8 @@ int MoveLookup<MoveType>::genMove_xPawn(int8* const list, int8* offset, const in
 	case BISHOP:
 	case ROOK:
 	case QUEEN:
-		for (; *offset; offset++) {
-			for (int to = From + *offset; !(to & 0x88); to += *offset) {
+		for (; offset[i]; i++) {
+			for (int to = From + offset[i]; !(to & 0x88); to += offset[i]) {
 				if (square[to] == EMPTY)
 					list[next++] = to;
 				else
