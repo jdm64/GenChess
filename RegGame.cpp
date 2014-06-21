@@ -18,37 +18,6 @@
 #include "Game.h"
 
 template<>
-void Game<GenMove>::newGame()
-{
-	board->reset();
-	history.clear();
-}
-
-template<>
-void Game<GenMove>::doMove(const GenMove &move)
-{
-	const HistoryNode<GenMove> item = {move};
-
-	board->make(move);
-	history.push_back(item);
-}
-
-template<>
-bool Game<GenMove>::undoMove()
-{
-	if (history.empty())
-		return false;
-
-	HistoryNode<GenMove> node = history.back();
-	board->unmake(node.move);
-	history.pop_back();
-
-	return true;
-}
-
-// --- Start Regular Chess ---
-
-template<>
 void Game<RegMove>::newGame()
 {
 	board->reset();

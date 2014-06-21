@@ -6,8 +6,9 @@ TARGET = genchess
 VERSION = $(shell grep "define VERSION" Defines.h | cut -d'"' -f2)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
-objs = Util.o Move.o BaseBoard.o MoveLookup.o Position.o Board.o \
-	TransTable.o Engine.o Game.o main.o
+objs = Util.o Move.o BaseBoard.o MoveLookup.o GenMoveLookup.o RegMoveLookup.o Position.o \
+	GenPosition.o RegPosition.o GenBoard.o RegBoard.o TransTable.o GenEngine.o \
+	RegEngine.o GenGame.o RegGame.o main.o
 
 all : genchess enginetester
 

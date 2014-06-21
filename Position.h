@@ -27,7 +27,17 @@
 #define SF88(x) (((x) & ~7) + (x))
 #define SFF88(x) (((x) & 7) + ((7 - ((x) >> 3)) << 4))
 
-extern const int8 InitRegPiece[32];
+const int8 stype[20] = {
+	EMPTY,          EMPTY,          BLACK_KING,     WHITE_BISHOP,   EMPTY,
+	BLACK_KNIGHT,   EMPTY,          BLACK_PAWN,     BLACK_QUEEN,    BLACK_ROOK,
+	EMPTY,          EMPTY,          WHITE_KING,     EMPTY,          BLACK_BISHOP,
+	WHITE_KNIGHT,   EMPTY,          WHITE_PAWN,     WHITE_QUEEN,    WHITE_ROOK};
+
+const int8 InitRegPiece[32] = {
+        A7, B7, C7, D7, E7, F7, G7, H7,
+        B8, G8, C8, F8, A8, H8, D8, E8,
+        A2, B2, C2, D2, E2, F2, G2, H2,
+        B1, G1, C1, F1, A1, H1, D1, E1};
 
 template<class MoveType>
 class Position : public MoveLookup<MoveType>
@@ -42,21 +52,143 @@ protected:
 public:
 	bool incheck(const int color) const;
 
-	int parseFen_BoardStm(const string &st);
-
 	bool parseFen(const string &st);
-
-	int parseZfen_Board(const string &st);
 
 	bool parseZfen(const string &st);
 
-	void printFen_BoardStm(ostringstream &buf, string &fen) const;
-
 	string printFen() const;
 
-	void printZfen_Board(ostringstream &buf, string &fen) const;
-
 	string printZfen() const;
+
+	int parseFen_BoardStm(const string &st)
+	{
+		parseReset();
+
+		// index counter for st
+		int n = 0;
+		while (isspace(st[n]))
+			n++;
+
+		// parse board
+		for (int loc = 0, cont = true; cont; n++) {
+			switch (st[n]) {
+			case 'p':	case 'b':	case 'r':
+			case 'n':	case 'q':	case 'k':
+			case 'P':	case 'B':	case 'R':
+			case 'N':	case 'Q':	case 'K':
+				if (!setPiece(SFF88(loc), stype[st[n] % 21]))
+					return -1;
+				loc++;
+				break;
+			case '1':	case '2':	case '3':
+			case '4':	case '5':	case '6':
+			case '7':	case '8':
+				loc += st[n] - '0';
+				break;
+			case '/':
+				break;
+			case ' ':
+				cont = false;
+				break;
+			default:
+				return -1;
+			}
+		}
+		// pick up color-to-move
+		BB::stm = (st[n] == 'w')? WHITE : BLACK;
+		n += 2;
+
+		return n;
+	}
+
+	int parseZfen_Board(const string &st)
+	{
+		parseReset();
+
+		// index counter for st
+		int n = 0;
+
+		// parse board
+		string num = "";
+		for (int loc = 0, act = false; true; n++) {
+			if (isdigit(st[n])) {
+				num += st[n];
+				act = true;
+			} else if (isalpha(st[n])) {
+				if (act) {
+					loc += atoi(num.c_str());
+					num = "";
+					act = false;
+				}
+				if (!setPiece(SFF88(loc), stype[st[n] % 21]))
+					return -1;
+				loc++;
+			} else if (st[n] == ':') {
+				n++;
+				break;
+			} else {
+				return -1;
+			}
+		}
+		return n;
+	}
+
+	void printFen_BoardStm(ostringstream &buf, string &fen) const
+	{
+		for (int i = 0, empty = 0; i < 64; i++) {
+			// convert cordinate system
+			int n = SFF88(i);
+			if (i && i % 8 == 0) {
+				if (empty) {
+					buf.str(string());
+					buf << empty;
+					fen += buf.str();
+				}
+				if (i == 64)
+					break;
+				empty = 0;
+				fen += '/';
+			}
+			if (BB::square[n] == EMPTY) {
+				empty++;
+				continue;
+			}
+			if (empty) {
+				buf.str(string());
+				buf << empty;
+				fen += buf.str();
+				empty = 0;
+			}
+			if (BB::square[n] > EMPTY)
+				fen += pieceSymbol[BB::square[n]];
+			else
+				fen += tolower(pieceSymbol[-BB::square[n]]);
+		}
+		fen += ' ';
+		fen += (BB::ply % 2)? 'b':'w';
+		fen += ' ';
+	}
+
+	void printZfen_Board(ostringstream &buf, string &fen) const
+	{
+		for (int i = 0, empty = 0; i < 64; i++) {
+			// convert cordinate system
+			int n = SFF88(i);
+			if (BB::square[n] == EMPTY) {
+				empty++;
+				continue;
+			} else if (empty) {
+				buf.str(string());
+				buf << empty;
+				fen += buf.str();
+			}
+			fen += (BB::square[n] > EMPTY)?
+					pieceSymbol[BB::square[n]] :
+					tolower(pieceSymbol[-BB::square[n]]);
+			empty = 0;
+		}
+		fen += ':';
+	}
 };
 
 typedef Position<GenMove> GenPosition;
