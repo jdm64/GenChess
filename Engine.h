@@ -62,8 +62,6 @@ private:
 
 	void search(int alpha, int beta, int depth, int limit);
 
-	void debugTree();
-
 public:
 	Engine(Board<MoveType> *_Board, TransTable<MoveType> *TT) : curr(NULL), board(_Board), tt(TT)
 	{
@@ -99,9 +97,7 @@ public:
 		// Randomize opening
 		if (board->getPly() < 7)
 			pickRandomMove();
-#ifdef DEBUG_SCORES
-		debugTree();
-#endif
+
 		delete curr;
 		return pvMove[0];
 	}

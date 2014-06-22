@@ -58,7 +58,7 @@ int8* MoveLookup<RegMove>::genAll(const int From) const
 template<>
 int8* MoveLookup<RegMove>::genCapture(const int From) const
 {
-	const int type = ABS(square[From]); //  mfrom = mailbox64[From];
+	const int type = ABS(square[From]);
 	int8* const list = new int8[28];
 	int next = 0;
 

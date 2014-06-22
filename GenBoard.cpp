@@ -131,12 +131,6 @@ void Board<GenMove>::reset()
 }
 
 template<>
-Board<GenMove>::Board()
-{
-	reset();
-}
-
-template<>
 void Board<GenMove>::rebuildHash()
 {
 #ifdef TT_ENABLED
@@ -255,26 +249,16 @@ void Board<GenMove>::unmake(const GenMove &move)
 	ply--;
 }
 
-template<>
-bool Board<GenMove>::incheckMove(const GenMove &move, const int color, const bool stmCk) const
-{
-	const int king = (color == WHITE)? 31:15;
-	if (stmCk || move.index == king)
-		return incheck(color);
-	else
-		return (attackLine(piece[king], move.from) || attackLine(piece[king], move.to));
-}
 
 template<>
 bool Board<GenMove>::anyMoves(const int color)
 {
-	GenMove move;
-
 	// shortest games takes 5 half-moves
 	if (ply < 4)
 		return true;
 
 	// generate piece moves
+	GenMove move;
 	const bool stmCk = incheck(color);
 	const int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
 	for (int idx = start; idx < end; idx++) {
@@ -324,27 +308,17 @@ bool Board<GenMove>::anyMoves(const int color)
 }
 
 template<>
-int Board<GenMove>::isMate()
-{
-	if (anyMoves(stm))
-		return NOTMATE;
-	else if (incheck(stm))
-		return (stm == WHITE)? BLACK_CHECKMATE : WHITE_CHECKMATE;
-	else
-		return STALEMATE;
-}
-
-template<>
 bool Board<GenMove>::validMove(const GenMove &moveIn, GenMove &move)
 {
 	move = moveIn;
-
-	if ((move.index = pieceIndex(move.from, piecetype[move.index])) == NONE)
+	move.index = pieceIndex(move.from, piecetype[move.index]);
+	if (move.index == NONE)
 		return false;
 	if (piecetype[move.index] * stm <= 0)
 		return false;
 	if (move.xindex != NONE) {
-		if ((move.xindex = pieceIndex(move.to, piecetype[move.xindex])) == NONE)
+		move.xindex = pieceIndex(move.to, piecetype[move.xindex]);
+		if (move.xindex == NONE)
 			return false;
 	} else if (square[move.to] != EMPTY) {
 		return false;
@@ -358,6 +332,7 @@ bool Board<GenMove>::validMove(const GenMove &moveIn, GenMove &move)
 	bool ret = true;
 
 	make(move);
+	// stm is opponent after make
 	if (incheck(stm ^ -2))
 		ret = false;
 	if (move.from == PLACEABLE && incheck(stm))
@@ -396,7 +371,8 @@ int Board<GenMove>::validMove(const string &smove, const int color, GenMove &mov
 	if (ply < 2 && ABS(piecetype[move.index]) != KING)
 		return KING_FIRST;
 	if (move.from != PLACEABLE && !fromto(move.from, move.to))
-			return INVALID_MOVEMENT;
+		return INVALID_MOVEMENT;
+
 	int ret = VALID_MOVE;
 
 	make(move);
@@ -408,12 +384,6 @@ int Board<GenMove>::validMove(const string &smove, const int color, GenMove &mov
 	unmake(move);
 
 	return ret;
-}
-
-template<>
-int Board<GenMove>::eval() const
-{
-	return (stm == WHITE)? -mscore : mscore;
 }
 
 template<>
@@ -455,7 +425,6 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 {
 	const bool stmCk = incheck(color);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
-	GenMoveNode item;
 
 	for (int idx = start; idx >= end; idx--) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
@@ -476,6 +445,7 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 		}
 
 		for (int n = 0; loc[n] != -1; n++) {
+			GenMoveNode item;
 			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			item.move.to = loc[n];
 			item.move.from = piece[idx];
@@ -523,12 +493,4 @@ GenMoveList* Board<GenMove>::getMoveList(const int color, const MoveClass movety
 		break;
 	}
 	return data;
-}
-
-template<>
-void Board<GenMove>::dumpDebug() const
-{
-	cout << "hash:" << key << " stm:" << (int)stm << " ply:" << ply << endl;
-	cout << printBoard();
-	cout << printPieceList() << endl;
 }

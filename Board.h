@@ -45,20 +45,29 @@ private:
 		return (color == WHITE)? (move.to >= A8) : (move.to <= H1);
 	}
 
-	bool incheckMove(const MoveType &move, const int color, const bool stmCk) const;
+	bool incheckMove(const MoveType &move, const int color, const bool stmCk) const
+	{
+		const int king = (color == WHITE)? 31:15;
+		if (stmCk || move.index == king)
+			return Position<MoveType>::incheck(color);
+		else
+			return MoveLookup<MoveType>::attackLine(BB::piece[king], move.from)
+				|| MoveLookup<MoveType>::attackLine(BB::piece[king], move.to);
+	}
 
 	int validCastle(RegMove &move, const int color);
 
 	int validEnPassant(RegMove &move, const int color);
-
-	void validateBoard(const RegMove &move) const;
 
 	void rebuildHash();
 
 	void rebuildScore();
 
 public:
-	Board();
+	Board()
+	{
+		reset();
+	}
 
 	uint64 hash() const
 	{
@@ -90,13 +99,24 @@ public:
 
 	void unmake(const RegMove &move, const MoveFlags &undoFlags);
 
-	int isMate();
+	int isMate()
+	{
+		if (anyMoves(BB::stm))
+			return NOTMATE;
+		else if (Position<MoveType>::incheck(BB::stm))
+			return (BB::stm == WHITE)? BLACK_CHECKMATE : WHITE_CHECKMATE;
+		else
+			return STALEMATE;
+	}
 
 	bool validMove(const MoveType &moveIn, MoveType &move);
 
 	int validMove(const string &smove, const int color, MoveType &move);
 
-	int eval() const;
+	int eval() const
+	{
+		return (BB::stm == WHITE)? -mscore : mscore;
+	}
 
 	bool anyMoves(const int color);
 
@@ -141,8 +161,6 @@ public:
 		}
 		return buff.str();
 	}
-
-	void dumpDebug() const;
 };
 
 template<class MoveType>

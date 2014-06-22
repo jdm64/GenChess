@@ -239,7 +239,6 @@ string Position<RegMove>::printFen() const
 	} else {
 		fen += '-';
 	}
-
 	fen += ' ';
 	fen += '0';
 	fen += ' ';

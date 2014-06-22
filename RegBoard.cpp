@@ -108,9 +108,9 @@ void Board<RegMove>::rebuildScore()
 template<>
 void Board<RegMove>::reset()
 {
+	memset(square, EMPTY, 128);
 	copy(InitRegPiece, InitRegPiece + 32, piece);
 	copy(InitPieceType, InitPieceType + 32, piecetype);
-	memset(square, EMPTY, 128);
 
 	for (int i = 0; i < 32; i++)
 		square[piece[i]] = piecetype[i];
@@ -121,12 +121,6 @@ void Board<RegMove>::reset()
 	ply = 0;
 	flags.reset();
 	rebuildScore();
-}
-
-template<>
-Board<RegMove>::Board()
-{
-	reset();
 }
 
 template<>
@@ -159,10 +153,8 @@ void Board<RegMove>::setBoard(const RegPosition &pos)
 	ply = pos.ply;
 	stm = pos.stm;
 
-	rebuildScore();
-#ifdef TT_ENABLED
 	rebuildHash();
-#endif
+	rebuildScore();
 }
 
 template<>
@@ -174,51 +166,6 @@ int Board<RegMove>::pieceIndex(const int loc, const int type) const
 		if (piece[i] == loc && piecetype[i] == type)
 			return i;
 	return NONE;
-}
-
-template<>
-void Board<RegMove>::validateBoard(const RegMove &move) const
-{
-	int cpt = 0;
-
-	if (square[move.from] * square[move.to] > 0)
-		goto error;
-	for (int i = A1; i <= H1; i++)
-		if (ABS(square[i]) == PAWN) {
-			cpt = 1;
-			goto error;
-		}
-	for (int i = A8; i <= H8; i++) {
-		if (ABS(square[i]) == PAWN) {
-			cpt = 2;
-			goto error;
-		}
-	}
-	for (int i = 0; i < 32; i++) {
-		if (piece[i] == DEAD)
-			continue;
-		if (piece[i] < 0 || piece[i] > 63) {
-			cpt = 3;
-			goto error;
-		}
-		if (ABS(piecetype[i]) < 1 || ABS(piecetype[i]) > 6) {
-			cpt = 4;
-			goto error;
-		}
-		if (square[piece[i]] == piecetype[i])
-			continue;
-		cerr << " " << i;
-		cpt = 5;
-		goto error;
-	}
-	return;
-error:
-	cerr << "E:" << move.dump() << " " << printZfen() << " "
-	<< (int)square[move.from] << " " << (int)square[move.to] << " " << cpt << endl;
-	for (int i = 0; i < 32; i++)
-		cerr << (int) piece[i] << "," << (int) piecetype[i] << " ";
-	cerr << endl;
-	assert(0);
 }
 
 template<>
@@ -385,30 +332,31 @@ bool Board<RegMove>::incheckMove(const RegMove &move, const int color, const boo
 template<>
 bool Board<RegMove>::anyMoves(const int color)
 {
+	// generate piece moves
+	RegMove move;
 	const bool stmCk = incheck(color);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
 	const MoveFlags undoFlags = flags;
-	RegMoveNode item;
 
 	for (int idx = start; idx >= end; idx--) {
 		if (piece[idx] == DEAD)
 			continue;
 
 		const int8* const loc = genAll(piece[idx]);
-
 		for (int n = 0; loc[n] != -1; n++) {
-			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
-			item.move.to = loc[n];
-			item.move.from = piece[idx];
-			item.move.index = idx;
+			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
+			move.to = loc[n];
+			move.from = piece[idx];
+			move.index = idx;
 
 			// nothing special for promotion
-			make(item.move);
-			if (!incheckMove(item.move, color, stmCk)) {
-				unmake(item.move, undoFlags);
+			make(move);
+			if (!incheckMove(move, color, stmCk)) {
+				delete[] loc;
+				unmake(move, undoFlags);
 				return true;
 			}
-			unmake(item.move, undoFlags);
+			unmake(move, undoFlags);
 		}
 		delete[] loc;
 	}
@@ -440,33 +388,33 @@ bool Board<RegMove>::anyMoves(const int color)
 
 	// en passant to left
 	if (eps_file != 0 && square[eps - 1] == your_pawn) {
-		item.move.xindex = pieceIndex(eps, opp_pawn);
-		item.move.to = eps + 8 * opp_pawn;
-		item.move.from = eps - 1;
-		item.move.index = pieceIndex(eps - 1, your_pawn);
-		item.move.setEnPassant();
+		move.xindex = pieceIndex(eps, opp_pawn);
+		move.to = eps + 8 * opp_pawn;
+		move.from = eps - 1;
+		move.index = pieceIndex(eps - 1, your_pawn);
+		move.setEnPassant();
 
-		make(item.move);
+		make(move);
 		if (!incheck(color)) {
-			unmake(item.move, undoFlags);
+			unmake(move, undoFlags);
 			return true;
 		}
-		unmake(item.move, undoFlags);
+		unmake(move, undoFlags);
 	}
 	// en passant to right
 	if (eps_file != 7 && square[eps + 1] == your_pawn) {
-		item.move.xindex = pieceIndex(eps, opp_pawn);
-		item.move.to = eps + 8 * opp_pawn;
-		item.move.from = eps + 1;
-		item.move.index = pieceIndex(eps + 1, your_pawn);
-		item.move.setEnPassant();
+		move.xindex = pieceIndex(eps, opp_pawn);
+		move.to = eps + 8 * opp_pawn;
+		move.from = eps + 1;
+		move.index = pieceIndex(eps + 1, your_pawn);
+		move.setEnPassant();
 
-		make(item.move);
+		make(move);
 		if (!incheck(color)) {
-			unmake(item.move, undoFlags);
+			unmake(move, undoFlags);
 			return true;
 		}
-		unmake(item.move, undoFlags);
+		unmake(move, undoFlags);
 	}
 	return false;
 }
@@ -546,9 +494,7 @@ bool Board<RegMove>::validMove(const RegMove &moveIn, RegMove &move)
 	if (moveIn.from == moveIn.to)
 		return false;
 
-	const MoveFlags undoFlags = flags;
 	move = moveIn;
-
 	move.index = pieceIndex(move.from, square[move.from]);
 	if (move.index == NONE)
 		return false;
@@ -572,7 +518,8 @@ bool Board<RegMove>::validMove(const RegMove &moveIn, RegMove &move)
 	if (!fromto(move.from, move.to))
 		return false;
 
-	int ret = true;
+	bool ret = true;
+	const MoveFlags undoFlags = flags;
 
 	make(move);
 	// stm is opponent after make
@@ -586,8 +533,6 @@ bool Board<RegMove>::validMove(const RegMove &moveIn, RegMove &move)
 template<>
 int Board<RegMove>::validMove(const string &smove, const int color, RegMove &move)
 {
-	const MoveFlags undoFlags = flags;
-
 	// pre-setup move
 	if (!move.parse(smove))
 		return INVALID_FORMAT;
@@ -635,6 +580,7 @@ int Board<RegMove>::validMove(const string &smove, const int color, RegMove &mov
 		return INVALID_MOVEMENT;
 
 	int ret = VALID_MOVE;
+	const MoveFlags undoFlags = flags;
 
 	make(move);
 	// stm is opponent after make
@@ -643,12 +589,6 @@ int Board<RegMove>::validMove(const string &smove, const int color, RegMove &mov
 	unmake(move, undoFlags);
 
 	return ret;
-}
-
-template<>
-int Board<RegMove>::eval() const
-{
-	return (stm == WHITE)? -mscore : mscore;
 }
 
 template<>
@@ -678,7 +618,6 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 
 		for (int n = 0; loc[n] != -1; n++) {
 			RegMoveNode item;
-
 			item.move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			item.move.to = loc[n];
 			item.move.from = piece[idx];
@@ -812,7 +751,7 @@ void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int color)
 template<>
 RegMoveList* Board<RegMove>::getMoveList(const int color, const MoveClass movetype)
 {
-	RegMoveList *data = new RegMoveList;
+	RegMoveList* const data = new RegMoveList;
 	data->size = 0;
 
 	switch (movetype) {

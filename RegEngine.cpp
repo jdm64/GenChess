@@ -20,7 +20,8 @@
 template<>
 void Engine<RegMove>::pickRandomMove()
 {
-	int score = curr->list[0].score, end = 1;
+	const int score = curr->list[0].score;
+	int end = 1;
 
 	for (int i = 1; i < curr->size; i++) {
 		if (curr->list[i].score != score) {
@@ -34,7 +35,7 @@ void Engine<RegMove>::pickRandomMove()
 template<>
 int Engine<RegMove>::Quiescence(int alpha, int beta, int depth)
 {
-	RegMoveList *ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveClass::ALL : MoveClass::CAPTURE);
+	RegMoveList* const ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveClass::ALL : MoveClass::CAPTURE);
 	const MoveFlags undoFlags = board->getMoveFlags();
 
 	if (!ptr->size) {
@@ -73,7 +74,7 @@ int Engine<RegMove>::Quiescence(int alpha, int beta, int depth)
 
 // forward declaration
 template<>
-int Engine<RegMove>::NegaScout(int alpha, int beta, int depth, int limit);
+int Engine<RegMove>::NegaScout(int alpha, const int beta, const int depth, int limit);
 
 template<>
 bool Engine<RegMove>::NegaMoveType(int &alpha, const int beta, int &best,
@@ -105,7 +106,7 @@ bool Engine<RegMove>::NegaMoveType(int &alpha, const int beta, int &best,
 		}
 	}
 	// Try all of moveType Moves
-	RegMoveList *ptr = board->getMoveList(board->getStm(), type);
+	RegMoveList* const ptr = board->getMoveList(board->getStm(), type);
 
 	if (!ptr->size) {
 		delete ptr;
@@ -143,7 +144,7 @@ bool Engine<RegMove>::NegaMoveType(int &alpha, const int beta, int &best,
 }
 
 template<>
-int Engine<RegMove>::NegaScout(int alpha, int beta, int depth, int limit)
+int Engine<RegMove>::NegaScout(int alpha, const int beta, const int depth, int limit)
 {
 	const MoveFlags undoFlags = board->getMoveFlags();
 
@@ -205,7 +206,7 @@ hashMiss:
 }
 
 template<>
-void Engine<RegMove>::search(int alpha, int beta, int depth, int limit)
+void Engine<RegMove>::search(int alpha, const int beta, const int depth, const int limit)
 {
 	const MoveFlags undoFlags = board->getMoveFlags();
 	curr = curr? curr : board->getMoveList(board->getStm(), MoveClass::ALL);
@@ -228,53 +229,4 @@ void Engine<RegMove>::search(int alpha, int beta, int depth, int limit)
 		b = alpha + 1;
 	}
 	stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
-}
-
-template<>
-void Engine<RegMove>::debugTree()
-{
-	RegMoveList *ptr = new RegMoveList(*curr);
-	string cmd;
-	int mDepth = maxNg, cDepth = 0;
-	RegMove move;
-	vector<RegMove> mstack;
-
-	while (true) {
-		ptr->print();
-
-		cout << "<" << cDepth << "/" << mDepth << "> ";
-		cin >> cmd;
-
-		if (cmd == "quit") {
-			break;
-		} else if (cmd == "up") {
-		//	board->unmake(mstack.back());
-			mstack.pop_back();
-			cDepth--;
-			mDepth++;
-			delete ptr;
-			ptr = NULL;
-			NegaScout(-INT_MAX, INT_MAX, 0, mDepth);
-		} else if (cmd == "down") {
-			cin >> cmd;
-			if (board->validMove(cmd, board->getStm(), move) != VALID_MOVE) {
-				cout << "error\n";
-			} else {
-				mstack.push_back(move);
-				board->make(move);
-				cDepth++;
-				mDepth--;
-				delete ptr;
-				ptr = NULL;
-				NegaScout(-INT_MAX, INT_MAX, 0, mDepth);
-			}
-		} else {
-			cout << "error\n";
-		}
-	}
-	for (unsigned int i = 0; i < mstack.size(); i++) {
-	//	board->unmake(mstack.back());
-                mstack.pop_back();
-	}
-	delete ptr;
 }

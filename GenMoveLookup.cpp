@@ -23,8 +23,8 @@ template<>
 int8* MoveLookup<GenMove>::genAll(const int From) const
 {
 	const int type = ABS(square[From]);
+	int8* const list = new int8[28];
 	int8 *offset = offsets[type];
-	int8 *list = new int8[28];
 	int next = 0;
 
 	if (type == PAWN) {
@@ -47,8 +47,8 @@ template<>
 int8* MoveLookup<GenMove>::genCapture(const int From) const
 {
 	const int type = ABS(square[From]);
-	int8 *offset = offsets[type];
-	int8 *list = new int8[28];
+	int8* const list = new int8[28];
+	int8* offset = offsets[type];
 	int next = 0;
 
 	if (type == PAWN) {
@@ -71,8 +71,8 @@ template<>
 int8* MoveLookup<GenMove>::genMove(const int From) const
 {
 	const int type = ABS(square[From]);
+	int8* const list = new int8[28];
 	int8 *offset = offsets[type];
-	int8 *list = new int8[28];
 	int next = 0;
 
 	if (type == PAWN) {
@@ -121,9 +121,9 @@ bool MoveLookup<GenMove>::attackLine_Bishop(const DistDB &db, const int From, co
 			continue;
 		else if (OWN_PIECE(square[From], square[to]))
 			return false;
-		else if (k == 1 && (ABS(square[to]) == PAWN || ABS(square[to]) == KING))
-			return true;
 		else if (ABS(square[to]) == BISHOP || ABS(square[to]) == QUEEN)
+			return true;
+		else if (k == 1 && (ABS(square[to]) == PAWN || ABS(square[to]) == KING))
 			return true;
 		break;
 	}
@@ -133,7 +133,6 @@ bool MoveLookup<GenMove>::attackLine_Bishop(const DistDB &db, const int From, co
 template<>
 bool MoveLookup<GenMove>::isAttacked(const int From) const
 {
-	// BISHOP
 	int8 *offset = offsets[BISHOP];
 	for (; *offset; offset++) {
 		for (int to = From + *offset, k = 1; !(to & 0x88); to += *offset, k++) {
@@ -141,12 +140,11 @@ bool MoveLookup<GenMove>::isAttacked(const int From) const
 				continue;
 			else if (OWN_PIECE(square[From], square[to]))
 				break;
-			else if (k == 1 && (ABS(square[to]) == PAWN || ABS(square[to]) == KING))
-				return true;
 			else if (ABS(square[to]) == BISHOP || ABS(square[to]) == QUEEN)
 				return true;
-			else
-				break;
+			else if (k == 1 && (ABS(square[to]) == PAWN || ABS(square[to]) == KING))
+				return true;
+			break;
 		}
 	}
 	return isAttacked_xBishop(From, square[From]);
