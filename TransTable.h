@@ -18,6 +18,7 @@
 #ifndef __TRANS_TABLE_H__
 #define __TRANS_TABLE_H__
 
+#include <cassert>
 #include "Board.h"
 #include "Rand64.h"
 

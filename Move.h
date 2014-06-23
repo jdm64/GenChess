@@ -19,7 +19,7 @@
 #define __MOVE_H__
 
 #include <iostream>
-#include <boost/array.hpp>
+#include <array>
 #include "Defines.h"
 
 using namespace std;
@@ -112,7 +112,7 @@ typedef MoveNode<RegMove> RegMoveNode;
 template<class MoveType>
 struct MoveList
 {
-	boost::array<MoveNode<MoveType>, 320> list;
+	array<MoveNode<MoveType>, 320> list;
 	int size;
 
 	MoveList() : size(0) {}
