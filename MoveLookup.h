@@ -42,16 +42,17 @@ class MoveLookup : public BB
 protected:
 	bool attackLine_Bishop(const DistDB &db, const int From, const int To) const;
 
-	int8* genAll(const int From) const;
+	array<int8,28> genAll(const int From) const;
 
-	int8* genCapture(const int From) const;
+	array<int8,28> genCapture(const int From) const;
 
-	int8* genMove(const int From) const;
+	array<int8,28> genMove(const int From) const;
 
 	bool fromto(const int From, const int To) const;
 
-	int genAll_xPawn(int8* const list, int8* offset, const int From, const int type) const
+	array<int8,28> genAll_xPawn(int8* offset, const int From, const int type) const
 	{
+		array<int8,28> list;
 		int next = 0, i = 0;
 
 		switch (type) {
@@ -81,11 +82,13 @@ protected:
 			}
 			break;
 		}
-		return next;
+		list[next] = -1;
+		return list;
 	}
 
-	int genCapture_xPawn(int8* const list, int8* offset, const int From, const int type) const
+	array<int8,28> genCapture_xPawn(int8* offset, const int From, const int type) const
 	{
+		array<int8,28> list;
 		int next = 0, i = 0;
 
 		switch (type) {
@@ -113,11 +116,13 @@ protected:
 			}
 			break;
 		}
-		return next;
+		list[next] = -1;
+		return list;
 	}
 
-	int genMove_xPawn(int8* const list, int8* offset, const int From, const int type) const
+	array<int8,28> genMove_xPawn(int8* offset, const int From, const int type) const
 	{
+		array<int8,28> list;
 		int next = 0, i = 0;
 
 		switch (type) {
@@ -144,7 +149,8 @@ protected:
 			}
 			break;
 		}
-		return next;
+		list[next] = -1;
+		return list;
 	}
 
 	bool fromto_xPawn(const int From, const int To, const int type, int8* const offset) const

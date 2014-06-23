@@ -265,7 +265,7 @@ bool Board<GenMove>::anyMoves(const int color)
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
 
-		const int8* const loc = genAll(piece[idx]);
+		auto loc = genAll(piece[idx]);
 		for (int n = 0; loc[n] != -1; n++) {
 			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			move.to = loc[n];
@@ -274,13 +274,11 @@ bool Board<GenMove>::anyMoves(const int color)
 
 			make(move);
 			if (!incheckMove(move, color, stmCk)) {
-				delete[] loc;
 				unmake(move);
 				return true;
 			}
 			unmake(move);
 		}
-		delete[] loc;
 	}
 	// generate piece place moves
 	for (int type = PAWN; type <= KING; type++) {
@@ -430,7 +428,7 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
 
-		int8 *loc;
+		array<int8,28> loc;
 		switch (movetype) {
 		case MoveClass::ALL:
 		default:
@@ -459,7 +457,6 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 			}
 			unmake(item.move);
 		}
-		delete[] loc;
 	}
 }
 

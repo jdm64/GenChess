@@ -20,13 +20,13 @@
 #include "MoveLookup.h"
 
 template<>
-int8* MoveLookup<RegMove>::genAll(const int From) const
+array<int8,28> MoveLookup<RegMove>::genAll(const int From) const
 {
 	const int type = ABS(square[From]);
-	int8* const list = new int8[28];
-	int next = 0;
 
 	if (type == PAWN) {
+		array<int8,28> list;
+		int next = 0;
 		if (square[From] == WHITE_PAWN) { // WHITE
 			if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 15]))
 				list[next++] = From + 15;
@@ -48,21 +48,21 @@ int8* MoveLookup<RegMove>::genAll(const int From) const
 					list[next++] = From - 32;
 			}
 		}
+		list[next] = -1;
+		return list;
 	} else {
-		next = genAll_xPawn(list, offsets[type], From, type);
+		return genAll_xPawn(offsets[type], From, type);
 	}
-	list[next] = -1;
-	return list;
 }
 
 template<>
-int8* MoveLookup<RegMove>::genCapture(const int From) const
+array<int8,28> MoveLookup<RegMove>::genCapture(const int From) const
 {
 	const int type = ABS(square[From]);
-	int8* const list = new int8[28];
-	int next = 0;
 
 	if (type == PAWN) {
+		array<int8,28> list;
+		int next = 0;
 		if (square[From] == WHITE_PAWN) { // WHITE
 			if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 15]))
 				list[next++] = From + 15;
@@ -74,21 +74,21 @@ int8* MoveLookup<RegMove>::genCapture(const int From) const
 			if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From - 15]))
 				list[next++] = From - 15;
 		}
+		list[next] = -1;
+		return list;
 	} else {
-		next = genCapture_xPawn(list, offsets[type], From, type);
+		return genCapture_xPawn(offsets[type], From, type);
 	}
-	list[next] = -1;
-	return list;
 }
 
 template<>
-int8* MoveLookup<RegMove>::genMove(const int From) const
+array<int8,28> MoveLookup<RegMove>::genMove(const int From) const
 {
 	const int type = ABS(square[From]);
-	int8* const list = new int8[28];
-	int next = 0;
 
 	if (type == PAWN) {
+		array<int8,28> list;
+		int next = 0;
 		if (square[From] == WHITE_PAWN) { // WHITE
 			if (!square[From + 16]) {
 				list[next++] = From + 16;
@@ -102,11 +102,11 @@ int8* MoveLookup<RegMove>::genMove(const int From) const
 					list[next++] = From - 32;
 			}
 		}
+		list[next] = -1;
+		return list;
 	} else {
-		next = genMove_xPawn(list, offsets[type], From, type);
+		return genMove_xPawn(offsets[type], From, type);
 	}
-	list[next] = -1;
-	return list;
 }
 
 template<>

@@ -342,7 +342,7 @@ bool Board<RegMove>::anyMoves(const int color)
 		if (piece[idx] == DEAD)
 			continue;
 
-		const int8* const loc = genAll(piece[idx]);
+		auto loc = genAll(piece[idx]);
 		for (int n = 0; loc[n] != -1; n++) {
 			move.xindex = (square[loc[n]] == EMPTY)? NONE : pieceIndex(loc[n], square[loc[n]]);
 			move.to = loc[n];
@@ -352,13 +352,11 @@ bool Board<RegMove>::anyMoves(const int color)
 			// nothing special for promotion
 			make(move);
 			if (!incheckMove(move, color, stmCk)) {
-				delete[] loc;
 				unmake(move, undoFlags);
 				return true;
 			}
 			unmake(move, undoFlags);
 		}
-		delete[] loc;
 	}
 
 	// can't castle while in check
@@ -602,7 +600,7 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 		if (piece[idx] == DEAD)
 			continue;
 
-		int8 *loc;
+		array<int8,28> loc;
 		switch (movetype) {
 		case MoveClass::ALL:
 		default:
@@ -656,7 +654,6 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 				unmake(item.move, undoFlags);
 			}
 		}
-		delete[] loc;
 	}
 }
 

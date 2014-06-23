@@ -20,14 +20,14 @@
 #include "MoveLookup.h"
 
 template<>
-int8* MoveLookup<GenMove>::genAll(const int From) const
+array<int8,28> MoveLookup<GenMove>::genAll(const int From) const
 {
 	const int type = ABS(square[From]);
-	int8* const list = new int8[28];
 	int8 *offset = offsets[type];
-	int next = 0;
 
 	if (type == PAWN) {
+		array<int8,28> list;
+		int next = 0;
 		for (bool evn = true; *offset; offset++, evn ^= true) {
 			const int to = From + *offset;
 			if (to & 0x88)
@@ -36,22 +36,22 @@ int8* MoveLookup<GenMove>::genAll(const int From) const
 			if (val)
 				list[next++] = to;
 		}
+		list[next] = -1;
+		return list;
 	} else {
-		next = genAll_xPawn(list, offset, From, type);
+		return genAll_xPawn(offset, From, type);
 	}
-	list[next] = -1;
-	return list;
 }
 
 template<>
-int8* MoveLookup<GenMove>::genCapture(const int From) const
+array<int8,28> MoveLookup<GenMove>::genCapture(const int From) const
 {
 	const int type = ABS(square[From]);
-	int8* const list = new int8[28];
 	int8* offset = offsets[type];
-	int next = 0;
 
 	if (type == PAWN) {
+		array<int8,28> list;
+		int next = 0;
 		// captures
 		for (; *offset; offset += 2) {
 			const int to = From + *offset;
@@ -60,22 +60,22 @@ int8* MoveLookup<GenMove>::genCapture(const int From) const
 			else if (CAPTURE_MOVE(square[From], square[to]))
 				list[next++] = to;
 		}
+		list[next] = -1;
+		return list;
 	} else {
-		next = genCapture_xPawn(list, offset, From, type);
+		return genCapture_xPawn(offset, From, type);
 	}
-	list[next] = -1;
-	return list;
 }
 
 template<>
-int8* MoveLookup<GenMove>::genMove(const int From) const
+array<int8,28> MoveLookup<GenMove>::genMove(const int From) const
 {
 	const int type = ABS(square[From]);
-	int8* const list = new int8[28];
 	int8 *offset = offsets[type];
-	int next = 0;
 
 	if (type == PAWN) {
+		array<int8,28> list;
+		int next = 0;
 		// moves
 		for (offset++; *offset; offset += 2) {
 			const int to = From + *offset;
@@ -84,11 +84,11 @@ int8* MoveLookup<GenMove>::genMove(const int From) const
 			else if (square[to] == EMPTY)
 				list[next++] = to;
 		}
+		list[next] = -1;
+		return list;
 	} else {
-		next = genMove_xPawn(list, offset, From, type);
+		return genMove_xPawn(offset, From, type);
 	}
-	list[next] = -1;
-	return list;
 }
 
 template<>
