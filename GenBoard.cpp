@@ -119,12 +119,12 @@ void Board<GenMove>::reset()
 	memset(square, EMPTY, 128);
 	memset(piece, PLACEABLE, 32);
 	copy(InitPieceType, InitPieceType + 32, piecetype);
-#ifdef TT_ENABLED
+
 	key = startHash;
 	key += hashBox[WTM_HASH];
 	for (int i = HOLD_START; i < HOLD_END; i++)
 		key += hashBox[i];
-#endif
+
 	stm = WHITE;
 	ply = 0;
 	rebuildScore();
@@ -133,7 +133,6 @@ void Board<GenMove>::reset()
 template<>
 void Board<GenMove>::rebuildHash()
 {
-#ifdef TT_ENABLED
 	key = startHash;
 	key += (stm == WHITE)? hashBox[WTM_HASH] : 0;
 
@@ -150,7 +149,6 @@ void Board<GenMove>::rebuildHash()
 			break;
 		}
 	}
-#endif
 }
 
 template<>
@@ -197,7 +195,6 @@ void Board<GenMove>::make(const GenMove &move)
 		piece[move.xindex] = DEAD;
 	}
 
-#ifdef TT_ENABLED
 	int to = EE64(move.to);
 	int from = EE64(move.from);
 
@@ -209,7 +206,7 @@ void Board<GenMove>::make(const GenMove &move)
 		key -= hashBox[HOLD_START + typeLookup[move.index]];
 	if (move.xindex != NONE)
 		key -= hashBox[12 * to + typeLookup[move.xindex]];
-#endif
+
 	stm ^= -2;
 	ply++;
 }
@@ -232,7 +229,6 @@ void Board<GenMove>::unmake(const GenMove &move)
 		mscore -= stm * genLocValue[ABS(square[move.from])][EE64F(move.from)];
 	}
 
-#ifdef TT_ENABLED
 	int to = EE64(move.to);
 	int from = EE64(move.from);
 
@@ -244,7 +240,7 @@ void Board<GenMove>::unmake(const GenMove &move)
 		key += hashBox[HOLD_START + typeLookup[move.index]];
 	if (move.xindex != NONE)
 		key += hashBox[12 * to + typeLookup[move.xindex]];
-#endif
+
 	stm ^= -2;
 	ply--;
 }

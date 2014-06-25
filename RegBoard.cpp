@@ -114,9 +114,9 @@ void Board<RegMove>::reset()
 
 	for (int i = 0; i < 32; i++)
 		square[piece[i]] = piecetype[i];
-#ifdef TT_ENABLED
+
 	key = startHash;
-#endif
+
 	stm = WHITE;
 	ply = 0;
 	flags.reset();
@@ -126,7 +126,6 @@ void Board<RegMove>::reset()
 template<>
 void Board<RegMove>::rebuildHash()
 {
-#ifdef TT_ENABLED
 	key = startHash;
 	key ^= (stm == WHITE)? hashBox[WTM_HASH] : 0;
 
@@ -139,7 +138,6 @@ void Board<RegMove>::rebuildHash()
 	key ^= (flags.bits & BK_CASTLE)? hashBox[CASTLE_HASH + BLACK] : 0;
 	key ^= (flags.bits & WQ_CASTLE)? hashBox[CASTLE_HASH + 2 * WHITE] : 0;
 	key ^= (flags.bits & BQ_CASTLE)? hashBox[CASTLE_HASH + 2 * BLACK] : 0;
-#endif
 }
 
 template<>
@@ -172,21 +170,21 @@ template<>
 void Board<RegMove>::make(const RegMove &move)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
-#ifdef TT_ENABLED
+
 	key ^= hashBox[13 * EE64(move.from) + piecetype[move.index] + 6];
-#endif
+
 	if (move.getCastle()) {
 		bool left = (move.getCastle() == CASTLE_QS);
 		int castleTo = move.to + (left? 1 : -1);
 		int castleI = pieceIndex(move.to - (move.to & EP_FILE) + (left? 0 : 7), color * ROOK);
-#ifdef TT_ENABLED
+
 		key ^= hashBox[13 * EE64(piece[castleI]) + piecetype[castleI] + 6];
 		key ^= hashBox[13 * EE64(castleTo) + piecetype[castleI] + 6];
 		if (flags.canKingCastle(color))
 			key ^= hashBox[CASTLE_HASH + color];
 		if (flags.canQueenCastle(color))
 			key ^= hashBox[CASTLE_HASH + color * 2];
-#endif
+
 		mscore += stm * regLocValue[ROOK][EE64(castleTo)];
 		mscore -= stm * regLocValue[ROOK][EE64(castleI)];
 		square[castleTo] = piecetype[castleI];
@@ -196,35 +194,25 @@ void Board<RegMove>::make(const RegMove &move)
 	} else if (ABS(piecetype[move.index]) == ROOK) {
 		if (move.from == (isWhite? H1:H8) && flags.canKingCastle(color)) {
 			flags.clearKingCastle(color);
-#ifdef TT_ENABLED
 			key ^= hashBox[CASTLE_HASH + color];
-#endif
 		} else if (move.from == (isWhite? A1:A8) && flags.canQueenCastle(color)) {
 			flags.clearQueenCastle(color);
-#ifdef TT_ENABLED
 			key ^= hashBox[CASTLE_HASH + color * 2];
-#endif
 		}
 	} else if (ABS(piecetype[move.index]) == KING && flags.canCastle(color)) {
-#ifdef TT_ENABLED
 		if (flags.canKingCastle(color))
 			key ^= hashBox[CASTLE_HASH + color];
 		if (flags.canQueenCastle(color))
 			key ^= hashBox[CASTLE_HASH + color * 2];
-#endif
 		flags.clearCastle(color);
 	} else if (move.getPromote()) {
 		piecetype[move.index] = move.getPromote() * color;
 	}
-#ifdef TT_ENABLED
 	key ^= hashBox[13 * EE64(move.to) + piecetype[move.index] + 6];
-#endif
 
 	if (flags.canEnPassant()) {
 		flags.clearEnPassant();
-#ifdef TT_ENABLED
 		key ^= hashBox[ENPASSANT_HASH];
-#endif
 	}
 
 	// update board information
@@ -235,9 +223,8 @@ void Board<RegMove>::make(const RegMove &move)
 	// update piece information
 	piece[move.index] = move.to;
 	if (move.xindex != NONE) {
-#ifdef TT_ENABLED
 		key ^= hashBox[13 * EE64(piece[move.xindex]) + piecetype[move.xindex] + 6];
-#endif
+
 		mscore += stm * regLocValue[ABS(piecetype[move.xindex])][EE64F(piece[move.xindex])];
 		mscore += stm * regPieceValue[ABS(piecetype[move.xindex])];
 
@@ -246,13 +233,10 @@ void Board<RegMove>::make(const RegMove &move)
 		piece[move.xindex] = DEAD;
 	} else if (ABS(piecetype[move.index]) == PAWN && ABS(move.to - move.from) == 32) {
 		flags.setEnPassant(move.to & EP_FILE);
-#ifdef TT_ENABLED
 		key ^= hashBox[ENPASSANT_HASH];
-#endif
 	}
-#ifdef TT_ENABLED
 	key ^= hashBox[WTM_HASH];
-#endif
+
 	stm ^= -2;
 	ply++;
 }
@@ -262,22 +246,20 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 {
 	const int isWhite = (move.index > 15), color = isWhite? WHITE : BLACK;
 
-#ifdef TT_ENABLED
 	const int bits = flags.bits ^ undoFlags.bits;
 	key ^= (bits & ((color == WHITE)? WK_CASTLE : BK_CASTLE))? hashBox[CASTLE_HASH + color] : 0;
 	key ^= (bits & ((color == WHITE)? WQ_CASTLE : BQ_CASTLE))? hashBox[CASTLE_HASH + 2 * color] : 0;
 	key ^= (bits & CAN_EP)? hashBox[ENPASSANT_HASH] : 0;
 	key ^= hashBox[13 * EE64(move.to) + piecetype[move.index] + 6];
-#endif
 
 	if (move.getCastle()) {
 		bool left = (move.from - move.to > 0);
 		int castleFrom = move.to - (move.to & EP_FILE) + (left? 0 : 7);
 		int castleI = pieceIndex(move.to + (left? 1 : -1), isWhite? WHITE_ROOK : BLACK_ROOK);
-#ifdef TT_ENABLED
+
 		key ^= hashBox[13 * EE64(piece[castleI]) + piecetype[castleI] + 6];
 		key ^= hashBox[13 * EE64(castleFrom) + piecetype[castleI] + 6];
-#endif
+
 		mscore += stm * regLocValue[ROOK][EE64(castleFrom)];
 		mscore -= stm * regLocValue[ROOK][EE64(castleI)];
 		square[piece[castleI]] = EMPTY;
@@ -286,9 +268,7 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 	} else if (move.getPromote()) {
 		piecetype[move.index] = PAWN * color;
 	}
-#ifdef TT_ENABLED
 	key ^= hashBox[13 * EE64(move.from) + piecetype[move.index] + 6];
-#endif
 
 	piece[move.index] = move.from;
 	mscore += stm * regLocValue[ABS(square[move.to])][EE64F(move.to)];
@@ -305,15 +285,14 @@ void Board<RegMove>::unmake(const RegMove &move, const MoveFlags &undoFlags)
 		}
 		mscore += stm * regLocValue[ABS(piecetype[move.xindex])][EE64F(piece[move.xindex])];
 		mscore += stm * regPieceValue[ABS(piecetype[move.xindex])];
-#ifdef TT_ENABLED
+
 		key ^= hashBox[13 * EE64(piece[move.xindex]) + piecetype[move.xindex] + 6];
-#endif
 	}
 	square[move.from] = piecetype[move.index];
 	mscore -= stm * regLocValue[ABS(square[move.from])][EE64F(move.from)];
-#ifdef TT_ENABLED
+
 	key ^= hashBox[WTM_HASH];
-#endif
+
 	flags = undoFlags;
 	stm ^= -2;
 	ply--;

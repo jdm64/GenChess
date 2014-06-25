@@ -21,8 +21,6 @@
 #include <sstream>
 #include "Position.h"
 
-#define TT_ENABLED
-
 extern const int genPieceValue[7];
 
 extern const int genLocValue[7][64];
