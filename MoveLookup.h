@@ -42,18 +42,19 @@ class MoveLookup : public BB
 protected:
 	bool attackLine_Bishop(const DistDB &db, const int From, const int To) const;
 
-	array<int8,28> genAll(const int From) const;
+	array<int8,28> genAll_Pawn(const int From) const;
 
-	array<int8,28> genCapture(const int From) const;
+	array<int8,28> genAll(const int From) const
+	{
+		const int type = ABS(square[From]);
+		return type == PAWN? genAll_Pawn(From) : genAll_xPawn(From, type);
+	}
 
-	array<int8,28> genMove(const int From) const;
-
-	bool fromto(const int From, const int To) const;
-
-	array<int8,28> genAll_xPawn(int8* offset, const int From, const int type) const
+	array<int8,28> genAll_xPawn(const int From, const int type) const
 	{
 		array<int8,28> list;
 		int next = 0, i = 0;
+		int8 *offset = offsets[type];
 
 		switch (type) {
 		case BISHOP:
@@ -86,10 +87,19 @@ protected:
 		return list;
 	}
 
-	array<int8,28> genCapture_xPawn(int8* offset, const int From, const int type) const
+	array<int8,28> genCapture_Pawn(const int From) const;
+
+	array<int8,28> genCapture(const int From) const
+	{
+		const int type = ABS(square[From]);
+		return type == PAWN? genCapture_Pawn(From) : genCapture_xPawn(From, type);
+	}
+
+	array<int8,28> genCapture_xPawn(const int From, const int type) const
 	{
 		array<int8,28> list;
 		int next = 0, i = 0;
+		int8* offset = offsets[type];
 
 		switch (type) {
 		case KNIGHT:
@@ -120,10 +130,19 @@ protected:
 		return list;
 	}
 
-	array<int8,28> genMove_xPawn(int8* offset, const int From, const int type) const
+	array<int8,28> genMove_Pawn(const int From) const;
+
+	array<int8,28> genMove(const int From) const
+	{
+		const int type = ABS(square[From]);
+		return type == PAWN? genMove_Pawn(From) : genMove_xPawn(From, type);
+	}
+
+	array<int8,28> genMove_xPawn(const int From, const int type) const
 	{
 		array<int8,28> list;
 		int next = 0, i = 0;
+		int8 *offset = offsets[type];
 
 		switch (type) {
 		case KNIGHT:
@@ -153,9 +172,21 @@ protected:
 		return list;
 	}
 
-	bool fromto_xPawn(const int From, const int To, const int type, int8* const offset) const
+	bool fromto_Pawn(const int From, const int to) const;
+
+	bool fromto(const int From, const int To) const
+	{
+		if ((From | To) & 0x88)
+			return false;
+
+		const int type = ABS(square[From]);
+		return type == PAWN? fromto_Pawn(From, To) : fromto_xPawn(From, To, type);
+	}
+
+	bool fromto_xPawn(const int From, const int To, const int type) const
 	{
 		int diff = ABS(From - To), n = 2;
+		int8 *offset = offsets[type];
 
 		switch (type) {
 		case KNIGHT:

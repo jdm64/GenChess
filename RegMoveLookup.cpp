@@ -20,126 +20,105 @@
 #include "MoveLookup.h"
 
 template<>
-array<int8,28> MoveLookup<RegMove>::genAll(const int From) const
+array<int8,28> MoveLookup<RegMove>::genAll_Pawn(const int From) const
 {
-	const int type = ABS(square[From]);
+	array<int8,28> list;
+	int next = 0;
 
-	if (type == PAWN) {
-		array<int8,28> list;
-		int next = 0;
-		if (square[From] == WHITE_PAWN) { // WHITE
-			if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 15]))
-				list[next++] = From + 15;
-			if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From + 17]))
-				list[next++] = From + 17;
-			if (!square[From + 16]) {
-				list[next++] = From + 16;
-				if (From <= H2 && !square[From + 32])
-					list[next++] = From + 32;
-			}
-		} else { // BLACK
-			if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From - 17]))
-				list[next++] = From - 17;
-			if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From - 15]))
-				list[next++] = From - 15;
-			if (!square[From - 16]) {
-				list[next++] = From - 16;
-				if (From >= A7 && !square[From - 32])
-					list[next++] = From - 32;
-			}
+	if (square[From] == WHITE_PAWN) { // WHITE
+		if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 15]))
+			list[next++] = From + 15;
+		if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From + 17]))
+			list[next++] = From + 17;
+		if (!square[From + 16]) {
+			list[next++] = From + 16;
+			if (From <= H2 && !square[From + 32])
+				list[next++] = From + 32;
 		}
-		list[next] = -1;
-		return list;
-	} else {
-		return genAll_xPawn(offsets[type], From, type);
+	} else { // BLACK
+		if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From - 17]))
+			list[next++] = From - 17;
+		if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From - 15]))
+			list[next++] = From - 15;
+		if (!square[From - 16]) {
+			list[next++] = From - 16;
+			if (From >= A7 && !square[From - 32])
+				list[next++] = From - 32;
+		}
 	}
+	list[next] = -1;
+	return list;
 }
 
 template<>
-array<int8,28> MoveLookup<RegMove>::genCapture(const int From) const
+array<int8,28> MoveLookup<RegMove>::genCapture_Pawn(const int From) const
 {
-	const int type = ABS(square[From]);
+	array<int8,28> list;
+	int next = 0;
 
-	if (type == PAWN) {
-		array<int8,28> list;
-		int next = 0;
-		if (square[From] == WHITE_PAWN) { // WHITE
-			if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 15]))
-				list[next++] = From + 15;
-			if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From + 17]))
-				list[next++] = From + 17;
-		} else { // BLACK
-			if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From - 17]))
-				list[next++] = From - 17;
-			if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From - 15]))
-				list[next++] = From - 15;
-		}
-		list[next] = -1;
-		return list;
-	} else {
-		return genCapture_xPawn(offsets[type], From, type);
+	if (square[From] == WHITE_PAWN) { // WHITE
+		if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 15]))
+			list[next++] = From + 15;
+		if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From + 17]))
+			list[next++] = From + 17;
+	} else { // BLACK
+		if (COL(From) != 0 && CAPTURE_MOVE(square[From], square[From - 17]))
+			list[next++] = From - 17;
+		if (COL(From) != 7 && CAPTURE_MOVE(square[From], square[From - 15]))
+			list[next++] = From - 15;
 	}
+	list[next] = -1;
+	return list;
 }
 
 template<>
-array<int8,28> MoveLookup<RegMove>::genMove(const int From) const
+array<int8,28> MoveLookup<RegMove>::genMove_Pawn(const int From) const
 {
-	const int type = ABS(square[From]);
+	array<int8,28> list;
+	int next = 0;
 
-	if (type == PAWN) {
-		array<int8,28> list;
-		int next = 0;
-		if (square[From] == WHITE_PAWN) { // WHITE
-			if (!square[From + 16]) {
-				list[next++] = From + 16;
-				if (From <= H2 && !square[From + 32])
-					list[next++] = From + 32;
-			}
-		} else { // BLACK
-			if (!square[From - 16]) {
-				list[next++] = From - 16;
-				if (From >= A7 && !square[From - 32])
-					list[next++] = From - 32;
-			}
+	if (square[From] == WHITE_PAWN) { // WHITE
+		if (!square[From + 16]) {
+			list[next++] = From + 16;
+			if (From <= H2 && !square[From + 32])
+				list[next++] = From + 32;
 		}
-		list[next] = -1;
-		return list;
-	} else {
-		return genMove_xPawn(offsets[type], From, type);
+	} else { // BLACK
+		if (!square[From - 16]) {
+			list[next++] = From - 16;
+			if (From >= A7 && !square[From - 32])
+				list[next++] = From - 32;
+		}
 	}
+	list[next] = -1;
+	return list;
 }
 
 template<>
-bool MoveLookup<RegMove>::fromto(const int From, const int To) const
+bool MoveLookup<RegMove>::fromto_Pawn(const int From, const int To) const
 {
-	const int type = ABS(square[From]);
-
-	if (type == PAWN) {
-		if (square[From] == WHITE_PAWN) { // WHITE
-			if (From + 15 == To && COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 15]))
+	if (square[From] == WHITE_PAWN) { // WHITE
+		if (From + 15 == To && COL(From) != 0 && CAPTURE_MOVE(square[From], square[From + 15]))
+			return true;
+		if (From + 17 == To && COL(From) != 7 && CAPTURE_MOVE(square[From], square[From + 17]))
+			return true;
+		if (!square[From + 16]) {
+			if (From + 16 == To)
 				return true;
-			if (From + 17 == To && COL(From) != 7 && CAPTURE_MOVE(square[From], square[From + 17]))
+			if (From + 32 == To && From <= H2 && !square[From + 32])
 				return true;
-			if (!square[From + 16]) {
-				if (From + 16 == To)
-					return true;
-				if (From + 32 == To && From <= H2 && !square[From + 32])
-					return true;
-			}
-		} else { // BLACK
-			if (From - 17 == To && COL(From) != 0 && CAPTURE_MOVE(square[From], square[From - 17]))
-				return true;
-			if (From - 15 == To && COL(From) != 7 && CAPTURE_MOVE(square[From], square[From - 15]))
-				return true;
-			if (!square[From - 16]) {
-				if (From - 16 == To)
-					return true;
-				else if (From - 32 == To && From >= A7 && !square[From - 32])
-					return true;
-			}
 		}
-	} else {
-		return fromto_xPawn(From, To, type, offsets[type]);
+	} else { // BLACK
+		if (From - 17 == To && COL(From) != 0 && CAPTURE_MOVE(square[From], square[From - 17]))
+			return true;
+		if (From - 15 == To && COL(From) != 7 && CAPTURE_MOVE(square[From], square[From - 15]))
+			return true;
+		if (!square[From - 16]) {
+			if (From - 16 == To)
+				return true;
+			else if (From - 32 == To && From >= A7 && !square[From - 32])
+				return true;
+		}
 	}
 	return false;
 }

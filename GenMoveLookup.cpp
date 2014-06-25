@@ -20,94 +20,65 @@
 #include "MoveLookup.h"
 
 template<>
-array<int8,28> MoveLookup<GenMove>::genAll(const int From) const
+array<int8,28> MoveLookup<GenMove>::genAll_Pawn(const int From) const
 {
-	const int type = ABS(square[From]);
-	int8 *offset = offsets[type];
+	array<int8,28> list;
+	int next = 0;
+	int8 *offset = offsets[PAWN];
 
-	if (type == PAWN) {
-		array<int8,28> list;
-		int next = 0;
-		for (bool evn = true; *offset; offset++, evn ^= true) {
-			const int to = From + *offset;
-			if (to & 0x88)
-				continue;
-			const bool val = evn? CAPTURE_MOVE(square[From], square[to]) : (square[to] == EMPTY);
-			if (val)
-				list[next++] = to;
-		}
-		list[next] = -1;
-		return list;
-	} else {
-		return genAll_xPawn(offset, From, type);
+	for (bool evn = true; *offset; offset++, evn ^= true) {
+		const int to = From + *offset;
+		if (to & 0x88)
+			continue;
+		const bool val = evn? CAPTURE_MOVE(square[From], square[to]) : (square[to] == EMPTY);
+		if (val)
+			list[next++] = to;
 	}
+	list[next] = -1;
+	return list;
 }
 
 template<>
-array<int8,28> MoveLookup<GenMove>::genCapture(const int From) const
+array<int8,28> MoveLookup<GenMove>::genCapture_Pawn(const int From) const
 {
-	const int type = ABS(square[From]);
-	int8* offset = offsets[type];
+	array<int8,28> list;
+	int next = 0;
 
-	if (type == PAWN) {
-		array<int8,28> list;
-		int next = 0;
-		// captures
-		for (; *offset; offset += 2) {
-			const int to = From + *offset;
-			if (to & 0x88)
-				continue;
-			else if (CAPTURE_MOVE(square[From], square[to]))
-				list[next++] = to;
-		}
-		list[next] = -1;
-		return list;
-	} else {
-		return genCapture_xPawn(offset, From, type);
+	for (int8 *offset = offsets[PAWN]; *offset; offset += 2) {
+		const int to = From + *offset;
+		if (to & 0x88)
+			continue;
+		else if (CAPTURE_MOVE(square[From], square[to]))
+			list[next++] = to;
 	}
+	list[next] = -1;
+	return list;
 }
 
 template<>
-array<int8,28> MoveLookup<GenMove>::genMove(const int From) const
+array<int8,28> MoveLookup<GenMove>::genMove_Pawn(const int From) const
 {
-	const int type = ABS(square[From]);
-	int8 *offset = offsets[type];
+	array<int8,28> list;
+	int next = 0;
 
-	if (type == PAWN) {
-		array<int8,28> list;
-		int next = 0;
-		// moves
-		for (offset++; *offset; offset += 2) {
-			const int to = From + *offset;
-			if (to & 0x88)
-				continue;
-			else if (square[to] == EMPTY)
-				list[next++] = to;
-		}
-		list[next] = -1;
-		return list;
-	} else {
-		return genMove_xPawn(offset, From, type);
+	for (int8 *offset = &offsets[PAWN][1]; *offset; offset += 2) {
+		const int to = From + *offset;
+		if (to & 0x88)
+			continue;
+		else if (square[to] == EMPTY)
+			list[next++] = to;
 	}
+	list[next] = -1;
+	return list;
 }
 
 template<>
-bool MoveLookup<GenMove>::fromto(const int From, const int To) const
+bool MoveLookup<GenMove>::fromto_Pawn(const int From, const int To) const
 {
-	if ((From | To) & 0x88)
-		return false;
-
-	const int type = ABS(square[From]);
-	int8 *offset = offsets[type];
-
-	if (type == PAWN) {
-		const int diff = ABS(From - To);
-		for (int i = 0; i < 4; i++) {
-			if (diff == offset[i])
-				return ((i%2)? (square[To] == EMPTY) : CAPTURE_MOVE(square[From], square[To]));
-		}
-	} else {
-		return fromto_xPawn(From, To, type, offset);
+	const int diff = ABS(From - To);
+	for (int i = 0; i < 4; i++) {
+		if (diff == offsets[PAWN][i])
+			return ((i%2)? (square[To] == EMPTY) : CAPTURE_MOVE(square[From], square[To]));
 	}
 	return false;
 }
