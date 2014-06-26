@@ -285,9 +285,12 @@ protected:
 		return false;
 	}
 
-	bool isAttacked(const int From) const;
-
 	bool isAttacked(const int From, const int FromColor) const;
+
+	bool isAttacked(const int From) const
+	{
+		return isAttacked(From, square[From]);
+	}
 };
 
 #endif

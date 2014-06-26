@@ -85,8 +85,7 @@ template<>
 bool Position<RegMove>::incheck(const int color) const
 {
 	const int king = (color == WHITE)? 31:15;
-
-	return isAttacked(piece[king], color);
+	return isAttacked(piece[king]);
 }
 
 template<>

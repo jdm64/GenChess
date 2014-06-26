@@ -102,14 +102,14 @@ bool MoveLookup<GenMove>::attackLine_Bishop(const DistDB &db, const int From, co
 }
 
 template<>
-bool MoveLookup<GenMove>::isAttacked(const int From) const
+bool MoveLookup<GenMove>::isAttacked(const int From, const int FromColor) const
 {
 	int8 *offset = offsets[BISHOP];
 	for (; *offset; offset++) {
 		for (int to = From + *offset, k = 1; !(to & 0x88); to += *offset, k++) {
 			if (square[to] == EMPTY)
 				continue;
-			else if (OWN_PIECE(square[From], square[to]))
+			else if (OWN_PIECE(FromColor, square[to]))
 				break;
 			else if (ABS(square[to]) == BISHOP || ABS(square[to]) == QUEEN)
 				return true;
@@ -118,5 +118,5 @@ bool MoveLookup<GenMove>::isAttacked(const int From) const
 			break;
 		}
 	}
-	return isAttacked_xBishop(From, square[From]);
+	return isAttacked_xBishop(From, FromColor);
 }
