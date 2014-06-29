@@ -27,7 +27,7 @@ void Game<GenMove>::newGame()
 template<>
 void Game<GenMove>::doMove(const GenMove &move)
 {
-	const HistoryNode<GenMove> item = {move};
+	const HistoryNode<GenMove> item = {move, board->getMoveFlags()};
 
 	board->make(move);
 	history.push_back(item);
@@ -40,7 +40,7 @@ bool Game<GenMove>::undoMove()
 		return false;
 
 	HistoryNode<GenMove> node = history.back();
-	board->unmake(node.move);
+	board->unmake(node.move, node.flags);
 	history.pop_back();
 
 	return true;

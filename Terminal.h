@@ -214,12 +214,13 @@ uint64 Terminal<GenMove>::perft(int depth)
 		return 1;
 
 	uint64 nodes = 0;
+	const MoveFlags undoFlags = board.getMoveFlags();
 	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MoveClass::ALL);
 
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
 		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 	delete list;
 	return nodes;
@@ -248,6 +249,7 @@ template<>
 void Terminal<GenMove>::divide(int depth)
 {
 	uint64 nodes = 0, children;
+	const MoveFlags undoFlags = board.getMoveFlags();
 
 	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MoveClass::MOVE);
 	for (int i = 0; i < list->size; i++) {
@@ -255,7 +257,7 @@ void Terminal<GenMove>::divide(int depth)
 		children = perft(depth - 1);
 		cout << list->list[i].move.toString() << " " << children << endl;
 		nodes += children;
-		board.unmake(list->list[i].move);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 	delete list;
 
@@ -265,7 +267,7 @@ void Terminal<GenMove>::divide(int depth)
 		children = perft(depth - 1);
 		cout << list->list[i].move.toString() << " " << children << endl;
 		nodes += children;
-		board.unmake(list->list[i].move);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 	delete list;
 
@@ -275,7 +277,7 @@ void Terminal<GenMove>::divide(int depth)
 		children = perft(depth - 1);
 		cout << list->list[i].move.toString() << " " << children << endl;
 		nodes += children;
-		board.unmake(list->list[i].move);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 	delete list;
 

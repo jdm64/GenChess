@@ -32,6 +32,7 @@ uint64 perft(int depth)
 {
 	GenMoveList *list;
 	uint64 nodes;
+	MoveFlags undoFlags = board.getMoveFlags();
 
 	if (depth == 1) {
 		list = board.getMoveList(board.getStm(), MoveClass::ALL);
@@ -48,7 +49,7 @@ uint64 perft(int depth)
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
 		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 moves:
 	delete list;
@@ -59,7 +60,7 @@ moves:
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
 		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 captures:
 	delete list;
@@ -70,7 +71,7 @@ captures:
 	for (int i = 0; i < list->size; i++) {
 		board.make(list->list[i].move);
 		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move);
+		board.unmake(list->list[i].move, undoFlags);
 	}
 done:
 	delete list;

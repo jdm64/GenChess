@@ -212,7 +212,7 @@ void Board<GenMove>::make(const GenMove &move)
 }
 
 template<>
-void Board<GenMove>::unmake(const GenMove &move)
+void Board<GenMove>::unmake(const GenMove &move, const MoveFlags &undoFlags)
 {
 	piece[move.index] = move.from;
 	mscore += stm * genLocValue[ABS(square[move.to])][EE64F(move.to)];
@@ -257,6 +257,8 @@ bool Board<GenMove>::anyMoves(const int color)
 	GenMove move;
 	const bool stmCk = incheck(color);
 	const int start = (color == BLACK)? 0:16, end = (color == BLACK)? 16:32;
+	const MoveFlags undoFlags = flags;
+
 	for (int idx = start; idx < end; idx++) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
 			continue;
@@ -270,10 +272,10 @@ bool Board<GenMove>::anyMoves(const int color)
 
 			make(move);
 			if (!incheckMove(move, color, stmCk)) {
-				unmake(move);
+				unmake(move, undoFlags);
 				return true;
 			}
-			unmake(move);
+			unmake(move, undoFlags);
 		}
 	}
 	// generate piece place moves
@@ -292,10 +294,10 @@ bool Board<GenMove>::anyMoves(const int color)
 			make(move);
 			// place moves are only valid if neither side is inCheck
 			if (!incheckMove(move, color, stmCk) && !incheckMove(move, color ^ -2, false)) {
-				unmake(move);
+				unmake(move, undoFlags);
 				return true;
 			}
-			unmake(move);
+			unmake(move, undoFlags);
 		}
 	}
 	return false;
@@ -324,6 +326,7 @@ bool Board<GenMove>::validMove(const GenMove &moveIn, GenMove &move)
 		return false;
 
 	bool ret = true;
+	const MoveFlags undoFlags = flags;
 
 	make(move);
 	// stm is opponent after make
@@ -331,7 +334,7 @@ bool Board<GenMove>::validMove(const GenMove &moveIn, GenMove &move)
 		ret = false;
 	if (move.from == PLACEABLE && incheck(stm))
 		ret = false;
-	unmake(move);
+	unmake(move, undoFlags);
 
 	return ret;
 }
@@ -368,6 +371,7 @@ int Board<GenMove>::validMove(const string &smove, const int color, GenMove &mov
 		return INVALID_MOVEMENT;
 
 	int ret = VALID_MOVE;
+	const MoveFlags undoFlags = flags;
 
 	make(move);
 	// stm is opponent after make
@@ -375,7 +379,7 @@ int Board<GenMove>::validMove(const string &smove, const int color, GenMove &mov
 		ret = IN_CHECK;
 	if (move.from == PLACEABLE && incheck(stm))
 		ret = IN_CHECK_PLACE;
-	unmake(move);
+	unmake(move, undoFlags);
 
 	return ret;
 }
@@ -385,6 +389,7 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int pieceTy
 {
 	const int idx = pieceIndex(PLACEABLE, pieceType);
 	const int color = pieceType / ABS(pieceType);
+	const MoveFlags undoFlags = flags;
 	GenMoveNode item;
 
 	if (idx == NONE)
@@ -410,7 +415,7 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int pieceTy
 			item.score = eval();
 			data->list[data->size++] = item;
 		}
-		unmake(item.move);
+		unmake(item.move, undoFlags);
 	}
 }
 
@@ -419,6 +424,7 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 {
 	const bool stmCk = incheck(color);
 	const int start = (color == WHITE)? 31:15, end = (color == WHITE)? 16:0;
+	const MoveFlags undoFlags = flags;
 
 	for (int idx = start; idx >= end; idx--) {
 		if (piece[idx] == PLACEABLE || piece[idx] == DEAD)
@@ -451,7 +457,7 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 				item.score = eval();
 				data->list[data->size++] = item;
 			}
-			unmake(item.move);
+			unmake(item.move, undoFlags);
 		}
 	}
 }

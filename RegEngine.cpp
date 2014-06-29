@@ -36,7 +36,6 @@ template<>
 int Engine<RegMove>::Quiescence(int alpha, int beta, int depth)
 {
 	RegMoveList* const ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveClass::ALL : MoveClass::CAPTURE);
-	const MoveFlags undoFlags = board->getMoveFlags();
 
 	if (!ptr->size) {
 		delete ptr;
@@ -50,7 +49,7 @@ int Engine<RegMove>::Quiescence(int alpha, int beta, int depth)
 		return score;
 	}
 	alpha = max(alpha, score);
-
+	const MoveFlags undoFlags = board->getMoveFlags();
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	for (int n = 0; n < ptr->size; n++) {
@@ -146,8 +145,6 @@ bool Engine<RegMove>::NegaMoveType(int &alpha, const int beta, int &best,
 template<>
 int Engine<RegMove>::NegaScout(int alpha, const int beta, const int depth, int limit)
 {
-	const MoveFlags undoFlags = board->getMoveFlags();
-
 	if (depth >= limit) {
 		if (!tactical[depth])
 			return Quiescence(alpha, beta, depth);
@@ -171,6 +168,7 @@ int Engine<RegMove>::NegaScout(int alpha, const int beta, const int depth, int l
 		if (tt_item->getMove(move)) {
 			if (!board->validMove(move, move))
 				goto hashMiss;
+			const MoveFlags undoFlags = board->getMoveFlags();
 			ismate[depth] = false;
 
 			board->make(move);

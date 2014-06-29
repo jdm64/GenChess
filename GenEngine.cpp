@@ -49,7 +49,7 @@ int Engine<GenMove>::Quiescence(int alpha, int beta, int depth)
 		return score;
 	}
 	alpha = max(alpha, score);
-
+	const MoveFlags undoFlags = board->getMoveFlags();
 	sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
 
 	for (int n = 0; n < ptr->size; n++) {
@@ -58,7 +58,7 @@ int Engine<GenMove>::Quiescence(int alpha, int beta, int depth)
 
 		board->make(ptr->list[n].move);
 		score = -Quiescence(-beta, -alpha, depth + 1);
-		board->unmake(ptr->list[n].move);
+		board->unmake(ptr->list[n].move, undoFlags);
 
 		if (score >= beta) {
 			delete ptr;
@@ -79,6 +79,7 @@ template<>
 bool Engine<GenMove>::NegaMoveType(int &alpha, const int beta, int &best,
 		const int depth, const int limit, Array<GenMove> &killer, const MoveClass type)
 {
+	const MoveFlags undoFlags = board->getMoveFlags();
 	GenMove move;
 
 	best = MIN_SCORE;
@@ -93,7 +94,7 @@ bool Engine<GenMove>::NegaMoveType(int &alpha, const int beta, int &best,
 		tactical[depth + 1] = board->incheck(board->getStm());
 
 		best = -NegaScout(-beta, -alpha, depth + 1, limit);
-		board->unmake(move);
+		board->unmake(move, undoFlags);
 
 		if (best >= beta) {
 			tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
@@ -123,7 +124,7 @@ bool Engine<GenMove>::NegaMoveType(int &alpha, const int beta, int &best,
 		ptr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
 		if (ptr->list[n].score > alpha && ptr->list[n].score < beta)
 			ptr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
-		board->unmake(ptr->list[n].move);
+		board->unmake(ptr->list[n].move, undoFlags);
 
 		best = max(best, ptr->list[n].score);
 		if (best >= beta) {
@@ -167,6 +168,7 @@ int Engine<GenMove>::NegaScout(int alpha, const int beta, const int depth, int l
 		if (tt_item->getMove(move)) {
 			if (!board->validMove(move, move))
 				goto hashMiss;
+			const MoveFlags undoFlags = board->getMoveFlags();
 			ismate[depth] = false;
 
 			board->make(move);
@@ -175,7 +177,7 @@ int Engine<GenMove>::NegaScout(int alpha, const int beta, const int depth, int l
 			tactical[depth + 1] = board->incheck(board->getStm());
 
 			best = -NegaScout(-beta, -alpha, depth + 1, limit);
-			board->unmake(move);
+			board->unmake(move, undoFlags);
 
 			if (best >= beta) {
 				tt->setItem(board->hash(), best, move, limit - depth, CUT_NODE);
@@ -207,6 +209,7 @@ hashMiss:
 template<>
 void Engine<GenMove>::search(int alpha, const int beta, const int depth, const int limit)
 {
+	const MoveFlags undoFlags = board->getMoveFlags();
 	curr = curr? curr : board->getMoveList(board->getStm(), MoveClass::ALL);
 
 	int b = beta;
@@ -217,7 +220,7 @@ void Engine<GenMove>::search(int alpha, const int beta, const int depth, const i
 		curr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
 		if (curr->list[n].score > alpha && curr->list[n].score < beta && n > 0)
 			curr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
-		board->unmake(curr->list[n].move);
+		board->unmake(curr->list[n].move, undoFlags);
 
 		if (curr->list[n].score > alpha) {
 			alpha = curr->list[n].score;

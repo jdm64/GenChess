@@ -93,9 +93,7 @@ public:
 
 	void make(const MoveType &move);
 
-	void unmake(const MoveType &move);
-
-	void unmake(const RegMove &move, const MoveFlags &undoFlags);
+	void unmake(const MoveType &move, const MoveFlags &undoFlags);
 
 	int isMate()
 	{
@@ -164,18 +162,7 @@ public:
 template<class MoveType>
 struct HistoryNode
 {
-};
-
-template<>
-struct HistoryNode<GenMove>
-{
-	GenMove move;
-};
-
-template<>
-struct HistoryNode<RegMove>
-{
-	RegMove move;
+	MoveType move;
 	MoveFlags flags;
 };
 
