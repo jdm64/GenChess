@@ -39,9 +39,41 @@ private:
 
 	int *playerType;
 
-	uint64 perft(int depth);
+	uint64 perft(int depth)
+	{
+		if (depth == 0)
+			return 1;
 
-	void divide(int depth);
+		uint64 nodes = 0;
+		const MoveFlags undoFlags = board.getMoveFlags();
+		auto *list = board.getMoveList(board.getStm(), MoveClass::ALL);
+
+		for (int i = 0; i < list->size; i++) {
+			board.make(list->list[i].move);
+			nodes += perft(depth - 1);
+			board.unmake(list->list[i].move, undoFlags);
+		}
+		delete list;
+		return nodes;
+	}
+
+	void divide(int depth)
+	{
+		uint64 nodes = 0, children;
+		const MoveFlags undoFlags = board.getMoveFlags();
+
+		MoveList<MoveType> *list = board.getMoveList(board.getStm(), MoveClass::ALL);
+		for (int i = 0; i < list->size; i++) {
+			board.make(list->list[i].move);
+			children = perft(depth - 1);
+			cout << list->list[i].move.toString() << " " << children << endl;
+			nodes += children;
+			board.unmake(list->list[i].move, undoFlags);
+		}
+		delete list;
+
+		cout << "total " << nodes << endl;
+	}
 
 	static void displayHelp()
 	{
@@ -206,112 +238,6 @@ public:
 
 template<class MoveType>
 const string Terminal<MoveType>::PS[3] = {"black", "", "white"};
-
-template<>
-uint64 Terminal<GenMove>::perft(int depth)
-{
-	if (depth == 0)
-		return 1;
-
-	uint64 nodes = 0;
-	const MoveFlags undoFlags = board.getMoveFlags();
-	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MoveClass::ALL);
-
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move, undoFlags);
-	}
-	delete list;
-	return nodes;
-}
-
-template<>
-uint64 Terminal<RegMove>::perft(int depth)
-{
-	if (depth == 0)
-		return 1;
-
-	uint64 nodes = 0;
-	const MoveFlags undoFlags = board.getMoveFlags();
-	RegMoveList *list = board.getMoveList(board.getStm(), MoveClass::ALL);
-
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move, undoFlags);
-	}
-	delete list;
-	return nodes;
-}
-
-template<>
-void Terminal<GenMove>::divide(int depth)
-{
-	uint64 nodes = 0, children;
-	const MoveFlags undoFlags = board.getMoveFlags();
-
-	MoveList<GenMove> *list = board.getMoveList(board.getStm(), MoveClass::MOVE);
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		children = perft(depth - 1);
-		cout << list->list[i].move.toString() << " " << children << endl;
-		nodes += children;
-		board.unmake(list->list[i].move, undoFlags);
-	}
-	delete list;
-
-	list = board.getMoveList(board.getStm(), MoveClass::CAPTURE);
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		children = perft(depth - 1);
-		cout << list->list[i].move.toString() << " " << children << endl;
-		nodes += children;
-		board.unmake(list->list[i].move, undoFlags);
-	}
-	delete list;
-
-	list = board.getMoveList(board.getStm(), MoveClass::PLACE);
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		children = perft(depth - 1);
-		cout << list->list[i].move.toString() << " " << children << endl;
-		nodes += children;
-		board.unmake(list->list[i].move, undoFlags);
-	}
-	delete list;
-
-	cout << "total " << nodes << endl;
-}
-
-template<>
-void Terminal<RegMove>::divide(int depth)
-{
-	uint64 nodes = 0, children;
-	const MoveFlags undoFlags = board.getMoveFlags();
-
-	RegMoveList *list = board.getMoveList(board.getStm(), MoveClass::MOVE);
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		children = perft(depth - 1);
-		cout << list->list[i].move.toString() << " " << children << endl;
-		nodes += children;
-		board.unmake(list->list[i].move, undoFlags);
-	}
-	delete list;
-
-	list = board.getMoveList(board.getStm(), MoveClass::CAPTURE);
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		children = perft(depth - 1);
-		cout << list->list[i].move.toString() << " " << children << endl;
-		nodes += children;
-		board.unmake(list->list[i].move, undoFlags);
-	}
-	delete list;
-
-	cout << "total " << nodes << endl;
-}
 
 typedef Terminal<GenMove> GenTerminal;
 typedef Terminal<RegMove> RegTerminal;

@@ -32,11 +32,29 @@ private:
 public:
 	Game(Board<MoveType> *Board) : board(Board) {}
 
-	void newGame();
+	void newGame()
+	{
+		board->reset();
+		history.clear();
+	}
 
-	void doMove(const MoveType &move);
+	void doMove(const MoveType &move)
+	{
+		history.push_back({move, board->getMoveFlags()});
+		board->make(move);
+	}
 
-	bool undoMove();
+	bool undoMove()
+	{
+		if (history.empty())
+			return false;
+
+		HistoryNode<MoveType> node = history.back();
+		board->unmake(node.move, node.flags);
+		history.pop_back();
+
+		return true;
+	}
 };
 
 typedef Game<GenMove> GenGame;

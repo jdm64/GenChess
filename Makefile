@@ -8,7 +8,7 @@ DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
 objs = Util.o Move.o BaseBoard.o MoveLookup.o GenMoveLookup.o RegMoveLookup.o \
 	GenPosition.o RegPosition.o GenBoard.o RegBoard.o TransTable.o GenEngine.o \
-	RegEngine.o GenGame.o RegGame.o main.o
+	RegEngine.o main.o
 
 all : genchess enginetester
 
