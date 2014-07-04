@@ -20,7 +20,6 @@
 
 #include <cstdint>
 
-#define VERSION		"2.0.75"
 #define ABS(X)		((X >= 0)? X : -(X))
 #define COL(X)		((X) & 7)
 

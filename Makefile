@@ -3,7 +3,7 @@ CXX = g++
 CXXFLAGS = -Wall -Wextra -pedantic -O3 -std=gnu++0x
 TARGET = genchess
 
-VERSION = $(shell grep "define VERSION" Defines.h | cut -d'"' -f2)
+VERSION = $(shell git describe --tags --dirty)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
 objs = Util.o Move.o BaseBoard.o MoveLookup.o GenMoveLookup.o RegMoveLookup.o \
@@ -21,6 +21,9 @@ enginetester : EngineTester.o Util.o
 
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+main.o : main.cpp
+	$(CXX) -DVERSION=\"$(VERSION)\" $(CXXFLAGS) -c $< -o $@
 
 clean :
 	rm -f *~ *.o $(TARGET) enginetester

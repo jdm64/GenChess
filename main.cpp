@@ -81,7 +81,7 @@ done:
 
 void show_help()
 {
-	cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
+	cout << "GenChess " << VERSION << " a Genesis Chess playing engine\n"
 		<< "Copyright (C) 2011 Justin Madru under the GPLv3\n\n"
 		<< "Usage: genchess [options]\n\n"
 		<< "The following options are recognized:\n"
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
 			genesis = false;
 			break;
 		case 'v':
-			cout << "GenChess v" << VERSION << " a Genesis Chess playing engine\n"
+			cout << "GenChess " << VERSION << " a Genesis Chess playing engine\n"
 				<< "Copyright (C) 2011 Justin Madru under the GPLv3\n\n";
 			return EXIT_SUCCESS;
 		}
