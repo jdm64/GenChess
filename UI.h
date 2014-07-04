@@ -21,8 +21,16 @@
 #include "Engine.h"
 #include "Game.h"
 
+class BaseUI
+{
+public:
+	virtual void run() = 0;
+
+	virtual ~BaseUI() { }
+};
+
 template<class MoveType>
-class UI
+class UI : public BaseUI
 {
 protected:
 	static const string moveError[NUM_MOVE_ERRORS];
@@ -47,14 +55,12 @@ public:
 		engine = new Engine<MoveType>(&board, tt);
 	}
 
-	virtual ~UI()
+	~UI()
 	{
 		delete game;
 		delete engine;
 		delete tt;
 	}
-
-	virtual void run() = 0;
 };
 
 template<class MoveType>

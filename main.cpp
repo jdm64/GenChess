@@ -15,6 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <memory>
 #include <iostream>
 #include <unistd.h>
 #include "Terminal.h"
@@ -145,24 +146,20 @@ int main(int argc, char **argv)
 		cout << "invalid command line\n";
 		return EXIT_FAILURE;
 	}
-	if (genesis) {
-		if (xMode) {
-			GenTerminal ui(white, black);
-			ui.run();
-		} else {
-			GenCVEP ui;
-			ui.run();
-		}
-	} else {
-		if (xMode) {
-			RegTerminal ui(white, black);
-			ui.run();
-		} else {
-			RegCVEP ui;
-			ui.run();
-		}
-	}
 
+	unique_ptr<BaseUI> ui;
+	if (xMode) {
+		if (genesis)
+			ui = unique_ptr<BaseUI>(new GenTerminal(white, black));
+		else
+			ui = unique_ptr<BaseUI>(new RegTerminal(white, black));
+	} else {
+		if (genesis)
+			ui = unique_ptr<BaseUI>(new GenCVEP);
+		else
+			ui = unique_ptr<BaseUI>(new RegCVEP);
+	}
+	ui->run();
 
 	return EXIT_SUCCESS;
 }
