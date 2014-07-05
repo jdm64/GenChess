@@ -33,6 +33,8 @@ public:
 		data = new T[size];
 	}
 
+	Array(const Array& other) = delete;
+
 	~Array() { delete[] data; }
 
 	const T operator[](const int i) const

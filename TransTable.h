@@ -139,6 +139,8 @@ public:
 		TableStats::clear();
 	}
 
+	TransTable(const TransTable& other) = delete;
+
 	~TransTable()
 	{
 		delete[] table;
