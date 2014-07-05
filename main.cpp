@@ -21,64 +21,6 @@
 #include "Terminal.h"
 #include "CVEP.h"
 
-GenBoard board;
-
-/* depth=1	nodes=64
- * depth=2	nodes=3612
- * depth=3	nodes=953632
- * depth=4	nodes=248188772
- * depth=5	nodes=64518625428
- */
-uint64 perft(int depth)
-{
-	GenMoveList *list;
-	uint64 nodes;
-	MoveFlags undoFlags = board.getMoveFlags();
-
-	if (depth == 1) {
-		list = board.getMoveList(board.getStm(), MoveClass::ALL);
-		nodes = list->size;
-		delete list;
-		return nodes;
-	}
-	nodes = 0;
-
-	// Placement Moves
-	list = board.getMoveList(board.getStm(), MoveClass::PLACE);
-	if (list->size == 0)
-		goto moves;
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move, undoFlags);
-	}
-moves:
-	delete list;
-	// Movement Moves
-	list = board.getMoveList(board.getStm(), MoveClass::MOVE);
-	if (list->size == 0)
-		goto captures;
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move, undoFlags);
-	}
-captures:
-	delete list;
-	// Capture Moves
-	list = board.getMoveList(board.getStm(), MoveClass::CAPTURE);
-	if (list->size == 0)
-		goto done;
-	for (int i = 0; i < list->size; i++) {
-		board.make(list->list[i].move);
-		nodes += perft(depth - 1);
-		board.unmake(list->list[i].move, undoFlags);
-	}
-done:
-	delete list;
-	return nodes;
-}
-
 void show_help()
 {
 	cout << "GenChess " << VERSION << " a Genesis Chess playing engine\n"
@@ -96,9 +38,11 @@ void show_help()
 
 int main(int argc, char **argv)
 {
-	int white = HUMAN, black = COMPUTER;
+	enum Mode { PROTOCAL, TERMINAL, PERFT };
+	int white = HUMAN, black = COMPUTER, depth = 3;
 	char c;
-	bool error = false, xMode = false, genesis = true;
+	Mode mode = PROTOCAL;
+	bool error = false, genesis = true;
 
 	// set I/O to unbuffered
 	cout.setf(ios::unitbuf);
@@ -106,7 +50,7 @@ int main(int argc, char **argv)
 	while ((c = getopt(argc, argv, "iw:b:hp:vgr")) != -1) {
 		switch (c) {
 		case 'i':
-			xMode = true;
+			mode = TERMINAL;
 			break;
 		case 'w':
 			if (optarg[0] == 'c' || optarg[0] == 'C')
@@ -128,8 +72,9 @@ int main(int argc, char **argv)
 			show_help();
 			return EXIT_SUCCESS;
 		case 'p':
-			cout << perft(atoi(optarg)) << endl;
-			return EXIT_SUCCESS;
+			mode = PERFT;
+			depth = atoi(optarg);
+			break;
 		case 'g':
 			genesis = true;
 			break;
@@ -148,18 +93,28 @@ int main(int argc, char **argv)
 	}
 
 	unique_ptr<BaseUI> ui;
-	if (xMode) {
-		if (genesis)
-			ui = unique_ptr<BaseUI>(new GenTerminal(white, black));
-		else
-			ui = unique_ptr<BaseUI>(new RegTerminal(white, black));
-	} else {
+	switch (mode) {
+	case PROTOCAL:
 		if (genesis)
 			ui = unique_ptr<BaseUI>(new GenCVEP);
 		else
 			ui = unique_ptr<BaseUI>(new RegCVEP);
+		break;
+	case TERMINAL:
+		if (genesis)
+			ui = unique_ptr<BaseUI>(new GenTerminal(white, black));
+		else
+			ui = unique_ptr<BaseUI>(new RegTerminal(white, black));
+		break;
+	case PERFT:
+		if (genesis)
+			ui = unique_ptr<BaseUI>(new UI<GenMove>());
+		else
+			ui = unique_ptr<BaseUI>(new UI<RegMove>());
+		cout << ui->perft(depth) << endl;
+		return EXIT_SUCCESS;
 	}
-	ui->run();
 
+	ui->run();
 	return EXIT_SUCCESS;
 }

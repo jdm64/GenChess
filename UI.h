@@ -24,7 +24,9 @@
 class BaseUI
 {
 public:
-	virtual void run() = 0;
+	virtual void run() { }
+
+	virtual uint64 perft(int depth) = 0;
 
 	virtual ~BaseUI() { }
 };
@@ -60,6 +62,31 @@ public:
 		delete game;
 		delete engine;
 		delete tt;
+	}
+
+	/*              genesis   regular
+	 * depth=1           64       20
+	 * depth=2         3612      400
+	 * depth=3       953632     8902
+	 * depth=4    248188772   197281
+	 * depth=5  64518625428  4865609
+	 */
+	uint64 perft(int depth)
+	{
+		if (depth == 0)
+			return 1;
+
+		uint64 nodes = 0;
+		const MoveFlags undoFlags = board.getMoveFlags();
+		auto *list = board.getMoveList(board.getStm(), MoveClass::ALL);
+
+		for (int i = 0; i < list->size; i++) {
+			board.make(list->list[i].move);
+			nodes += perft(depth - 1);
+			board.unmake(list->list[i].move, undoFlags);
+		}
+		delete list;
+		return nodes;
 	}
 };
 

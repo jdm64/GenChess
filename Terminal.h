@@ -29,6 +29,7 @@ class Terminal : public UI<MoveType>
 	using UI<MoveType>::tt;
 	using UI<MoveType>::game;
 	using UI<MoveType>::again;
+	using UI<MoveType>::perft;
 
 private:
 	static const string PS[3];
@@ -38,24 +39,6 @@ private:
 	int PT[3];
 
 	int *playerType;
-
-	uint64 perft(int depth)
-	{
-		if (depth == 0)
-			return 1;
-
-		uint64 nodes = 0;
-		const MoveFlags undoFlags = board.getMoveFlags();
-		auto *list = board.getMoveList(board.getStm(), MoveClass::ALL);
-
-		for (int i = 0; i < list->size; i++) {
-			board.make(list->list[i].move);
-			nodes += perft(depth - 1);
-			board.unmake(list->list[i].move, undoFlags);
-		}
-		delete list;
-		return nodes;
-	}
 
 	void divide(int depth)
 	{
