@@ -246,7 +246,7 @@ private:
 	}
 
 public:
-	Engine(Board<MoveType> *_Board, TransTable<MoveType> *TT) : curr(NULL), board(_Board), tt(TT)
+	Engine(Board<MoveType> *_Board, TransTable<MoveType> *TT) : curr(nullptr), board(_Board), tt(TT)
 	{
 		maxNg = 5;
 	}
@@ -259,13 +259,13 @@ public:
 	{
 		timeval t1, t2;
 
-		srand(time(NULL));
-		curr = NULL;
+		srand(time(nullptr));
+		curr = nullptr;
 
-		gettimeofday(&t1, NULL);
+		gettimeofday(&t1, nullptr);
 		for (int depth = 1; depth <= maxNg; depth++) {
 			search(MIN_SCORE, MAX_SCORE, 0, depth);
-			gettimeofday(&t2, NULL);
+			gettimeofday(&t2, nullptr);
 			cout << "stats depth " << depth << " time " << time_in_msec(t2 - t1) << endl;
 		}
 

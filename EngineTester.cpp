@@ -182,7 +182,7 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 		// get white's move
 		res.ply++;
 		fputs("go\n", white.in);
-		gettimeofday(&tm1, NULL);
+		gettimeofday(&tm1, nullptr);
 
 		// loop over stat output
 		while (true) {
@@ -198,7 +198,7 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 			if (word == "move")
 				break;
 		}
-		gettimeofday(&tm2, NULL);
+		gettimeofday(&tm2, nullptr);
 		sum(res.whiteTime, tm2 - tm1);
 
 		move = line.str();
@@ -224,7 +224,7 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 		// get black's move
 		res.ply++;
 		fputs("go\n", black.in);
-		gettimeofday(&tm1, NULL);
+		gettimeofday(&tm1, nullptr);
 
 		// loop over stat output
 		while (true) {
@@ -240,7 +240,7 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 			if (word == "move")
 				break;
 		}
-		gettimeofday(&tm2, NULL);
+		gettimeofday(&tm2, nullptr);
 		sum(res.blackTime, tm2 - tm1);
 
 		move = line.str();
@@ -361,7 +361,7 @@ IOptr connectIO(const string& program)
 		}
 		close(pipe1[OUT]);
 		close(pipe2[IN]);
-		execlp(program.c_str(), program.c_str(), NULL);
+		execlp(program.c_str(), program.c_str(), nullptr);
 		// program ends here
 	}
 	IOptr ret;
@@ -372,7 +372,7 @@ IOptr connectIO(const string& program)
 	ret.out = fdopen(pipe2[IN], "r");
 
 	// set unbuffered I/O
-	setbuf(ret.in, NULL);
+	setbuf(ret.in, nullptr);
 
 	return ret;
 }

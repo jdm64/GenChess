@@ -54,7 +54,7 @@ public:
 		size = BLOCK - 1;
 		last = BLOCK;
 
-		srand(time(NULL));
+		srand(time(nullptr));
 		for (int i = 0; i < BLOCK; i++)
 			box[i] = i;
 		for (int i = 0; i < BLOCK; i++)
