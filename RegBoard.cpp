@@ -611,7 +611,7 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 				}
 				unmake(item.move, undoFlags);
 
-				data->list[data->size++] = item;
+				data->add(item);
 				for (int i = ROOK; i > PAWN; i--) {
 					item.move.setPromote(i);
 
@@ -620,7 +620,7 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 					item.score = eval();
 					unmake(item.move, undoFlags);
 
-					data->list[data->size++] = item;
+					data->add(item);
 				}
 				item.move.flags = 0;
 			} else {
@@ -628,7 +628,7 @@ void Board<RegMove>::getMoveList(RegMoveList *data, const int color, const MoveC
 				if (!incheckMove(item.move, color, stmCk)) {
 					item.check = incheckMove(item.move, color ^ -2, false);
 					item.score = eval();
-					data->list[data->size++] = item;
+					data->add(item);
 				}
 				unmake(item.move, undoFlags);
 			}
@@ -659,7 +659,7 @@ void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int color)
 		item.score = eval();
 		item.check = false;
 
-		data->list[data->size++] = item;
+		data->add(item);
 	}
 	// Queen Side
 	if (flags.canQueenCastle(color) && square[king - 1] == EMPTY && square[king - 2] == EMPTY &&
@@ -673,7 +673,7 @@ void Board<RegMove>::getCastleMoveList(RegMoveList *data, const int color)
 		item.score = eval();
 		item.check = false;
 
-		data->list[data->size++] = item;
+		data->add(item);
 	}
 }
 
@@ -702,7 +702,7 @@ void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int color)
 		if (!incheck(color)) {
 			item.check = incheck(color ^ -2);
 			item.score = eval();
-			data->list[data->size++] = item;
+			data->add(item);
 		}
 		unmake(item.move, undoFlags);
 	}
@@ -718,7 +718,7 @@ void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int color)
 		if (!incheck(color)) {
 			item.check = incheck(color ^ -2);
 			item.score = eval();
-			data->list[data->size++] = item;
+			data->add(item);
 		}
 		unmake(item.move, undoFlags);
 	}
@@ -728,7 +728,6 @@ template<>
 RegMoveList* Board<RegMove>::getMoveList(const int color, const MoveClass movetype)
 {
 	RegMoveList* const data = new RegMoveList;
-	data->size = 0;
 
 	switch (movetype) {
 	case MoveClass::ALL:

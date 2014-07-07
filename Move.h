@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <array>
+#include <algorithm>
 #include "Defines.h"
 
 using namespace std;
@@ -110,26 +111,6 @@ typedef MoveNode<GenMove> GenMoveNode;
 typedef MoveNode<RegMove> RegMoveNode;
 
 template<class MoveType>
-struct MoveList
-{
-	array<MoveNode<MoveType>, 320> list;
-	int size;
-
-	MoveList() : size(0) {}
-
-	void print() const
-	{
-		for (int i = 0; i < size; i++)
-			cout << list[i].move.toString() << "[" << list[i].score << "] ";
-		cout << "\n";
-	}
-};
-
-typedef MoveList<GenMove> GenMoveList;
-typedef MoveList<RegMove> RegMoveList;
-
-
-template<class MoveType>
 struct ScoreSort
 {
 	bool operator()(const MoveNode<MoveType> &a, const MoveNode<MoveType> &b) const
@@ -138,7 +119,61 @@ struct ScoreSort
 	}
 };
 
-typedef ScoreSort<GenMove> GenScoreSort;
-typedef ScoreSort<RegMove> RegScoreSort;
+template<class MoveType>
+class MoveList
+{
+	typedef typename array<MoveNode<MoveType>, 320>::iterator MoveListIter;
+
+	array<MoveNode<MoveType>, 320> list;
+	int len;
+
+public:
+	MoveList() : len(0) {}
+
+	void add(const MoveNode<MoveType> &item)
+	{
+		list[len++] = item;
+	}
+
+	void sort()
+	{
+		stable_sort(begin(), end(), ScoreSort<MoveType>());
+	}
+
+	bool empty() const
+	{
+		return !len;
+	}
+
+	int size() const
+	{
+		return len;
+	}
+
+	MoveNode<MoveType>& at(int i)
+	{
+		return list[i];
+	}
+
+	MoveListIter begin()
+	{
+		return list.begin();
+	}
+
+	MoveListIter end()
+	{
+		return list.begin() + len;
+	}
+
+	void print() const
+	{
+		for (int i = 0; i < len; i++)
+			cout << list[i].move.toString() << "[" << list[i].score << "] ";
+		cout << "\n";
+	}
+};
+
+typedef MoveList<GenMove> GenMoveList;
+typedef MoveList<RegMove> RegMoveList;
 
 #endif

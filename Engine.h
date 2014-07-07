@@ -50,27 +50,24 @@ private:
 	Array<bool> tactical;
 	Array<bool> ismate;
 
-	ScoreSort<MoveType> cmpScore;
-
 	void pickRandomMove()
 	{
-		const int score = curr->list[0].score;
-		int end = 1;
+		const int score = curr->at(0).score;
+		int end = 0;
 
-		for (int i = 1; i < curr->size; i++) {
-			if (curr->list[i].score != score) {
-				end = i + 1;
+		for (auto item : *curr) {
+			if (item.score != score)
 				break;
-			}
+			end++;
 		}
-		pvMove[0] = curr->list[rand() % end].move;
+		pvMove[0] = curr->at(rand() % end).move;
 	}
 
 	int Quiescence(int alpha, int beta, int depth)
 	{
 		auto ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveClass::ALL : MoveClass::CAPTURE);
 
-		if (!ptr->size) {
+		if (ptr->empty()) {
 			delete ptr;
 			return tactical[depth]? CHECKMATE_SCORE + board->getPly() : -board->eval();
 		}
@@ -83,15 +80,15 @@ private:
 		}
 		alpha = max(alpha, score);
 		const MoveFlags undoFlags = board->getMoveFlags();
-		sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
+		ptr->sort();
 
-		for (int n = 0; n < ptr->size; n++) {
+		for (auto& item : *ptr) {
 			// set check for opponent
-			tactical[depth + 1] = ptr->list[n].check;
+			tactical[depth + 1] = item.check;
 
-			board->make(ptr->list[n].move);
+			board->make(item.move);
 			score = -Quiescence(-beta, -alpha, depth + 1);
-			board->unmake(ptr->list[n].move, undoFlags);
+			board->unmake(item.move, undoFlags);
 
 			if (score >= beta) {
 				delete ptr;
@@ -134,34 +131,34 @@ private:
 		// Try all of moveType Moves
 		auto ptr = board->getMoveList(board->getStm(), type);
 
-		if (!ptr->size) {
+		if (ptr->empty()) {
 			delete ptr;
 			return false;
 		}
-		sort(ptr->list.begin(), ptr->list.begin() + ptr->size, cmpScore);
+		ptr->sort();
 
 		ismate[depth] = false;
 		int b = alpha + 1;
-		for (int n = 0; n < ptr->size; n++) {
-			board->make(ptr->list[n].move);
+		for (auto& item : *ptr) {
+			board->make(item.move);
 
 			// set check for opponent
-			tactical[depth + 1] = ptr->list[n].check;
+			tactical[depth + 1] = item.check;
 
-			ptr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
-			if (ptr->list[n].score > alpha && ptr->list[n].score < beta)
-				ptr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
-			board->unmake(ptr->list[n].move, undoFlags);
+			item.score = -NegaScout(-b, -alpha, depth + 1, limit);
+			if (item.score > alpha && item.score < beta)
+				item.score = -NegaScout(-beta, -alpha, depth + 1, limit);
+			board->unmake(item.move, undoFlags);
 
-			best = max(best, ptr->list[n].score);
+			best = max(best, item.score);
 			if (best >= beta) {
-				killer[depth] = ptr->list[n].move;
+				killer[depth] = item.move;
 				tt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
 				delete ptr;
 				return true;
 			} else if (best > alpha) {
 				alpha = best;
-				pvMove[depth] = ptr->list[n].move;
+				pvMove[depth] = item.move;
 			}
 			b = alpha + 1;
 		}
@@ -226,23 +223,23 @@ private:
 		curr = curr? curr : board->getMoveList(board->getStm(), MoveClass::ALL);
 
 		int b = beta;
-		for (int n = 0; n < curr->size; n++) {
-			tactical[depth + 1] = curr->list[n].check;
+		for (auto& item : *curr) {
+			tactical[depth + 1] = item.check;
 
-			board->make(curr->list[n].move);
-			curr->list[n].score = -NegaScout(-b, -alpha, depth + 1, limit);
-			if (curr->list[n].score > alpha && curr->list[n].score < beta && n > 0)
-				curr->list[n].score = -NegaScout(-beta, -alpha, depth + 1, limit);
-			board->unmake(curr->list[n].move, undoFlags);
+			board->make(item.move);
+			item.score = -NegaScout(-b, -alpha, depth + 1, limit);
+			if (item.score > alpha && item.score < beta)
+				item.score = -NegaScout(-beta, -alpha, depth + 1, limit);
+			board->unmake(item.move, undoFlags);
 
-			if (curr->list[n].score > alpha) {
-				alpha = curr->list[n].score;
-				pvMove[depth] = curr->list[n].move;
+			if (item.score > alpha) {
+				alpha = item.score;
+				pvMove[depth] = item.move;
 				tt->setItem(board->hash(), alpha, pvMove[depth], limit - depth, PV_NODE);
 			}
 			b = alpha + 1;
 		}
-		stable_sort(curr->list.begin(), curr->list.begin() + curr->size, cmpScore);
+		curr->sort();
 	}
 
 public:

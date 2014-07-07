@@ -80,10 +80,10 @@ public:
 		const MoveFlags undoFlags = board.getMoveFlags();
 		auto *list = board.getMoveList(board.getStm(), MoveClass::ALL);
 
-		for (int i = 0; i < list->size; i++) {
-			board.make(list->list[i].move);
+		for (auto& item : *list) {
+			board.make(item.move);
 			nodes += perft(depth - 1);
-			board.unmake(list->list[i].move, undoFlags);
+			board.unmake(item.move, undoFlags);
 		}
 		delete list;
 		return nodes;

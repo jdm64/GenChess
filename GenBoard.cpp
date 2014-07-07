@@ -413,7 +413,7 @@ void Board<GenMove>::getPlaceMoveList(GenMoveList* const data, const int pieceTy
 		if (!incheckMove(item.move, color, stmCk) && !incheckMove(item.move, color ^ -2, false)) {
 			// item.check initialized to false
 			item.score = eval();
-			data->list[data->size++] = item;
+			data->add(item);
 		}
 		unmake(item.move, undoFlags);
 	}
@@ -455,7 +455,7 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 			if (!incheckMove(item.move, color, stmCk)) {
 				item.check = incheckMove(item.move, color ^ -2, false);
 				item.score = eval();
-				data->list[data->size++] = item;
+				data->add(item);
 			}
 			unmake(item.move, undoFlags);
 		}
@@ -466,7 +466,6 @@ template<>
 GenMoveList* Board<GenMove>::getMoveList(const int color, const MoveClass movetype)
 {
 	GenMoveList* const data = new GenMoveList;
-	data->size = 0;
 
 	switch (movetype) {
 	case MoveClass::ALL:

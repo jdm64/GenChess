@@ -46,12 +46,12 @@ private:
 		const MoveFlags undoFlags = board.getMoveFlags();
 
 		MoveList<MoveType> *list = board.getMoveList(board.getStm(), MoveClass::ALL);
-		for (int i = 0; i < list->size; i++) {
-			board.make(list->list[i].move);
+		for (auto& item : *list) {
+			board.make(item.move);
 			children = perft(depth - 1);
-			cout << list->list[i].move.toString() << " " << children << endl;
+			cout << item.move.toString() << " " << children << endl;
 			nodes += children;
-			board.unmake(list->list[i].move, undoFlags);
+			board.unmake(item.move, undoFlags);
 		}
 		delete list;
 
