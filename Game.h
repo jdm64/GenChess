@@ -57,7 +57,4 @@ public:
 	}
 };
 
-typedef Game<GenMove> GenGame;
-typedef Game<RegMove> RegGame;
-
 #endif

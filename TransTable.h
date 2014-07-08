@@ -114,10 +114,6 @@ public:
 	}
 };
 
-typedef TransItem<GenMove> GenTransItem;
-typedef TransItem<RegMove> RegTransItem;
-
-
 template<class MoveType>
 class TransTable 
 {
@@ -187,8 +183,5 @@ public:
 		item->type = type;
 	}
 };
-
-typedef TransTable<GenMove> GenTransTable;
-typedef TransTable<RegMove> RegTransTable;
 
 #endif

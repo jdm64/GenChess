@@ -173,7 +173,4 @@ struct HistoryNode
 	MoveFlags flags;
 };
 
-typedef Board<GenMove> GenBoard;
-typedef Board<RegMove> RegBoard;
-
 #endif
