@@ -21,6 +21,7 @@
 #include <iostream>
 #include <array>
 #include <algorithm>
+#include <deque>
 #include "Defines.h"
 
 using namespace std;
@@ -119,16 +120,26 @@ struct ScoreSort
 	}
 };
 
+// forward declaration
+template<class MoveType>
+class MoveListPool;
+
 template<class MoveType>
 class MoveList
 {
+	friend MoveListPool<MoveType>;
 	typedef typename array<MoveNode<MoveType>, 320>::iterator MoveListIter;
 
 	array<MoveNode<MoveType>, 320> list;
 	int len;
 
-public:
 	MoveList() : len(0) {}
+
+	void clear()
+	{
+		len = 0;
+	}
+public:
 
 	void add(const MoveNode<MoveType> &item)
 	{
@@ -175,5 +186,27 @@ public:
 
 typedef MoveList<GenMove> GenMoveList;
 typedef MoveList<RegMove> RegMoveList;
+
+template<class MoveType>
+class MoveListPool
+{
+	deque<MoveList<MoveType>*> pool;
+
+public:
+	MoveList<MoveType>* get()
+	{
+		if (pool.empty())
+			return new MoveList<MoveType>;
+		auto item = pool.back();
+		pool.pop_back();
+		return item;
+	}
+
+	void put(MoveList<MoveType>* item)
+	{
+		item->clear();
+		pool.push_back(item);
+	}
+};
 
 #endif

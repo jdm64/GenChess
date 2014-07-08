@@ -82,6 +82,9 @@ const int regLocValue[7][64] = {
 	};
 
 template<>
+MoveListPool<RegMove>* Board<RegMove>::pool = new MoveListPool<RegMove>;
+
+template<>
 void Board<RegMove>::rebuildScore()
 {
 	int white = 0, black = 0;
@@ -727,7 +730,7 @@ void Board<RegMove>::getEnPassantMoveList(RegMoveList *data, const int color)
 template<>
 RegMoveList* Board<RegMove>::getMoveList(const int color, const MoveClass movetype)
 {
-	RegMoveList* const data = new RegMoveList;
+	RegMoveList* const data = pool->get();
 
 	switch (movetype) {
 	case MoveClass::ALL:

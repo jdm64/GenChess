@@ -82,6 +82,9 @@ const int genLocValue[7][64] = {
 	};
 
 template<>
+MoveListPool<GenMove>* Board<GenMove>::pool = new MoveListPool<GenMove>;
+
+template<>
 void Board<GenMove>::rebuildScore()
 {
 	int white = 0, black = 0;
@@ -465,7 +468,7 @@ void Board<GenMove>::getMoveList(GenMoveList* const data, const int color, const
 template<>
 GenMoveList* Board<GenMove>::getMoveList(const int color, const MoveClass movetype)
 {
-	GenMoveList* const data = new GenMoveList;
+	GenMoveList* const data = pool->get();
 
 	switch (movetype) {
 	case MoveClass::ALL:

@@ -53,7 +53,7 @@ private:
 			nodes += children;
 			board.unmake(item.move, undoFlags);
 		}
-		delete list;
+		board.recycle(list);
 
 		cout << "total " << nodes << endl;
 	}

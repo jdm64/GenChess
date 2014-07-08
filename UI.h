@@ -85,7 +85,7 @@ public:
 			nodes += perft(depth - 1);
 			board.unmake(item.move, undoFlags);
 		}
-		delete list;
+		board.recycle(list);
 		return nodes;
 	}
 };

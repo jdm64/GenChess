@@ -68,14 +68,14 @@ private:
 		auto ptr = board->getMoveList(board->getStm(), tactical[depth]? MoveClass::ALL : MoveClass::CAPTURE);
 
 		if (ptr->empty()) {
-			delete ptr;
+			board->recycle(ptr);
 			return tactical[depth]? CHECKMATE_SCORE + board->getPly() : -board->eval();
 		}
 
 		int best = MIN_SCORE, score = -board->eval();
 
 		if (score >= beta) {
-			delete ptr;
+			board->recycle(ptr);
 			return score;
 		}
 		alpha = max(alpha, score);
@@ -91,13 +91,13 @@ private:
 			board->unmake(item.move, undoFlags);
 
 			if (score >= beta) {
-				delete ptr;
+				board->recycle(ptr);
 				return score;
 			}
 			best = max(best, score);
 			alpha = max(alpha, score);
 		}
-		delete ptr;
+		board->recycle(ptr);
 		return best;
 	}
 
@@ -132,7 +132,7 @@ private:
 		auto ptr = board->getMoveList(board->getStm(), type);
 
 		if (ptr->empty()) {
-			delete ptr;
+			board->recycle(ptr);
 			return false;
 		}
 		ptr->sort();
@@ -154,7 +154,7 @@ private:
 			if (best >= beta) {
 				killer[depth] = item.move;
 				tt->setItem(board->hash(), best, killer[depth], limit - depth, CUT_NODE);
-				delete ptr;
+				board->recycle(ptr);
 				return true;
 			} else if (best > alpha) {
 				alpha = best;
@@ -162,7 +162,7 @@ private:
 			}
 			b = alpha + 1;
 		}
-		delete ptr;
+		board->recycle(ptr);
 		return false;
 	}
 
@@ -278,7 +278,7 @@ public:
 		if (board->getPly() < 7)
 			pickRandomMove();
 
-		delete curr;
+		board->recycle(curr);
 		return pvMove[0];
 	}
 };

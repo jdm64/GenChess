@@ -33,6 +33,8 @@ template<class MoveType>
 class Board : public Position<MoveType>
 {
 private:
+	static MoveListPool<MoveType>* pool;
+
 	uint64 key;
 	int mscore;
 
@@ -85,6 +87,11 @@ public:
 	MoveFlags getMoveFlags() const
 	{
 		return BB::flags;
+	}
+
+	static void recycle(MoveList<MoveType>* item)
+	{
+		pool->put(item);
 	}
 
 	void reset();
