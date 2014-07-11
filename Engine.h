@@ -18,11 +18,11 @@
 #ifndef __ENGINE_H__
 #define __ENGINE_H__
 
-#include <iostream>
 #include <climits>
 #include <vector>
 #include "Array.h"
 #include "Util.h"
+#include "Board.h"
 #include "TransTable.h"
 
 #define MAX_DEPTH		10

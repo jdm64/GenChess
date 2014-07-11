@@ -16,7 +16,6 @@
  */
 
 #include <memory>
-#include <iostream>
 #include <unistd.h>
 #include "Terminal.h"
 #include "CVEP.h"

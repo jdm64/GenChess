@@ -19,7 +19,6 @@
 #define __POSITION_H__
 
 #include "Move.h"
-#include "Piece.h"
 #include "MoveLookup.h"
 
 #define EE64(x) (((x) >> 1) | ((x) & 7))

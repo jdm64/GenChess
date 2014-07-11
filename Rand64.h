@@ -18,7 +18,6 @@
 #ifndef __RAND64_H__
 #define __RAND64_H__
 
-#include <cstdint>
 #include <cstdlib>
 #include <algorithm>
 #include <ctime>
