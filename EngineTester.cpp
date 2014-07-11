@@ -32,22 +32,22 @@ struct IOptr {
 };
 
 struct GameResults {
-	timeval whiteTime;
-	timeval blackTime;
+	duration<int64,micro> whiteTime;
+	duration<int64,micro> blackTime;
 	int ply;
 	char winner;
 
 	GameResults()
 	{
-		whiteTime = {0, 0};
-		blackTime = {0, 0};
+		whiteTime = duration<int64,micro>(0);
+		blackTime = duration<int64,micro>(0);
 		ply = 0;
 		winner = 'D';
 	}
 };
 
 struct AsColor {
-	timeval time;
+	duration<int64,micro> time;
 	int win;
 	int lose;
 	int draw;
@@ -70,11 +70,6 @@ struct AsColor {
 struct EngineResults {
 	AsColor aswhite;
 	AsColor asblack;
-
-	EngineResults()
-	: aswhite({{0, 0}, 0, 0, 0, 0}), asblack({{0, 0}, 0, 0, 0, 0})
-	{
-	}
 };
 
 char buff[256];
@@ -135,13 +130,13 @@ void printStats()
 			<< " loss:" << eng1res.aswhite.lose
 			<< " draw:" << eng1res.aswhite.draw
 			<< " ply:" << eng1res.aswhite.ply
-			<< " time:" << eng1res.aswhite.time.tv_sec
+			<< " time:" << duration_cast<seconds>(eng1res.aswhite.time).count()
 			<< endl
 		<< "Black: win:" << eng1res.asblack.win
 			<< " loss:" << eng1res.asblack.lose
 			<< " draw:" << eng1res.asblack.draw
 			<< " ply:" << eng1res.asblack.ply
-			<< " time:" << eng1res.asblack.time.tv_sec
+			<< " time:" << duration_cast<seconds>(eng1res.asblack.time).count()
 			<< "\n\n"
 
 		<< "Engine 2: " << eng2Bin << endl
@@ -149,13 +144,13 @@ void printStats()
 			<< " loss:" << eng2res.aswhite.lose
 			<< " draw:" << eng2res.aswhite.draw
 			<< " ply:" << eng2res.aswhite.ply
-			<< " time:" << eng2res.aswhite.time.tv_sec
+			<< " time:" << duration_cast<seconds>(eng2res.aswhite.time).count()
 			<< endl
 		<< "Black: win:" << eng2res.asblack.win
 			<< " loss:" << eng2res.asblack.lose
 			<< " draw:" << eng2res.asblack.draw
 			<< " ply:" << eng2res.asblack.ply
-			<< " time:" << eng2res.asblack.time.tv_sec
+			<< " time:" << duration_cast<seconds>(eng2res.asblack.time).count()
 			<< "\n\n";
 
 	printf("Stats:\n");
@@ -173,7 +168,6 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 	istringstream line;
 	string move, word;
 	GameResults res;
-	timeval tm1, tm2;
 
 	fputs("newgame\n", white.in);
 	fputs("newgame\n", black.in);
@@ -182,7 +176,7 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 		// get white's move
 		res.ply++;
 		fputs("go\n", white.in);
-		gettimeofday(&tm1, nullptr);
+		auto start = Timer::now();
 
 		// loop over stat output
 		while (true) {
@@ -198,8 +192,7 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 			if (word == "move")
 				break;
 		}
-		gettimeofday(&tm2, nullptr);
-		sum(res.whiteTime, tm2 - tm1);
+		res.whiteTime += duration_cast<microseconds>(Timer::now() - start);
 
 		move = line.str();
 
@@ -224,7 +217,7 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 		// get black's move
 		res.ply++;
 		fputs("go\n", black.in);
-		gettimeofday(&tm1, nullptr);
+		start = Timer::now();
 
 		// loop over stat output
 		while (true) {
@@ -240,8 +233,7 @@ GameResults runGame(const IOptr &white, const IOptr &black)
 			if (word == "move")
 				break;
 		}
-		gettimeofday(&tm2, nullptr);
-		sum(res.blackTime, tm2 - tm1);
+		res.blackTime += duration_cast<microseconds>(Timer::now() - start);
 
 		move = line.str();
 
@@ -282,8 +274,8 @@ void runMatch()
 		eng1res.aswhite.ply += results.ply;
 		eng2res.asblack.ply += results.ply;
 
-		sum(eng1res.aswhite.time, results.whiteTime);
-		sum(eng2res.asblack.time, results.blackTime);
+		eng1res.aswhite.time += results.whiteTime;
+		eng2res.asblack.time += results.blackTime;
 
 		switch (results.winner) {
 		case 'W':
@@ -308,8 +300,8 @@ void runMatch()
 		eng2res.aswhite.ply += results.ply;
 		eng1res.asblack.ply += results.ply;
 
-		sum(eng2res.aswhite.time, results.whiteTime);
-		sum(eng1res.asblack.time, results.blackTime);
+		eng2res.aswhite.time += results.whiteTime;
+		eng1res.asblack.time += results.blackTime;
 
 		switch (results.winner) {
 		case 'W':

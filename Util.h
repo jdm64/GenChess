@@ -18,15 +18,23 @@
 #ifndef __UTIL_H__
 #define __UTIL_H__                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    #define __COMPUTER_PLAYER_H__ 
 
-#include <sys/time.h>
+#include <chrono>
 #include "Defines.h"
 
-#define USEC_PER_SEC 1000000
+using namespace std::chrono;
 
-timeval operator-(const timeval l, const timeval r);
+class Timer
+{
+public:
+	static time_point<high_resolution_clock> now()
+	{
+		return high_resolution_clock::now();
+	}
 
-void sum(timeval &l, const timeval r);
-
-int64 time_in_msec(const timeval t);
+	static int64 ms_diff(time_point<high_resolution_clock> start)
+	{
+		return duration_cast<milliseconds>(now() - start).count();
+	}
+};
 
 #endif

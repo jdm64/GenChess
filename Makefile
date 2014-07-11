@@ -6,7 +6,7 @@ TARGET = genchess
 VERSION = $(shell git describe --tags --dirty)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
 
-objs = Util.o Move.o BaseBoard.o MoveLookup.o GenMoveLookup.o RegMoveLookup.o \
+objs = Move.o BaseBoard.o MoveLookup.o GenMoveLookup.o RegMoveLookup.o \
 	GenPosition.o RegPosition.o GenBoard.o RegBoard.o TransTable.o GenEngine.o \
 	RegEngine.o main.o
 
@@ -16,8 +16,8 @@ genchess : $(objs)
 	$(CXX) $(objs) -o $(TARGET)
 #	strip -s $(TARGET)
 
-enginetester : EngineTester.o Util.o
-	$(CXX) EngineTester.o Util.o -o enginetester
+enginetester : EngineTester.o
+	$(CXX) EngineTester.o -o enginetester
 
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

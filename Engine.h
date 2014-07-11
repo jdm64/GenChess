@@ -254,16 +254,13 @@ public:
 
 	MoveType think()
 	{
-		timeval t1, t2;
-
 		srand(time(nullptr));
 		curr = nullptr;
 
-		gettimeofday(&t1, nullptr);
+		auto start = Timer::now();
 		for (int depth = 1; depth <= maxNg; depth++) {
 			search(MIN_SCORE, MAX_SCORE, 0, depth);
-			gettimeofday(&t2, nullptr);
-			cout << "stats depth " << depth << " time " << time_in_msec(t2 - t1) << endl;
+			cout << "stats depth " << depth << " time " << Timer::ms_diff(start) << endl;
 		}
 
 #ifdef PRINT_HASH_STATS
