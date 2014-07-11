@@ -1,7 +1,3 @@
-Justin Madru (jdm64@gawab.com)
-CPSC 386 - Game Design
-Assignment #6 - (2010-5-7)
-
   ________                 _________  .__                              
  /  _____/   ____    ____  \_   ___ \ |  |__    ____    ______  ______ 
 /   \  ___ _/ __ \  /    \ /    \  \/ |  |  \ _/ __ \  /  ___/ /  ___/ 
@@ -11,35 +7,21 @@ Assignment #6 - (2010-5-7)
                                                                        
 == Requirements ==
 
-* C++ compiler (with C++0x extended initializers)
+* C++11 compiler
 * make
-* Boost headers and libraries (for boost::array)
+* git
+* cppcheck (optional)
+* scan-build (optional)
 
-Optional for PyQt GUI
+PyQt GUI (deprecated)
 * Qt 4.0+ libraries
 * PyQt 4.0+ python modules
 * Python 2.5+
 
-Debian/ubuntu systems can install the required dependencies with:
-
-	apt-get install python-qt4 libboost-dev
-
-#Note1:
-It's known to compile successfully with GCC 4.4.3 with no alterations. Older
-compilers might need changes to the functions that use the extended initializers
-of C++0x. My development environment is Kubuntu 10.4.
-
-#Note2:
-The Qt libraries have to be the newer 4.0+ version. The older 3.0
-libraries will not work. The exact lowest required version is unknown,
-but it is known to work on recent Linux systems with Qt 4.6.
-
-
 == Build Instructions ==
 
-A make file is included to build the program. By default the make file will
-build with full debug support. To build, just run the following command in
-the same directory as the source.
+A make file is included to build the program. To build, just run the following
+command in the same directory as the source.
 
 	make
 
@@ -49,9 +31,9 @@ To clean the build environment just run
 
 To modify how deep the AI searches for moves modify the line:
 
-	 maxDepth = 3;
+	 maxNg = 5;
 
-In the ComputerPlayer.h file. On my 1.8Ghz computer, 3 will take 30-60secs a move
+In the Engine.h file. On my 2.2Ghz computer, depth 5 takes less than 6 seconds a move
 
 == Running The Game ==
 
@@ -64,9 +46,13 @@ command in the build directory.
 There are several command line arguments. The default options are for
 human vs human and terminal mode.
 
--X		puts the engine in GUI mode, the board and prompt are not printed
+-i		puts the engine interactive mode, the board and prompt are printed
+-g		play genesis chess
+-r		play regular chess
 -w[c|h]		selects type of white player: c=computer, h=human
 -b[c|h]		selects type of black player
+-p #		runs the perft command to depth # on the starting position
+-v		displays version information
 -h		prints the help screen for program and argument info
 
 

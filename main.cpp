@@ -28,6 +28,8 @@ void show_help()
 		<< "The following options are recognized:\n"
 		<< "-i\t\tputs the engine in terminal interactive mode; board and prompt are printed\n"
 		<< "\t\tif not supplied, engine is started in GUI mode; no prompts are displayed\n\n"
+		<< "-g\t\tplay genesis chess\n"
+		<< "-r\t\tplay regular chess\n"
 		<< "-w[c|h]\t\tselects type of white player: c=computer, h=human\n"
 		<< "-b[c|h]\t\tselects type of black player\n"
 		<< "-p #\t\truns the perft test to depth #\n"
