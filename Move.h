@@ -112,13 +112,10 @@ typedef MoveNode<GenMove> GenMoveNode;
 typedef MoveNode<RegMove> RegMoveNode;
 
 template<class MoveType>
-struct ScoreSort
+bool scoreSort(const MoveNode<MoveType> &a, const MoveNode<MoveType> &b)
 {
-	bool operator()(const MoveNode<MoveType> &a, const MoveNode<MoveType> &b) const
-	{
-		return a.score > b.score;
-	}
-};
+	return a.score > b.score;
+}
 
 // forward declaration
 template<class MoveType>
@@ -148,7 +145,7 @@ public:
 
 	void sort()
 	{
-		stable_sort(begin(), end(), ScoreSort<MoveType>());
+		stable_sort(begin(), end(), scoreSort<MoveType>);
 	}
 
 	bool empty() const
