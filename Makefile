@@ -1,6 +1,8 @@
 CXX = g++
 CXXFLAGS = -Wall -Wextra -pedantic -Wno-unused-parameter -O3 -std=c++11
 TARGET = genchess
+ENG_TESTER = enginetester
+LIB_GENCHESS = libgenchess.a
 
 VERSION = $(shell git describe --tags --dirty)
 DIR = $(shell pwd | sed -e 's/\//\n/g' | tail -1)
@@ -17,10 +19,10 @@ genchess : $(base_objs) $(eng_objs)
 #	strip -s $(TARGET)
 
 enginetester : EngineTester.o
-	$(CXX) EngineTester.o -o enginetester
+	$(CXX) EngineTester.o -o $(ENG_TESTER)
 
 libgenchess : $(base_objs)
-	ar rs libgenchess.a $(base_objs)
+	ar rs $(LIB_GENCHESS) $(base_objs)
 
 %.o : %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -29,7 +31,7 @@ main.o : main.cpp
 	$(CXX) -DVERSION=\"$(VERSION)\" $(CXXFLAGS) -c $< -o $@
 
 clean :
-	rm -f *~ *.o $(TARGET) enginetester libgenchess.a
+	rm -f *~ *.o $(TARGET) $(ENG_TESTER) $(LIB_GENCHESS)
 
 archive : clean
 	tar -caf ../genchess-$(VERSION).tar.xz ../$(DIR)
