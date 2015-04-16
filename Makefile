@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -Wall -Wextra -pedantic -Wno-unused-parameter -O3 -std=gnu++0x
+CXXFLAGS = -Wall -Wextra -pedantic -Wno-unused-parameter -O3 -std=c++11
 TARGET = genchess
 
 VERSION = $(shell git describe --tags --dirty)
