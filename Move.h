@@ -105,7 +105,7 @@ struct MoveNode
 	int score;
 	bool check;
 
-	MoveNode() : score(0), check(false) {}
+	MoveNode() : move(), score(0), check(false) {}
 };
 
 typedef MoveNode<GenMove> GenMoveNode;

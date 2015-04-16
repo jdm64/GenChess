@@ -42,13 +42,13 @@ private:
 
 	void divide(int depth)
 	{
-		uint64 nodes = 0, children;
+		uint64 nodes = 0;
 		const MoveFlags undoFlags = board.getMoveFlags();
 
 		MoveList<MoveType> *list = board.getMoveList(board.getStm(), MoveClass::ALL);
 		for (auto& item : *list) {
 			board.make(item.move);
-			children = perft(depth - 1);
+			auto children = perft(depth - 1);
 			cout << item.move.toString() << " " << children << endl;
 			nodes += children;
 			board.unmake(item.move, undoFlags);

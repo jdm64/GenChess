@@ -65,9 +65,9 @@ public:
 	MoveType move;
 
 	TransItem()
+	: type(NONE_NODE), move()
 	{
 		hash = score = depth = 0;
-		type = NONE_NODE;
 	}
 
 	bool getScore(const int alpha, const int beta, const int inDepth, int &outScore) const
