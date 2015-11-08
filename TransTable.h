@@ -121,7 +121,7 @@ private:
 	int size;
 
 public:
-	TransTable(const int num_MB)
+	explicit TransTable(const int num_MB)
 	{
 		Rand64 rad;
 
@@ -153,7 +153,7 @@ public:
 			table[i].hash = 0;
 	}
 
-	void clearStats() const
+	static void clearStats()
 	{
 		TableStats::clear();
 	}

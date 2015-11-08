@@ -30,7 +30,7 @@ private:
 	vector<HistoryNode<MoveType> > history;
 
 public:
-	Game(Board<MoveType> *Board) : board(Board) {}
+	explicit Game(Board<MoveType> *Board) : board(Board) {}
 
 	void newGame()
 	{

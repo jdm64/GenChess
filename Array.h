@@ -27,7 +27,7 @@ private:
 
 	int size;
 public:
-	Array(int Size = 1)
+	explicit Array(int Size = 1)
 	{
 		size = Size;
 		data = new T[size];
